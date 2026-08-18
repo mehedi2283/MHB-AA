@@ -1,0 +1,202 @@
+"use client";
+
+/* eslint-disable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
+import { useEffect, useState } from "react";
+import { LoaderCircle, Plus, Save, Trash2 } from "lucide-react";
+
+type Item = {
+  _id: string;
+  title?: string;
+  name?: string;
+  email?: string;
+  status?: string;
+  visible?: boolean;
+  [key: string]: unknown;
+};
+
+type Field = {
+  key: string;
+  label: string;
+  multiline?: boolean;
+  kind?: "number" | "list" | "pairs";
+};
+
+const fields: Record<string, Field[]> = {
+  projects: [
+    { key: "number", label: "Case number" },
+    { key: "client", label: "Client" },
+    { key: "title", label: "Title" },
+    { key: "slug", label: "URL slug" },
+    { key: "summary", label: "Card summary", multiline: true },
+    { key: "tags", label: "Tags (comma separated)", kind: "list" },
+    { key: "problem", label: "Case-study problem", multiline: true },
+    { key: "solution", label: "Case-study solution", multiline: true },
+    { key: "implementation", label: "Implementation story", multiline: true },
+    { key: "nodes", label: "Architecture nodes (comma separated)", kind: "list" },
+    { key: "capabilities", label: "Capabilities (comma separated)", kind: "list" },
+    { key: "stats", label: "Project stats", kind: "pairs" },
+    { key: "color", label: "Accent color" },
+    { key: "order", label: "Order", kind: "number" },
+  ],
+  services: [
+    { key: "title", label: "Title" },
+    { key: "description", label: "Description", multiline: true },
+    { key: "tools", label: "Tools (comma separated)", kind: "list" },
+    { key: "order", label: "Order", kind: "number" },
+  ],
+  technologies: [
+    { key: "name", label: "Technology" },
+    { key: "order", label: "Order", kind: "number" },
+  ],
+  process: [
+    { key: "title", label: "Step" },
+    { key: "order", label: "Order", kind: "number" },
+  ],
+};
+
+function toPairs(value: unknown): [string, string][] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .filter((entry): entry is unknown[] => Array.isArray(entry))
+    .map(entry => [String(entry[0] ?? ""), String(entry[1] ?? "")]);
+}
+
+export function ContentManager({ collection }: { collection: string }) {
+  const [items, setItems] = useState<Item[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState<Item | null>(null);
+  const [error, setError] = useState("");
+  const editable = Boolean(fields[collection]);
+
+  async function load() {
+    setLoading(true);
+    setError("");
+    const response = await fetch(`/api/admin/${collection}`);
+    const data = await response.json();
+    if (response.ok) setItems(data);
+    else setError(data.error);
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    load();
+  }, [collection]);
+
+  async function save() {
+    if (!editing) return;
+    const exists = editing._id;
+    const response = await fetch(`/api/admin/${collection}${exists ? `/${editing._id}` : ""}`, {
+      method: exists ? "PATCH" : "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(editing),
+    });
+    if (response.ok) {
+      setEditing(null);
+      load();
+    } else {
+      setError((await response.json()).error);
+    }
+  }
+
+  async function remove(id: string) {
+    if (!confirm("Delete this item? This cannot be undone.")) return;
+    await fetch(`/api/admin/${collection}/${id}`, { method: "DELETE" });
+    load();
+  }
+
+  function setField(field: Field, raw: string) {
+    let value: unknown = raw;
+    if (field.kind === "list") value = raw.split(",").map(item => item.trim()).filter(Boolean);
+    if (field.kind === "number") value = Number(raw);
+    setEditing(current => current ? ({ ...current, [field.key]: value }) : current);
+  }
+
+  function updatePair(field: Field, index: number, part: 0 | 1, value: string) {
+    setEditing(current => {
+      if (!current) return current;
+      const next = toPairs(current[field.key]);
+      next[index] = [...next[index]] as [string, string];
+      next[index][part] = value;
+      return { ...current, [field.key]: next };
+    });
+  }
+
+  function addPair(field: Field) {
+    setEditing(current => current ? ({
+      ...current,
+      [field.key]: [...toPairs(current[field.key]), ["", ""]],
+    }) : current);
+  }
+
+  function removePair(field: Field, index: number) {
+    setEditing(current => current ? ({
+      ...current,
+      [field.key]: toPairs(current[field.key]).filter((_, pairIndex) => pairIndex !== index),
+    }) : current);
+  }
+
+  return <div className="admin-page">
+    <header className="admin-page-header">
+      <div>
+        <div className="admin-kicker">Content / Collection</div>
+        <h1 className="capitalize">{collection}</h1>
+        <p>{items.length} records stored in Supabase.</p>
+      </div>
+      {editable && <button className="admin-button admin-button-primary" onClick={() => setEditing({ _id: "", status: "published", visible: true, order: items.length })}><Plus size={15} />Add record</button>}
+    </header>
+
+    {error && <div className="admin-notice">{error}</div>}
+
+    <section className="admin-panel admin-collection">
+      {loading ? <div className="admin-loader"><LoaderCircle className="animate-spin" /></div> : items.length ? items.map((item, index) => <div className="admin-collection-row" key={item._id}>
+        <span className="admin-row-index">{String(index + 1).padStart(2, "0")}</span>
+        <div className="admin-row-main">
+          <strong>{item.title || item.name || item.email || "Untitled"}</strong>
+          <span><i className={item.visible === false ? "is-muted" : ""} />{item.status || "new"} / {item.visible === false ? "hidden" : "visible"}</span>
+        </div>
+        <div className="admin-row-actions">
+          {editable && <button className="admin-button admin-button-quiet" onClick={() => setEditing(item)}>Edit</button>}
+          <button className="admin-icon-button is-danger" onClick={() => remove(item._id)} aria-label="Delete"><Trash2 size={15} /></button>
+        </div>
+      </div>) : <div className="admin-empty"><span>00</span><h2>No {collection} yet</h2><p>Add the first record to begin this collection.</p></div>}
+    </section>
+
+    {editing && <div className="admin-modal-backdrop">
+      <div className="admin-modal">
+        <div className="admin-modal-head">
+          <div><span>SUPABASE RECORD</span><h2>{editing._id ? "Edit" : "Add"} {collection.slice(0, -1)}</h2></div>
+          <button className="admin-button admin-button-quiet" onClick={() => setEditing(null)}>Close</button>
+        </div>
+
+        <div className="admin-form-grid">
+          {fields[collection].map(field => field.kind === "pairs" ? <div className="admin-field admin-field-wide admin-repeater" key={field.key}>
+            <div className="admin-repeater-heading">
+              <div><span>{field.label}</span><small>Each stat has a short value and a descriptive label.</small></div>
+              <button type="button" className="admin-button admin-button-quiet" onClick={() => addPair(field)}><Plus size={13} />Add stat</button>
+            </div>
+            <div className="admin-repeater-list">
+              {toPairs(editing[field.key]).map((pair, index) => <div className="admin-repeater-row" key={`${field.key}-${index}`}>
+                <span className="admin-repeater-index">{String(index + 1).padStart(2, "0")}</span>
+                <label><span>Value</span><input className="admin-input" value={pair[0]} placeholder="13+" onChange={event => updatePair(field, index, 0, event.target.value)} /></label>
+                <label><span>Label</span><input className="admin-input" value={pair[1]} placeholder="Connected workflows" onChange={event => updatePair(field, index, 1, event.target.value)} /></label>
+                <button type="button" className="admin-icon-button is-danger" aria-label={`Remove stat ${index + 1}`} onClick={() => removePair(field, index)}><Trash2 size={14} /></button>
+              </div>)}
+              {!toPairs(editing[field.key]).length && <div className="admin-repeater-empty">No stats added yet.</div>}
+            </div>
+          </div> : <label className={`admin-field ${field.multiline ? "admin-field-wide" : ""}`} key={field.key}>
+            <span>{field.label}</span>
+            {field.multiline ? <textarea className="admin-input admin-textarea admin-textarea-tall" value={String(editing[field.key] || "")} onChange={event => setField(field, event.target.value)} /> : <input className="admin-input" type={field.kind === "number" ? "number" : "text"} value={field.kind === "list" ? (editing[field.key] as string[] || []).join(", ") : String(editing[field.key] ?? "")} onChange={event => setField(field, event.target.value)} />}
+          </label>)}
+
+          <label className="admin-field"><span>Status</span><select className="admin-input" value={editing.status || "published"} onChange={event => setEditing({ ...editing, status: event.target.value })}><option>draft</option><option>published</option><option>archived</option></select></label>
+          <label className="admin-field"><span>Visibility</span><select className="admin-input" value={editing.visible === false ? "false" : "true"} onChange={event => setEditing({ ...editing, visible: event.target.value === "true" })}><option value="true">Visible</option><option value="false">Hidden</option></select></label>
+        </div>
+
+        <div className="admin-modal-actions">
+          <button className="admin-button" onClick={() => setEditing(null)}>Cancel</button>
+          <button className="admin-button admin-button-primary" onClick={save}><Save size={15} />Save record</button>
+        </div>
+      </div>
+    </div>}
+  </div>;
+}

@@ -1,0 +1,7 @@
+import { supabaseAdmin } from "../lib/supabase";
+import { defaultSiteContent } from "../lib/site-content";
+import { processSteps, projectDetails, projects, services, technologies } from "../lib/content";
+
+async function replace(collection:string,items:Record<string,unknown>[]){const db=supabaseAdmin(),removed=await db.from("cms_documents").delete().eq("collection",collection);if(removed.error)throw removed.error;const rows=items.map(({order=999,status="published",visible=true,...data})=>({collection,data,sort_order:Number(order),status,visible}));if(rows.length){const inserted=await db.from("cms_documents").insert(rows);if(inserted.error)throw inserted.error}}
+async function main(){const db=supabaseAdmin(),site=await db.from("site_content").upsert({id:"main",content:defaultSiteContent,updated_at:new Date().toISOString()});if(site.error)throw site.error;await replace("projects",projects.map((item,order)=>({...item,...projectDetails[item.slug as keyof typeof projectDetails],order,status:"published",visible:true})));await replace("services",services.map(([title,description,tools],order)=>({title,description,tools:[...tools],order,status:"published",visible:true})));await replace("technologies",technologies.map((name,order)=>({name,order,status:"published",visible:true})));await replace("process",processSteps.map((title,order)=>({title,order,status:"published",visible:true})));console.log("Supabase CMS seeded with the current website")}
+main().catch(error=>{console.error(error.message);process.exit(1)});

@@ -1,0 +1,49 @@
+{
+  "name": "nexaflow-ai-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "seed": "tsx --env-file=.env.local scripts/seed.ts",
+    "create-admin": "tsx --env-file=.env.local scripts/create-admin.ts"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "latest",
+    "@react-three/drei": "latest",
+    "@react-three/fiber": "latest",
+    "@supabase/supabase-js": "^2.112.3",
+    "bcryptjs": "latest",
+    "cobe": "^2.0.1",
+    "framer-motion": "latest",
+    "jose": "latest",
+    "lucide-react": "latest",
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "react-hook-form": "latest",
+    "sanitize-html": "latest",
+    "three": "latest",
+    "zod": "latest"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "latest",
+    "@types/bcryptjs": "latest",
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "@types/sanitize-html": "latest",
+    "@types/three": "latest",
+    "eslint": "latest",
+    "eslint-config-next": "latest",
+    "tailwindcss": "latest",
+    "tsx": "latest",
+    "typescript": "latest"
+  },
+  "overrides": {
+    "postcss": "^8.5.10"
+  }
+}

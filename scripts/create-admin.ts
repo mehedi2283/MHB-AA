@@ -1,0 +1,4 @@
+import bcrypt from "bcryptjs";
+import { supabaseAdmin } from "../lib/supabase";
+async function main(){const email=process.env.ADMIN_EMAIL,password=process.env.ADMIN_PASSWORD,full_name=process.env.ADMIN_NAME||"Portfolio owner";if(!email||!password)throw new Error("Set ADMIN_EMAIL and ADMIN_PASSWORD in .env.local");if(password.length<12)throw new Error("ADMIN_PASSWORD must be at least 12 characters");const password_hash=await bcrypt.hash(password,12),normalized=email.trim().toLowerCase();const {error}=await supabaseAdmin().from("admins").upsert({email:normalized,full_name,password_hash,role:"owner",created_by:normalized,updated_at:new Date().toISOString()});if(error)throw error;console.log(`Supabase admin account ready for ${normalized}`)}
+main().catch(error=>{console.error(error.message);process.exit(1)});
