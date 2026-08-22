@@ -21,6 +21,7 @@ import {
   Webhook,
 } from "lucide-react";
 import { PixelCalendar, PixelCheck } from "./PixelIcons";
+import { PixelLoader } from "./PixelLoader";
 
 type GoogleStatus = {
   connected: boolean;
@@ -129,12 +130,7 @@ export function IntegrationsSettingsForm() {
   }
 
   if (loading) {
-    return (
-      <div className="py-24 flex flex-col items-center justify-center gap-3 text-[#a4ada0]">
-        <LoaderCircle size={24} className="animate-spin text-[#c8ff3d]" />
-        <span className="text-xs font-mono tracking-wider">CHECKING GOOGLE ACCOUNT INTEGRATION…</span>
-      </div>
-    );
+    return <PixelLoader label="VERIFYING GOOGLE ACCOUNT INTEGRATION STATUS..." />;
   }
 
   return (

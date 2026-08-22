@@ -198,24 +198,41 @@ export async function createGoogleCalendarEvent(params: {
 }
 
 /**
- * Sends an email directly from the connected Gmail account using Google Gmail API.
+ * Sends an email directly from the connected Gmail account using Google Gmail API with rich HTML and CSS support.
  */
 export async function sendGmailMessage(params: {
   to: string;
   subject: string;
-  bodyText: string;
+  bodyText?: string;
+  bodyHtml?: string;
 }): Promise<boolean> {
   const token = await getValidGoogleAccessToken();
   if (!token) return false;
 
   try {
+    const boundary = `boundary_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+    const plainText = params.bodyText || (params.bodyHtml ? params.bodyHtml.replace(/<[^>]+>/g, " ") : "");
+    const htmlContent = params.bodyHtml || `<p style="white-space: pre-wrap;">${plainText}</p>`;
+
     const emailLines = [
       `To: ${params.to}`,
       `Subject: =?utf-8?B?${Buffer.from(params.subject).toString("base64")}?=`,
       "MIME-Version: 1.0",
-      "Content-Type: text/plain; charset=utf-8",
+      `Content-Type: multipart/alternative; boundary="${boundary}"`,
       "",
-      params.bodyText,
+      `--${boundary}`,
+      "Content-Type: text/plain; charset=UTF-8",
+      "Content-Transfer-Encoding: 7bit",
+      "",
+      plainText,
+      "",
+      `--${boundary}`,
+      "Content-Type: text/html; charset=UTF-8",
+      "Content-Transfer-Encoding: 7bit",
+      "",
+      htmlContent,
+      "",
+      `--${boundary}--`,
     ];
 
     const rawMessage = Buffer.from(emailLines.join("\r\n"))

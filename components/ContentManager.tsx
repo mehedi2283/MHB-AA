@@ -61,6 +61,8 @@ function toPairs(value: unknown): [string, string][] {
     .map(entry => [String(entry[0] ?? ""), String(entry[1] ?? "")]);
 }
 
+import { PixelLoader } from "./PixelLoader";
+
 export function ContentManager({ collection }: { collection: string }) {
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
@@ -148,17 +150,25 @@ export function ContentManager({ collection }: { collection: string }) {
     {error && <div className="admin-notice">{error}</div>}
 
     <section className="admin-panel admin-collection">
-      {loading ? <div className="admin-loader"><LoaderCircle className="animate-spin" /></div> : items.length ? items.map((item, index) => <div className="admin-collection-row" key={item._id}>
-        <span className="admin-row-index">{String(index + 1).padStart(2, "0")}</span>
-        <div className="admin-row-main">
-          <strong>{item.title || item.name || item.email || "Untitled"}</strong>
-          <span><i className={item.visible === false ? "is-muted" : ""} />{item.status || "new"} / {item.visible === false ? "hidden" : "visible"}</span>
-        </div>
-        <div className="admin-row-actions">
-          {editable && <button className="admin-button admin-button-quiet" onClick={() => setEditing(item)}>Edit</button>}
-          <button className="admin-icon-button is-danger" onClick={() => remove(item._id)} aria-label="Delete"><Trash2 size={15} /></button>
-        </div>
-      </div>) : <div className="admin-empty"><span>00</span><h2>No {collection} yet</h2><p>Add the first record to begin this collection.</p></div>}
+      {loading ? (
+        <PixelLoader label={`LOADING ${collection.toUpperCase()} RECORDS...`} />
+      ) : items.length ? (
+        items.map((item, index) => (
+          <div className="admin-collection-row" key={item._id}>
+            <span className="admin-row-index">{String(index + 1).padStart(2, "0")}</span>
+            <div className="admin-row-main">
+              <strong>{item.title || item.name || item.email || "Untitled"}</strong>
+              <span><i className={item.visible === false ? "is-muted" : ""} />{item.status || "new"} / {item.visible === false ? "hidden" : "visible"}</span>
+            </div>
+            <div className="admin-row-actions">
+              {editable && <button className="admin-button admin-button-quiet" onClick={() => setEditing(item)}>Edit</button>}
+              <button className="admin-icon-button is-danger" onClick={() => remove(item._id)} aria-label="Delete"><Trash2 size={15} /></button>
+            </div>
+          </div>
+        ))
+      ) : (
+        <div className="admin-empty"><span>00</span><h2>No {collection} yet</h2><p>Add the first record to begin this collection.</p></div>
+      )}
     </section>
 
     {editing && <div className="admin-modal-backdrop">

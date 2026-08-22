@@ -7,6 +7,7 @@ import {
   getConnectedGoogleAccount,
   sendGmailMessage,
 } from "@/lib/google-integration";
+import { buildAdminNotificationHtml, buildClientConfirmationHtml } from "@/lib/email-templates";
 import { supabaseAdmin } from "@/lib/supabase";
 import crypto from "crypto";
 
@@ -90,15 +91,42 @@ export async function POST(req: NextRequest) {
             calendarEventLink = eventResult.htmlLink;
           }
 
-          // A) Send Confirmation Message to Client
+          const emailData = {
+            clientName: submission.name,
+            clientEmail: submission.email,
+            company: submission.company,
+            projectType: submission.projectType,
+            budget: submission.budget,
+            timeline: submission.timeline,
+            message: submission.message,
+            meetingDate: submission.meetingDate,
+            meetingTime: submission.meetingTime,
+            meetUrl,
+          };
+
+          // A) Send Rich HTML & CSS Confirmation Message to Client
           await sendGmailMessage({
             to: submission.email,
             subject: `Discovery Call Confirmed · Mehedi & ${submission.name}`,
+            bodyHtml: buildClientConfirmationHtml(emailData),
             bodyText: `Hi ${submission.name},\n\nThank you for reaching out! Your discovery call has been placed on Google Calendar.\n\nMeeting Details:\n• Date: ${submission.meetingDate}\n• Time: ${submission.meetingTime || "03:00 PM"}\n• Project: ${submission.projectType}\n• Google Meet Link: ${meetUrl || "Will be provided in calendar invite"}\n\nI look forward to speaking with you.\n\nBest regards,\nMehedi\nAI & Automation Specialist\nhttps://mehedi.ai`,
           });
         }
 
-        // B) Send Instant Notification Email to Mehedi (Admin)
+        const adminEmailData = {
+          clientName: submission.name,
+          clientEmail: submission.email,
+          company: submission.company,
+          projectType: submission.projectType,
+          budget: submission.budget,
+          timeline: submission.timeline,
+          message: submission.message,
+          meetingDate: submission.meetingDate,
+          meetingTime: submission.meetingTime,
+          meetUrl,
+        };
+
+        // B) Send Rich HTML & CSS Instant Notification Email to Mehedi (Admin)
         const adminDestEmail =
           googleAccount.email ||
           process.env.NOTIFICATION_EMAIL ||
@@ -108,6 +136,7 @@ export async function POST(req: NextRequest) {
         await sendGmailMessage({
           to: adminDestEmail,
           subject: `🚨 New Lead & ${submission.meetingRequested ? "Meeting Booked" : "Inquiry"}: ${submission.name} (${submission.budget})`,
+          bodyHtml: buildAdminNotificationHtml(adminEmailData),
           bodyText: `New project inquiry received on your portfolio!\n\nClient Details:\n• Name: ${submission.name}\n• Email: ${submission.email}\n• Company: ${submission.company || "N/A"}\n• Project Type: ${submission.projectType}\n• Budget Range: ${submission.budget}\n• Timeline: ${submission.timeline}\n• Meeting Requested: ${submission.meetingRequested ? "YES" : "No"}\n${submission.meetingDate ? `• Meeting Date: ${submission.meetingDate} at ${submission.meetingTime || "Flexible"}\n` : ""}${meetUrl ? `• Google Meet Link: ${meetUrl}\n` : ""}\nProject Problem / Solution Brief:\n${submission.message}\n\nView and manage in Admin Control Room: /admin/inquiries`,
         });
       }

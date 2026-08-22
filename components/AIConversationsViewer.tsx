@@ -16,6 +16,7 @@ import {
   X,
 } from "lucide-react";
 import { PixelBot, PixelChat, PixelCheck } from "./PixelIcons";
+import { PixelLoader } from "./PixelLoader";
 
 type ChatMessage = {
   role: "user" | "assistant";
@@ -156,10 +157,7 @@ export function AIConversationsViewer() {
       {/* Main Table */}
       <div className="border border-[#ffffff18] bg-[#0d110d] rounded overflow-hidden">
         {loading ? (
-          <div className="py-16 flex flex-col items-center justify-center gap-3 text-[#a4ada0]">
-            <LoaderCircle size={22} className="animate-spin text-[#c8ff3d]" />
-            <span className="text-xs font-mono tracking-wider">SYNCING CONVERSATIONS FROM SUPABASE…</span>
-          </div>
+          <PixelLoader label="RETRIEVING AI CONVERSATIONS FROM SUPABASE..." />
         ) : error ? (
           <div className="p-8 text-center text-rose-400 text-xs font-mono">{error}</div>
         ) : filtered.length === 0 ? (
