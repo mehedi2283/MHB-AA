@@ -4,14 +4,14 @@ import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  ArrowUpRight, Bot, BriefcaseBusiness, FileText, Footprints, Inbox,
+  ArrowUpRight, Bot, BriefcaseBusiness, FileText, Footprints, Globe, Inbox,
   LayoutDashboard, LogOut, Menu, PanelsTopLeft, Settings, UserPlus,
   Users, Wrench, X,
 } from "lucide-react";
 
 const groups = [
   { label: "Workspace", links: [["/admin", LayoutDashboard, "Overview"], ["/admin/content/site", PanelsTopLeft, "Full website"]] },
-  { label: "Collections", links: [["/admin/content/projects", FileText, "Projects"], ["/admin/content/services", BriefcaseBusiness, "Services"], ["/admin/content/technologies", Wrench, "Technology"], ["/admin/content/process", Footprints, "Process"]] },
+  { label: "Collections", links: [["/admin/content/globe", Globe, "3D Globe & Clients"], ["/admin/content/projects", FileText, "Projects"], ["/admin/content/services", BriefcaseBusiness, "Services"], ["/admin/content/technologies", Wrench, "Technology"], ["/admin/content/process", Footprints, "Process"]] },
   { label: "Operations", links: [["/admin/leads", Users, "Leads"], ["/admin/inquiries", Inbox, "Inquiries"], ["/admin/ai", Bot, "AI assistant"]] },
   { label: "Access", links: [["/admin/register", UserPlus, "Add admin"], ["/admin/settings", Settings, "Settings"]] },
 ] as const;

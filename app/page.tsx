@@ -38,7 +38,7 @@ export default async function Home() {
           </div>
           <AutomationCommand />
         </div>
-        <AutomationCore />
+        <AutomationCore markers={content.globeMarkers} arcs={content.globeArcs} />
       </div>
       <div className="shell os-status-strip">
         <span>{content.hero.location}</span>

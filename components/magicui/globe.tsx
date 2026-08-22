@@ -4,7 +4,7 @@ import React, { useEffect, useRef } from "react";
 import createGlobe from "cobe";
 import { useMotionValue, useSpring } from "framer-motion";
 
-interface MarkerData {
+export interface MarkerData {
   id: string;
   name: string;
   sub?: string;
@@ -12,14 +12,14 @@ interface MarkerData {
   size: number;
 }
 
-interface ArcData {
+export interface ArcData {
   id: string;
   label: string;
   from: [number, number];
   to: [number, number];
 }
 
-const MARKERS: MarkerData[] = [
+export const DEFAULT_GLOBE_MARKERS: MarkerData[] = [
   { id: "nyc", name: "NYC", sub: "Gazi AI Engine", location: [40.7128, -74.006], size: 0.038 },
   { id: "sf", name: "SF", sub: "Lead Pipeline", location: [37.7749, -122.4194], size: 0.038 },
   { id: "london", name: "LONDON", sub: "UK Brand Ops", location: [51.5074, -0.1278], size: 0.038 },
@@ -29,7 +29,7 @@ const MARKERS: MarkerData[] = [
   { id: "sydney", name: "SYDNEY", sub: "Gaming Pub", location: [-33.8688, 151.2093], size: 0.038 },
 ];
 
-const ARCS: ArcData[] = [
+export const DEFAULT_GLOBE_ARCS: ArcData[] = [
   {
     id: "nyc-london",
     label: "NYC → LONDON",
@@ -77,7 +77,15 @@ function project3D(lat: number, lon: number, phi: number, theta: number, radius 
   };
 }
 
-export function Globe({ className = "" }: { className?: string }) {
+export function Globe({
+  className = "",
+  markers = DEFAULT_GLOBE_MARKERS,
+  arcs = DEFAULT_GLOBE_ARCS,
+}: {
+  className?: string;
+  markers?: MarkerData[];
+  arcs?: ArcData[];
+}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -86,6 +94,9 @@ export function Globe({ className = "" }: { className?: string }) {
 
   const pointerInteracting = useRef<{ x: number; y: number } | null>(null);
   const widthRef = useRef(0);
+
+  const activeMarkers = markers && markers.length > 0 ? markers : DEFAULT_GLOBE_MARKERS;
+  const activeArcs = arcs && arcs.length > 0 ? arcs : DEFAULT_GLOBE_ARCS;
 
   // Framer Motion Spring Physics Engine for buttery-smooth horizontal & vertical damping
   const phiTarget = useMotionValue(0);
@@ -142,12 +153,12 @@ export function Globe({ className = "" }: { className?: string }) {
       arcColor: ACID_COLOR,
       arcWidth: 0.45,
       arcHeight: 0.3,
-      markers: MARKERS.map((m) => ({
+      markers: activeMarkers.map((m) => ({
         location: m.location,
-        size: m.size,
+        size: m.size || 0.038,
         id: m.id,
       })),
-      arcs: ARCS.map((a) => ({
+      arcs: activeArcs.map((a) => ({
         from: a.from,
         to: a.to,
         id: a.id,
@@ -180,7 +191,7 @@ export function Globe({ className = "" }: { className?: string }) {
         });
 
         // 60 FPS Direct DOM transforms for Markers (tracking both phi and theta)
-        for (const marker of MARKERS) {
+        for (const marker of activeMarkers) {
           const el = markerDomMap.current.get(marker.id);
           if (el) {
             const proj = project3D(marker.location[0], marker.location[1], currentPhi, currentTheta, 0.82);
@@ -193,7 +204,7 @@ export function Globe({ className = "" }: { className?: string }) {
         }
 
         // 60 FPS Direct DOM transforms for Arcs (tracking both phi and theta)
-        for (const arc of ARCS) {
+        for (const arc of activeArcs) {
           const el = arcDomMap.current.get(arc.id);
           if (el) {
             const midLat = (arc.from[0] + arc.to[0]) / 2 + 18;
@@ -220,7 +231,7 @@ export function Globe({ className = "" }: { className?: string }) {
         globe?.destroy();
       } catch {}
     };
-  }, [phiTarget, springPhi, thetaTarget, springTheta]);
+  }, [phiTarget, springPhi, thetaTarget, springTheta, JSON.stringify(activeMarkers), JSON.stringify(activeArcs)]);
 
   return (
     <div
@@ -274,9 +285,9 @@ export function Globe({ className = "" }: { className?: string }) {
         }}
       />
 
-      {/* 3D Projected Connected Route Badges (NYC → LONDON, SF → TOKYO) */}
+      {/* 3D Projected Connected Route Badges */}
       <div className="absolute inset-0 pointer-events-none z-20 overflow-hidden">
-        {ARCS.map((route) => (
+        {activeArcs.map((route) => (
           <div
             key={route.id}
             ref={(el) => {
@@ -296,7 +307,7 @@ export function Globe({ className = "" }: { className?: string }) {
 
       {/* 3D Projected Interactive City Pins & Badges */}
       <div className="absolute inset-0 pointer-events-none z-30 overflow-hidden">
-        {MARKERS.map((city) => (
+        {activeMarkers.map((city) => (
           <div
             key={city.id}
             ref={(el) => {

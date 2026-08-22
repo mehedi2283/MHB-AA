@@ -5,6 +5,8 @@ import { processSteps, projects, services, technologies, workflowNodes } from "@
 export type ServiceItem = { title: string; description: string; tools: string[]; order: number; visible: boolean };
 export type ProjectItem = (typeof projects)[number] & { order?: number; visible?: boolean; problem?: string; solution?: string; nodes?: string[]; capabilities?: string[]; implementation?: string; stats?: [string,string][] };
 export type WorkflowItem = { name: string; desc: string; tools: string; benefit: string };
+export type GlobeMarker = { id: string; name: string; sub?: string; location: [number, number]; size: number };
+export type GlobeArc = { id: string; label: string; from: [number, number]; to: [number, number] };
 export type SiteContent = {
   hero: { kicker: string; availability: string; title: string; accentTitle: string; description: string; primaryCta: string; secondaryCta: string; location: string; specialties: string };
   about: { eyebrow: string; heading: string; intro: string; profileHeading: string; profileBody: string; signature: string; quote: string; principle: string };
@@ -17,6 +19,8 @@ export type SiteContent = {
   footer: { identity: string; copyright: string };
   metrics: { value: string; label: string }[];
   workflowNodes: WorkflowItem[];
+  globeMarkers: GlobeMarker[];
+  globeArcs: GlobeArc[];
 };
 
 export const defaultSiteContent: SiteContent = {
@@ -31,6 +35,19 @@ export const defaultSiteContent: SiteContent = {
   footer: { identity: "MEHEDI · AI AUTOMATION DEVELOPER", copyright: "MEHEDI / AI" },
   metrics: [{ value: "50+", label: "workflows engineered" }, { value: "20+", label: "projects delivered" }, { value: "15+", label: "platforms connected" }, { value: "08", label: "agents in one ecosystem" }],
   workflowNodes: workflowNodes.map(item => ({ ...item })),
+  globeMarkers: [
+    { id: "nyc", name: "NYC", sub: "Gazi AI Engine", location: [40.7128, -74.006], size: 0.038 },
+    { id: "sf", name: "SF", sub: "Lead Pipeline", location: [37.7749, -122.4194], size: 0.038 },
+    { id: "london", name: "LONDON", sub: "UK Brand Ops", location: [51.5074, -0.1278], size: 0.038 },
+    { id: "paris", name: "PARIS", location: [48.8566, 2.3522], size: 0.035 },
+    { id: "dubai", name: "DUBAI", sub: "Real Estate AI", location: [25.2048, 55.2708], size: 0.038 },
+    { id: "tokyo", name: "TOKYO", sub: "Multi-Agent", location: [35.6762, 139.6503], size: 0.038 },
+    { id: "sydney", name: "SYDNEY", sub: "Gaming Pub", location: [-33.8688, 151.2093], size: 0.038 },
+  ],
+  globeArcs: [
+    { id: "nyc-london", label: "NYC → LONDON", from: [40.7128, -74.006], to: [51.5074, -0.1278] },
+    { id: "sf-tokyo", label: "SF → TOKYO", from: [37.7749, -122.4194], to: [35.6762, 139.6503] },
+  ],
 };
 
 function deepMerge<T>(base: T, patch: Partial<T>): T {
