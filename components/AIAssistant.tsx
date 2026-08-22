@@ -1,14 +1,19 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpRight, Bot, MessageCircle, Send, Sparkles, X } from "lucide-react";
 import { PixelCard } from "./PixelCard";
 
 type Msg = { role: "user" | "assistant"; content: string };
 const suggestions = ["What does Mehedi build?", "Explore the 8-agent project", "Can Mehedi build my SaaS?"];
 
-function PixelMaterializeEffect({ onComplete }: { onComplete?: () => void }) {
+function PixelTransitionOverlay({
+  mode,
+  onComplete,
+}: {
+  mode: "open" | "close";
+  onComplete?: () => void;
+}) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
@@ -39,18 +44,35 @@ function PixelMaterializeEffect({ onComplete }: { onComplete?: () => void }) {
       "rgba(255, 255, 255, 0.45)",
     ];
 
-    for (let r = 0; r < rows; r++) {
-      for (let c = 0; c < cols; c++) {
-        // Stagger radiating outward from bottom-right (where launcher was clicked)
-        const distFromBottomRight = Math.hypot(cols - 1 - c, rows - 1 - r);
-        const baseDelay = (distFromBottomRight / (cols + rows)) * 240;
-        grid.push({
-          x: c * pixelSize,
-          y: r * pixelSize,
-          delay: baseDelay + Math.random() * 60,
-          duration: 160 + Math.random() * 100,
-          color: colors[Math.floor(Math.random() * colors.length)],
-        });
+    if (mode === "open") {
+      // Opening: pixel dissolve revealing full box in place
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const rowNorm = (rows - 1 - r) / rows;
+          const baseDelay = rowNorm * 160;
+          grid.push({
+            x: c * pixelSize,
+            y: r * pixelSize,
+            delay: baseDelay + Math.random() * 45,
+            duration: 130 + Math.random() * 70,
+            color: colors[Math.floor(Math.random() * colors.length)],
+          });
+        }
+      }
+    } else {
+      // Closing: pixel curtain falling from TOP to BOTTOM across full box
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const rowNorm = r / rows; // 0 at top, 1 at bottom
+          const baseDelay = rowNorm * 160;
+          grid.push({
+            x: c * pixelSize,
+            y: r * pixelSize,
+            delay: baseDelay + Math.random() * 40,
+            duration: 110 + Math.random() * 50,
+            color: colors[Math.floor(Math.random() * colors.length)],
+          });
+        }
       }
     }
 
@@ -62,41 +84,62 @@ function PixelMaterializeEffect({ onComplete }: { onComplete?: () => void }) {
       const elapsed = now - startTime;
       ctx.clearRect(0, 0, width, height);
 
-      let activePixels = 0;
+      let animating = false;
 
-      for (const p of grid) {
-        if (elapsed < p.delay) {
-          // Solid pre-materialization pixel
-          ctx.fillStyle = "rgba(11, 14, 11, 0.96)";
-          ctx.fillRect(p.x, p.y, pixelSize - 1, pixelSize - 1);
-          activePixels++;
-        } else if (elapsed < p.delay + p.duration) {
-          const progress = (elapsed - p.delay) / p.duration;
-          ctx.fillStyle = p.color;
-          ctx.globalAlpha = 1 - progress;
-          ctx.fillRect(p.x, p.y, pixelSize - 1, pixelSize - 1);
-
-          // Center spark on pixel materialization
-          if (progress < 0.35) {
-            ctx.fillStyle = "#ffffff";
-            ctx.fillRect(p.x + 3, p.y + 3, pixelSize - 7, pixelSize - 7);
+      if (mode === "open") {
+        for (const p of grid) {
+          if (elapsed < p.delay) {
+            ctx.fillStyle = "rgba(11, 14, 11, 0.96)";
+            ctx.fillRect(p.x, p.y, pixelSize - 1, pixelSize - 1);
+            animating = true;
+          } else if (elapsed < p.delay + p.duration) {
+            const progress = (elapsed - p.delay) / p.duration;
+            ctx.fillStyle = p.color;
+            ctx.globalAlpha = 1 - progress;
+            ctx.fillRect(p.x, p.y, pixelSize - 1, pixelSize - 1);
+            if (progress < 0.35) {
+              ctx.fillStyle = "#ffffff";
+              ctx.fillRect(p.x + 3, p.y + 3, pixelSize - 7, pixelSize - 7);
+            }
+            ctx.globalAlpha = 1;
+            animating = true;
           }
-          ctx.globalAlpha = 1;
-          activePixels++;
+        }
+      } else {
+        for (const p of grid) {
+          if (elapsed >= p.delay + p.duration) {
+            ctx.fillStyle = "rgba(11, 14, 11, 0.98)";
+            ctx.fillRect(p.x, p.y, pixelSize - 1, pixelSize - 1);
+          } else if (elapsed >= p.delay) {
+            const progress = (elapsed - p.delay) / p.duration;
+            ctx.fillStyle = p.color;
+            ctx.globalAlpha = progress;
+            ctx.fillRect(p.x, p.y, pixelSize - 1, pixelSize - 1);
+            if (progress > 0.6) {
+              ctx.fillStyle = "#ffffff";
+              ctx.fillRect(p.x + 3, p.y + 3, pixelSize - 7, pixelSize - 7);
+            }
+            ctx.globalAlpha = 1;
+            animating = true;
+          } else {
+            animating = true;
+          }
         }
       }
 
-      if (activePixels > 0 && elapsed < 420) {
+      if (animating && elapsed < 350) {
         animationId = requestAnimationFrame(render);
       } else {
-        ctx.clearRect(0, 0, width, height);
+        if (mode === "open") {
+          ctx.clearRect(0, 0, width, height);
+        }
         onComplete?.();
       }
     }
 
     animationId = requestAnimationFrame(render);
     return () => cancelAnimationFrame(animationId);
-  }, [onComplete]);
+  }, [mode, onComplete]);
 
   return (
     <canvas
@@ -109,7 +152,7 @@ function PixelMaterializeEffect({ onComplete }: { onComplete?: () => void }) {
 
 export function AIAssistant() {
   const [open, setOpen] = useState(false);
-  const [isPixelating, setIsPixelating] = useState(false);
+  const [transitionMode, setTransitionMode] = useState<"open" | "close" | null>(null);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([
@@ -138,8 +181,21 @@ export function AIAssistant() {
   }, [open]);
 
   function handleOpen() {
-    setIsPixelating(true);
+    setTransitionMode("open");
     setOpen(true);
+  }
+
+  function handleClose() {
+    setTransitionMode("close");
+  }
+
+  function handleTransitionComplete() {
+    if (transitionMode === "close") {
+      setOpen(false);
+      setTransitionMode(null);
+    } else {
+      setTransitionMode(null);
+    }
   }
 
   async function send(text = input) {
@@ -167,117 +223,106 @@ export function AIAssistant() {
 
   return (
     <>
-      <AnimatePresence>
-        {!open && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8, y: 15 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.75, transition: { duration: 0.15 } }}
-            className="fixed bottom-5 right-5 z-40"
+      {!open && (
+        <div className="fixed bottom-5 right-5 z-40">
+          <PixelCard
+            as="button"
+            variant="primaryButton"
+            gridSize={6}
+            onClick={handleOpen}
+            className="ai-launcher"
+            aria-label="Open AI assistant"
           >
-            <PixelCard
-              as="button"
-              variant="primaryButton"
-              gridSize={6}
-              onClick={handleOpen}
-              className="ai-launcher"
-              aria-label="Open AI assistant"
-            >
+            <span>
+              <MessageCircle size={17} />
+            </span>
+            Ask My AI
+            <ArrowUpRight size={14} />
+          </PixelCard>
+        </div>
+      )}
+
+      {open && (
+        <div
+          className="ai-shell"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Mehedi portfolio assistant"
+        >
+          {/* Full-box Pixel Transition Overlay (Open dissolve or Top-to-Bottom Close Curtain) */}
+          {transitionMode && (
+            <PixelTransitionOverlay
+              mode={transitionMode}
+              onComplete={handleTransitionComplete}
+            />
+          )}
+
+          <header className="ai-header">
+            <div className="ai-avatar">
+              <Bot size={19} />
+            </div>
+            <div>
+              <small>PERSONAL AI / v1.0</small>
+              <strong>Mehedi’s portfolio guide</strong>
               <span>
-                <MessageCircle size={17} />
+                <i />
+                Online · portfolio knowledge
               </span>
-              Ask My AI
-              <ArrowUpRight size={14} />
-            </PixelCard>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.85, y: 25 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.8, y: 20, transition: { duration: 0.2 } }}
-            transition={{ type: "spring", stiffness: 340, damping: 26, mass: 0.85 }}
-            className="ai-shell"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Mehedi portfolio assistant"
-          >
-            {/* 8-bit Pixel Materialization Grid Wave */}
-            {isPixelating && <PixelMaterializeEffect onComplete={() => setIsPixelating(false)} />}
-
-            {/* CRT Pixel Scanline Sweep */}
-            <div className="ai-shell-pixel-sweep" aria-hidden="true" />
-
-            <header className="ai-header">
-              <div className="ai-avatar">
-                <Bot size={19} />
-              </div>
-              <div>
-                <small>PERSONAL AI / v1.0</small>
-                <strong>Mehedi’s portfolio guide</strong>
-                <span>
-                  <i />
-                  Online · portfolio knowledge
-                </span>
-              </div>
-              <button onClick={() => setOpen(false)} aria-label="Close assistant">
-                <X size={19} />
-              </button>
-            </header>
-
-            <div className="ai-messages scrollbar-hidden">
-              {messages.map((message, index) => (
-                <div className={`ai-message ${message.role}`} key={index}>
-                  {message.role === "assistant" && <Sparkles size={13} />}
-                  <p>{message.content}</p>
-                </div>
-              ))}
-              {loading && (
-                <div className="ai-thinking">
-                  <i />
-                  <i />
-                  <i />
-                </div>
-              )}
-              <div ref={messageEnd} aria-hidden="true" />
             </div>
+            <button onClick={handleClose} aria-label="Close assistant" type="button">
+              <X size={19} />
+            </button>
+          </header>
 
-            {showSuggestions && (
-              <>
-                <div className="ai-quick-label">START WITH A QUESTION</div>
-                <div className="ai-suggestions">
-                  {suggestions.map((suggestion) => (
-                    <button onClick={() => send(suggestion)} key={suggestion}>
-                      <span>{suggestion}</span>
-                      <ArrowUpRight size={13} />
-                    </button>
-                  ))}
-                </div>
-              </>
+          <div className="ai-messages scrollbar-hidden">
+            {messages.map((message, index) => (
+              <div className={`ai-message ${message.role}`} key={index}>
+                {message.role === "assistant" && <Sparkles size={13} />}
+                <p>{message.content}</p>
+              </div>
+            ))}
+            {loading && (
+              <div className="ai-thinking">
+                <i />
+                <i />
+                <i />
+              </div>
             )}
+            <div ref={messageEnd} aria-hidden="true" />
+          </div>
 
-            <div className="ai-composer">
-              <input
-                value={input}
-                onChange={(event) => setInput(event.target.value)}
-                onKeyDown={(event) => event.key === "Enter" && send()}
-                placeholder="Ask about my work…"
-                aria-label="Ask about Mehedi’s work"
-              />
-              <button onClick={() => send()} disabled={loading || !input.trim()} aria-label="Send message">
-                <Send size={17} />
-              </button>
-            </div>
-            <footer className="ai-footer">
-              <span>Powered by portfolio knowledge</span>
-              <span>↵ to send</span>
-            </footer>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          {showSuggestions && (
+            <>
+              <div className="ai-quick-label">START WITH A QUESTION</div>
+              <div className="ai-suggestions">
+                {suggestions.map((suggestion) => (
+                  <button onClick={() => send(suggestion)} key={suggestion} type="button">
+                    <span>{suggestion}</span>
+                    <ArrowUpRight size={13} />
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+
+          <div className="ai-composer">
+            <input
+              value={input}
+              onChange={(event) => setInput(event.target.value)}
+              onKeyDown={(event) => event.key === "Enter" && send()}
+              placeholder="Ask about my work…"
+              aria-label="Ask about Mehedi’s work"
+            />
+            <button onClick={() => send()} disabled={loading || !input.trim()} aria-label="Send message" type="button">
+              <Send size={17} />
+            </button>
+          </div>
+          <footer className="ai-footer">
+            <span>Powered by portfolio knowledge</span>
+            <span>↵ to send</span>
+          </footer>
+        </div>
+      )}
     </>
   );
 }
