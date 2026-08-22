@@ -1686,9 +1686,10 @@ select {
     position: relative;
     width: 100%;
     min-width: 0;
-    max-width: 104px;
-    height: 136px;
-    padding: 12px 6px 10px;
+    max-width: 110px;
+    min-height: 142px;
+    height: auto;
+    padding: 10px 8px 10px;
     border: 1px solid #ffffff18;
     border-radius: var(--ui-radius);
     background: #0e120e;
@@ -1698,7 +1699,7 @@ select {
     flex-direction: column;
     transition: border-color .25s ease, background .25s ease, box-shadow .25s ease;
     cursor: pointer;
-    overflow: visible;
+    overflow: hidden;
     box-sizing: border-box;
 }
 
@@ -1710,26 +1711,27 @@ select {
 .workflow-step.is-active {
     border-color: var(--acid);
     background: linear-gradient(145deg, #1a2211, #10150d);
-    box-shadow: 0 12px 35px #c8ff3d12
+    box-shadow: 0 12px 35px #c8ff3d12;
 }
 
 .workflow-step-index {
-    font-size: 8px;
+    font-size: 8.5px;
     color: #5e6759;
-    letter-spacing: .12em
+    letter-spacing: .12em;
+    font-family: var(--font-pixeloid-mono), monospace !important;
 }
 
 .workflow-step-icon {
     display: grid;
     place-items: center;
-    width: 30px;
-    height: 30px;
-    min-width: 30px;
-    min-height: 30px;
-    max-width: 30px;
-    max-height: 30px;
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+    min-height: 26px;
+    max-width: 26px;
+    max-height: 26px;
     aspect-ratio: 1 / 1;
-    margin: 6px 0;
+    margin: 6px 0 8px;
     border: 1px solid #ffffff15;
     border-radius: 50%;
     color: #7d8778;
@@ -1740,33 +1742,39 @@ select {
 .workflow-step.is-active .workflow-step-icon {
     color: #0b0e09;
     background: var(--acid);
-    border-color: var(--acid)
+    border-color: var(--acid);
 }
 
 .workflow-step strong {
     font-family: var(--font-pixeloid-sans), 'Pixeloid Sans', sans-serif !important;
-    font-size: 8.5px;
+    font-size: 9.5px !important;
     font-weight: 700;
-    color: #c8cec3;
-    line-height: 1.25;
-    word-break: keep-all;
-    overflow-wrap: normal;
+    color: #e4eee0;
+    line-height: 1.2;
+    word-break: break-word;
+    overflow-wrap: break-word;
     white-space: normal;
     letter-spacing: 0;
-    margin-bottom: 2px;
+    margin-bottom: auto;
+}
+
+.workflow-step.is-active strong {
+    color: #ffffff;
 }
 
 .workflow-step small {
-    margin-top: auto;
-    font-size: 7px;
+    margin-top: 8px;
+    font-size: 7.5px;
     letter-spacing: .08em;
     text-transform: uppercase;
     color: #596254;
     white-space: nowrap;
+    font-family: var(--font-pixeloid-sans), sans-serif !important;
 }
 
 .workflow-step.is-active small {
-    color: var(--acid)
+    color: var(--acid);
+    font-weight: 700;
 }
 
 .workflow-connector {
@@ -5389,7 +5397,6 @@ label {
     font-size: 10px
 }
 
-.workflow-step strong,
 .workflow-event-log strong,
 .workflow-inspector-row strong,
 .workflow-benefit,
