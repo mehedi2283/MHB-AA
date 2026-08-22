@@ -2105,6 +2105,32 @@ select {
     background: linear-gradient(90deg, transparent, var(--acid), transparent)
 }
 
+.ai-shell-pixel-sweep {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 45;
+    background: linear-gradient(
+        180deg,
+        transparent 0%,
+        rgba(200, 255, 61, 0.15) 50%,
+        transparent 100%
+    );
+    opacity: 0;
+    animation: aiPixelSweep 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes aiPixelSweep {
+    0% {
+        opacity: 0.9;
+        transform: translateY(-100%);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(100%);
+    }
+}
+
 .ai-header {
     display: grid;
     grid-template-columns: 42px 1fr 34px;
