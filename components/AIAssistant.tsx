@@ -45,26 +45,30 @@ function PixelTransitionOverlay({
     ];
 
     if (mode === "open") {
-      // Opening: pixel dissolve revealing full box in place
+      // Opening: diagonal pixel dissolve radiating from BOTTOM-RIGHT to TOP-LEFT
+      const maxDist = Math.hypot(cols - 1, rows - 1);
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
-          const rowNorm = (rows - 1 - r) / rows;
-          const baseDelay = rowNorm * 160;
+          const distFromBottomRight = Math.hypot(cols - 1 - c, rows - 1 - r);
+          const diagNorm = distFromBottomRight / maxDist; // 0 at bottom-right, 1 at top-left
+          const baseDelay = diagNorm * 220;
           grid.push({
             x: c * pixelSize,
             y: r * pixelSize,
             delay: baseDelay + Math.random() * 45,
-            duration: 130 + Math.random() * 70,
+            duration: 130 + Math.random() * 65,
             color: colors[Math.floor(Math.random() * colors.length)],
           });
         }
       }
     } else {
-      // Closing: pixel curtain falling from TOP to BOTTOM across full box
+      // Closing: diagonal pixel curtain sweeping from TOP-LEFT down to BOTTOM-RIGHT
+      const maxDist = Math.hypot(cols - 1, rows - 1);
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
-          const rowNorm = r / rows; // 0 at top, 1 at bottom
-          const baseDelay = rowNorm * 160;
+          const distFromTopLeft = Math.hypot(c, r);
+          const diagNorm = distFromTopLeft / maxDist; // 0 at top-left, 1 at bottom-right
+          const baseDelay = diagNorm * 200;
           grid.push({
             x: c * pixelSize,
             y: r * pixelSize,
