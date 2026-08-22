@@ -7,6 +7,7 @@ import { ServiceGrid } from "@/components/ServiceGrid";
 import { ProjectCards } from "@/components/ProjectCards";
 import { TechSignal } from "@/components/TechSignal";
 import { ContactForm } from "@/components/ContactForm";
+import { MarqueeStrip } from "@/components/MarqueeStrip";
 import { AIAssistant } from "@/components/AIAssistant";
 import { BackToTop } from "@/components/BackToTop";
 import { PixelCard } from "@/components/PixelCard";
@@ -46,7 +47,7 @@ export default async function Home() {
       </div>
     </section>
 
-    <section className="os-marquee" aria-label="Core capabilities"><div>AI AGENTS <i>✦</i> N8N WORKFLOWS <i>✦</i> API SYSTEMS <i>✦</i> SAAS PRODUCTS <i>✦</i> CRM AUTOMATION <i>✦</i> AI AGENTS <i>✦</i> N8N WORKFLOWS <i>✦</i></div></section>
+    <MarqueeStrip />
 
     <section id="about" className="section os-about"><div className="shell">
       <div className="os-section-head"><span>{content.about.eyebrow}</span><h2>{lines(content.about.heading)}</h2><p>{content.about.intro}</p></div>
