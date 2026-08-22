@@ -6,6 +6,8 @@ import { rateLimit } from "@/lib/rate-limit";
 import { getSiteContent, getPublicCollections } from "@/lib/site-content";
 
 const bodySchema = z.object({
+  sessionId: z.string().optional(),
+  userLabel: z.string().optional(),
   messages: z
     .array(
       z.object({
@@ -231,81 +233,121 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { messages } = bodySchema.parse(await req.json());
-    let message = "";
-    let usedProvider = "local";
-    let usedModel = "knowledge-fallback";
+      const parsedBody = bodySchema.parse(await req.json());
+      const messages = parsedBody.messages;
+      const userSessionId = parsedBody.sessionId || `visitor_${crypto.randomUUID().slice(0, 8)}`;
+      let message = "";
+      let usedProvider = "local";
+      let usedModel = "knowledge-fallback";
 
-    try {
-      const db = supabaseAdmin();
-      const settingsResult = await db.from("app_settings").select("data").eq("key", "ai:main").maybeSingle();
-      const settings = settingsResult.data?.data || {};
+      try {
+        const db = supabaseAdmin();
+        const settingsResult = await db.from("app_settings").select("data").eq("key", "ai:main").maybeSingle();
+        const settings = settingsResult.data?.data || {};
 
-      const activeProvider = settings.activeProvider || "gemini";
-      const fallbackList = settings.fallbackProviders || [];
-      const order = [activeProvider, ...fallbackList.filter((p: string) => p !== activeProvider)];
+        const activeProvider = settings.activeProvider || "gemini";
+        const fallbackList = settings.fallbackProviders || [];
+        const order = [activeProvider, ...fallbackList.filter((p: string) => p !== activeProvider)];
 
-      const configRows = await db
-        .from("app_settings")
-        .select("key, data")
-        .in("key", order.map((p) => `provider:${p}`));
+        const configRows = await db
+          .from("app_settings")
+          .select("key, data")
+          .in("key", order.map((p) => `provider:${p}`));
 
-      const configs = (configRows.data || []).map((row) => row.data);
+        const configs = (configRows.data || []).map((row) => row.data);
 
-      // Build live dynamic knowledge prompt from Supabase database tables
-      const fullKnowledgePrompt = await buildDynamicKnowledgePrompt(settings.systemPrompt);
+        // Build live dynamic knowledge prompt from Supabase database tables
+        const fullKnowledgePrompt = await buildDynamicKnowledgePrompt(settings.systemPrompt);
 
-      for (const provider of order) {
-        const c = configs.find((item) => item?.provider === provider);
-        if (!c?.encryptedApiKey || !c.enabled) continue;
+        for (const provider of order) {
+          const c = configs.find((item) => item?.provider === provider);
+          if (!c?.encryptedApiKey || !c.enabled) continue;
 
-        try {
-          const apiKey = decryptSecret(c.encryptedApiKey);
-          if (!apiKey) continue;
+          try {
+            const apiKey = decryptSecret(c.encryptedApiKey);
+            if (!apiKey) continue;
 
-          const modelToUse = c.model || settings.model || (provider === "gemini" ? "gemini-2.5-flash" : "gpt-4o-mini");
+            const modelToUse = c.model || settings.model || (provider === "gemini" ? "gemini-2.5-flash" : "gpt-4o-mini");
 
-          message = await callProvider(
-            provider,
-            apiKey,
-            modelToUse,
-            fullKnowledgePrompt,
-            messages,
-            settings.temperature ?? 0.3,
-            settings.maxTokens ?? 500
-          );
+            message = await callProvider(
+              provider,
+              apiKey,
+              modelToUse,
+              fullKnowledgePrompt,
+              messages,
+              settings.temperature ?? 0.3,
+              settings.maxTokens ?? 500
+            );
 
-          usedProvider = provider;
-          usedModel = modelToUse;
-          break;
-        } catch (providerError) {
-          console.error(`Provider [${provider}] failed:`, providerError);
-          continue;
+            usedProvider = provider;
+            usedModel = modelToUse;
+            break;
+          } catch (providerError) {
+            console.error(`Provider [${provider}] failed:`, providerError);
+            continue;
+          }
         }
-      }
 
-      if (!message) {
+        if (!message) {
+          const lastUserMsg = [...messages].reverse().find((m) => m.role === "user")?.content || "";
+          message = localReply(lastUserMsg);
+        }
+
+        // Log / update conversation in Supabase cms_documents under 'aiConversations' grouped by user sessionId
+        const fullConversation = [...messages, { role: "assistant" as const, content: message }];
+        const lastUserMsg = [...messages].reverse().find((m) => m.role === "user")?.content || "";
+
+        const { data: existingRows } = await db
+          .from("cms_documents")
+          .select("id, data")
+          .eq("collection", "aiConversations")
+          .order("created_at", { ascending: false });
+
+        const matchedDoc = (existingRows || []).find((r) => (r.data as Record<string, unknown>)?.sessionId === userSessionId);
+
+        if (matchedDoc) {
+          const prevData = (matchedDoc.data as Record<string, unknown>) || {};
+          await db.from("cms_documents").update({
+            data: {
+              ...prevData,
+              sessionId: userSessionId,
+              userLabel: prevData.userLabel || `Visitor #${userSessionId.replace(/[^a-zA-Z0-9]/g, "").slice(-6)}`,
+              messages: fullConversation,
+              turnCount: fullConversation.length,
+              lastUserMessage: lastUserMsg,
+              lastAssistantMessage: message,
+              provider: usedProvider,
+              model: usedModel,
+              ip: ip !== "local" ? ip : undefined,
+              lastActiveAt: new Date().toISOString(),
+            },
+            updated_at: new Date().toISOString(),
+          }).eq("id", matchedDoc.id);
+        } else {
+          await db.from("cms_documents").insert({
+            collection: "aiConversations",
+            data: {
+              sessionId: userSessionId,
+              userLabel: `Visitor #${userSessionId.replace(/[^a-zA-Z0-9]/g, "").slice(-6)}`,
+              messages: fullConversation,
+              turnCount: fullConversation.length,
+              lastUserMessage: lastUserMsg,
+              lastAssistantMessage: message,
+              provider: usedProvider,
+              model: usedModel,
+              ip: ip !== "local" ? ip : undefined,
+              startedAt: new Date().toISOString(),
+              lastActiveAt: new Date().toISOString(),
+            },
+            status: "complete",
+            visible: true,
+          });
+        }
+      } catch (dbErr) {
+        console.error("AI execution error:", dbErr);
         const lastUserMsg = [...messages].reverse().find((m) => m.role === "user")?.content || "";
         message = localReply(lastUserMsg);
       }
-
-      // Log conversation to CMS documents in Supabase
-      await db.from("cms_documents").insert({
-        collection: "aiConversations",
-        data: {
-          sessionId: crypto.randomUUID(),
-          messages: [...messages, { role: "assistant", content: message }],
-          provider: usedProvider,
-          model: usedModel,
-        },
-        status: "complete",
-        visible: false,
-      });
-    } catch (dbErr) {
-      console.error("AI execution error:", dbErr);
-      const lastUserMsg = [...messages].reverse().find((m) => m.role === "user")?.content || "";
-      message = localReply(lastUserMsg);
-    }
 
     return NextResponse.json({ message, provider: usedProvider, model: usedModel });
   } catch (err) {

@@ -165,6 +165,7 @@ export function AIAssistant() {
   const [open, setOpen] = useState(false);
   const [transitionMode, setTransitionMode] = useState<"open" | "close" | null>(null);
   const [isIdleActive, setIsIdleActive] = useState(false);
+  const [sessionId, setSessionId] = useState("");
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([
@@ -175,6 +176,19 @@ export function AIAssistant() {
     },
   ]);
   const messageEnd = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    try {
+      let id = localStorage.getItem("portfolio_visitor_session");
+      if (!id) {
+        id = "usr_" + Math.random().toString(36).substring(2, 8) + "_" + Date.now().toString(36);
+        localStorage.setItem("portfolio_visitor_session", id);
+      }
+      setSessionId(id);
+    } catch {
+      setSessionId("usr_" + Math.random().toString(36).substring(2, 8));
+    }
+  }, []);
 
   useEffect(() => {
     messageEnd.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -238,7 +252,7 @@ export function AIAssistant() {
       const response = await fetch("/api/ai/chat", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ messages: next }),
+        body: JSON.stringify({ sessionId, messages: next }),
       });
       const data = await response.json();
       setMessages([...next, { role: "assistant", content: data.message || "I couldn’t answer that just now. Please try again." }]);
