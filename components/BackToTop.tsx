@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowUp } from "lucide-react";
+import { PixelArrowUp } from "./PixelIcons";
 import { PixelCard } from "./PixelCard";
 
 export function BackToTop() {
@@ -37,7 +37,7 @@ export function BackToTop() {
       aria-label="Back to top"
     >
       <span>BACK TO TOP</span>
-      <ArrowUp size={13} />
+      <PixelArrowUp size={13} />
     </PixelCard>
   );
 }

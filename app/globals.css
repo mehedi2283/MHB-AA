@@ -5989,3 +5989,17 @@ pre,
 .ai-composer input {
     font-weight: 700 !important;
 }
+
+/* ==========================================================================
+   Universal 8-Bit Pixel Icon Rendering (Entire Project)
+   ========================================================================== */
+svg,
+svg *,
+.lucide,
+.lucide * {
+    shape-rendering: crispEdges !important;
+    stroke-linecap: square !important;
+    stroke-linejoin: miter !important;
+    image-rendering: pixelated !important;
+}
+

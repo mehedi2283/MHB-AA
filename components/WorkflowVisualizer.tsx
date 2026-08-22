@@ -1,11 +1,20 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { BrainCircuit, CalendarCheck, ChartNoAxesCombined, Check, Database, Radio, Send, Webhook } from "lucide-react";
+import {
+  PixelBrain,
+  PixelCalendar,
+  PixelChart,
+  PixelCheck,
+  PixelDatabase,
+  PixelRadio,
+  PixelSend,
+  PixelWebhook,
+} from "./PixelIcons";
 import type { WorkflowItem } from "@/lib/site-content";
 import { PixelCard } from "./PixelCard";
 
-const icons = [Webhook, BrainCircuit, Database, CalendarCheck, Send, ChartNoAxesCombined];
+const icons = [PixelWebhook, PixelBrain, PixelDatabase, PixelCalendar, PixelSend, PixelChart];
 const cycleDuration = 2400;
 const eventLabels = [
   "New lead captured",
@@ -89,7 +98,7 @@ export function WorkflowVisualizer({ workflowNodes }: { workflowNodes: WorkflowI
             })}
           </div>
           <div className="workflow-event-log" aria-live="polite">
-            <Radio size={13} />
+            <PixelRadio size={13} />
             <span>Live event</span>
             <strong>{eventLabels[active] || "Processing telemetry"}</strong>
             <time>now</time>
@@ -113,7 +122,7 @@ export function WorkflowVisualizer({ workflowNodes }: { workflowNodes: WorkflowI
             <strong>{selected.tools}</strong>
           </div>
           <div className="workflow-benefit">
-            <Check size={15} />
+            <PixelCheck size={15} />
             <span>{selected.benefit}</span>
           </div>
           <div className="workflow-node-stats">

@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Globe } from "@/components/magicui/globe";
 import { PixelCard } from "@/components/PixelCard";
-import { MapPin, Globe2, Radio, Zap, Shield, Clock } from "lucide-react";
+import { PixelGlobe, PixelRadio, PixelZap } from "./PixelIcons";
 
 interface ClientHub {
   city: string;
@@ -88,7 +88,7 @@ export function GlobalClients() {
         <div className="os-section-head os-section-head-row">
           <div>
             <span className="inline-flex items-center gap-1.5 text-xs tracking-wider uppercase text-[#c8ff3d]">
-              <Radio size={13} className="animate-pulse" />
+              <PixelRadio size={13} className="animate-pulse" />
               GLOBAL CLIENT NETWORK
             </span>
             <h2 className="text-3xl md:text-5xl font-bold tracking-tight mt-2 text-white">
@@ -159,7 +159,7 @@ export function GlobalClients() {
 
                     <div className="mt-3 pt-2.5 border-t border-white/10 flex items-center justify-between text-[9px] text-[#697265] font-mono">
                       <span className="flex items-center gap-1">
-                        <Zap size={10} className="text-[#c8ff3d]" />
+                        <PixelZap size={10} className="text-[#c8ff3d]" />
                         {hub.deployments}
                       </span>
                       <span>{hub.tz}</span>
@@ -178,7 +178,7 @@ export function GlobalClients() {
             >
               <div className="flex items-center gap-3">
                 <div className="size-9 rounded-full bg-[#c8ff3d]/10 border border-[#c8ff3d]/30 grid place-items-center text-[#c8ff3d]">
-                  <Globe2 size={18} />
+                  <PixelGlobe size={18} />
                 </div>
                 <div>
                   <div className="text-xs font-bold text-white">Cross-Border Availability</div>

@@ -1,10 +1,28 @@
 "use client";
 
-import { ArrowUpRight, Bot, Braces, ChartNoAxesCombined, DatabaseZap, GitBranch, LayoutDashboard, MessagesSquare, PhoneCall } from "lucide-react";
+import {
+  PixelArrowUpRight,
+  PixelBot,
+  PixelBrain,
+  PixelChart,
+  PixelChat,
+  PixelDatabase,
+  PixelRadio,
+  PixelWebhook,
+} from "./PixelIcons";
 import type { ServiceItem } from "@/lib/site-content";
 import { PixelCard } from "./PixelCard";
 
-const icons = [PhoneCall, MessagesSquare, Bot, GitBranch, ChartNoAxesCombined, LayoutDashboard, Braces, DatabaseZap];
+const icons = [
+  PixelRadio,
+  PixelChat,
+  PixelBot,
+  PixelWebhook,
+  PixelChart,
+  PixelBrain,
+  PixelDatabase,
+  PixelRadio,
+];
 const serviceVariants: Array<"acid" | "amber" | "mixed"> = ["acid", "mixed", "amber", "acid"];
 
 export function ServiceGrid({ services }: { services: ServiceItem[] }) {
@@ -33,7 +51,7 @@ export function ServiceGrid({ services }: { services: ServiceItem[] }) {
               ))}
             </div>
             <a href="#contact" className="flex items-center justify-between text-xs text-blue-300 mt-5 pt-4 border-t border-white/10">
-              Ask me about this <ArrowUpRight size={14} />
+              Ask me about this <PixelArrowUpRight size={14} />
             </a>
           </PixelCard>
         );

@@ -1,4 +1,4 @@
-import { ArrowUpRight } from "lucide-react";
+import { PixelArrowUpRight } from "./PixelIcons";
 import type { ProjectItem } from "@/lib/site-content";
 import { PixelCard } from "./PixelCard";
 
@@ -40,7 +40,7 @@ export function ProjectCards({ projects }: { projects: ProjectItem[] }) {
             ))}
           </div>
           <div className="deployment-open">
-            View case study <ArrowUpRight size={16} />
+            View case study <PixelArrowUpRight size={16} />
           </div>
         </PixelCard>
       ))}

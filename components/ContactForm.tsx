@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Check, ChevronDown, LoaderCircle, Send } from "lucide-react";
+import { ChevronDown, LoaderCircle } from "lucide-react";
+import { PixelCheck, PixelSend } from "./PixelIcons";
 import { PixelCard } from "./PixelCard";
 
 const projectTypes = ["Workflow automation", "AI agent system", "SaaS MVP", "CRM and outreach", "Automation audit"];
@@ -42,7 +43,7 @@ function PortfolioSelect({ name, placeholder, options }: { name: string; placeho
       <span className={value ? "has-value" : ""}>{value || placeholder}</span><ChevronDown size={15} />
     </button>
     {open && <div className="portfolio-select-menu" role="listbox" aria-label={placeholder}>
-      {options.map((option, index) => <button type="button" role="option" aria-selected={value === option} onClick={() => choose(option)} key={option}><span>{String(index + 1).padStart(2, "0")}</span><strong>{option}</strong>{value === option && <Check size={14} />}</button>)}
+      {options.map((option, index) => <button type="button" role="option" aria-selected={value === option} onClick={() => choose(option)} key={option}><span>{String(index + 1).padStart(2, "0")}</span><strong>{option}</strong>{value === option && <PixelCheck size={14} />}</button>)}
     </div>}
   </div>;
 }
@@ -77,6 +78,6 @@ export function ContactForm() {
     <label className="label contact-form-wide"><span>What should the system solve?</span><textarea className="input min-h-32 resize-y" name="message" minLength={20} maxLength={5000} required /></label>
     <input className="hidden" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" />
     {status === "error" && <p className="contact-form-wide text-sm text-red-300" role="alert">The message could not be sent. Please try again.</p>}
-    <PixelCard as="button" type="submit" disabled={status === "sending"} variant="primaryButton" gridSize={6} className="btn btn-primary contact-form-wide">{status === "sending" ? <LoaderCircle className="animate-spin" size={17} /> : <Send size={17} />} Send project brief</PixelCard>
+    <PixelCard as="button" type="submit" disabled={status === "sending"} variant="primaryButton" gridSize={6} className="btn btn-primary contact-form-wide">{status === "sending" ? <LoaderCircle className="animate-spin" size={17} /> : <PixelSend size={17} />} Send project brief</PixelCard>
   </form>;
 }

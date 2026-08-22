@@ -1,9 +1,16 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUpRight, Bot, MessageCircle, Send, Sparkles, X } from "lucide-react";
+import { motion } from "framer-motion";
 import { PixelCard } from "./PixelCard";
+import {
+  PixelArrowUpRight,
+  PixelBot,
+  PixelChat,
+  PixelClose,
+  PixelSend,
+  PixelSparkles,
+} from "./PixelIcons";
 
 type Msg = { role: "user" | "assistant"; content: string };
 const suggestions = ["What does Mehedi build?", "Explore the 8-agent project", "Can Mehedi build my SaaS?"];
@@ -250,10 +257,10 @@ export function AIAssistant() {
             aria-label="Open AI assistant"
           >
             <span>
-              <MessageCircle size={17} />
+              <PixelChat size={17} />
             </span>
             Ask My AI
-            <ArrowUpRight size={14} />
+            <PixelArrowUpRight size={14} />
           </PixelCard>
         ) : (
           <div className="ai-shell" role="dialog" aria-modal="true" aria-label="Mehedi portfolio assistant">
@@ -264,7 +271,7 @@ export function AIAssistant() {
 
             <header className="ai-header">
               <div className="ai-avatar">
-                <Bot size={19} />
+                <PixelBot size={20} />
               </div>
               <div>
                 <small>PERSONAL AI / v1.0</small>
@@ -275,14 +282,14 @@ export function AIAssistant() {
                 </span>
               </div>
               <button onClick={handleClose} aria-label="Close assistant" type="button">
-                <X size={19} />
+                <PixelClose size={18} />
               </button>
             </header>
 
             <div className="ai-messages scrollbar-hidden">
               {messages.map((message, index) => (
                 <div className={`ai-message ${message.role}`} key={index}>
-                  {message.role === "assistant" && <Sparkles size={13} />}
+                  {message.role === "assistant" && <PixelSparkles size={14} />}
                   <p>{message.content}</p>
                 </div>
               ))}
@@ -303,7 +310,7 @@ export function AIAssistant() {
                   {suggestions.map((suggestion) => (
                     <button onClick={() => send(suggestion)} key={suggestion} type="button">
                       <span>{suggestion}</span>
-                      <ArrowUpRight size={13} />
+                      <PixelArrowUpRight size={13} />
                     </button>
                   ))}
                 </div>
@@ -319,7 +326,7 @@ export function AIAssistant() {
                 aria-label="Ask about Mehedi’s work"
               />
               <button onClick={() => send()} disabled={loading || !input.trim()} aria-label="Send message" type="button">
-                <Send size={17} />
+                <PixelSend size={17} />
               </button>
             </div>
             <footer className="ai-footer">

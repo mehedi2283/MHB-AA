@@ -1,6 +1,8 @@
 "use client";
+
 import { FormEvent, useState } from "react";
-import { ArrowRight, Command, Sparkles } from "lucide-react";
+import { Command } from "lucide-react";
+import { PixelArrowRight, PixelSparkles } from "./PixelIcons";
 import { PixelCard } from "./PixelCard";
 
 export function AutomationCommand() {
@@ -42,12 +44,12 @@ export function AutomationCommand() {
           className="grid place-items-center size-10 rounded-[4px] bg-blue-500 hover:bg-blue-400 transition"
           aria-label="Get recommendation"
         >
-          <ArrowRight size={18} />
+          <PixelArrowRight size={18} />
         </PixelCard>
       </form>
       {answer && (
         <div className="mt-3 flex gap-2 rounded-[4px] border border-blue-400/20 bg-blue-400/8 p-4 text-sm text-slate-300 leading-relaxed">
-          <Sparkles className="text-blue-400 shrink-0" size={16} />
+          <PixelSparkles className="text-blue-400 shrink-0" size={16} />
           <span>
             {answer} <a href="#contact" className="text-blue-300">Discuss the idea →</a>
           </span>
