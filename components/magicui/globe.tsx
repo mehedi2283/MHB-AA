@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef } from "react";
 import createGlobe from "cobe";
+import { useMotionValue, useSpring } from "framer-motion";
 
 interface MarkerData {
   id: string;
@@ -84,12 +85,17 @@ export function Globe({ className = "" }: { className?: string }) {
   const arcDomMap = useRef<Map<string, HTMLDivElement>>(new Map());
 
   const pointerInteracting = useRef<number | null>(null);
-  const pointerInteractionMovement = useRef(0);
-  const dragVelocity = useRef(0);
-
-  const phiRef = useRef(0);
-  const thetaRef = useRef(0.24);
   const widthRef = useRef(0);
+  const thetaRef = useRef(0.24);
+
+  // Framer Motion Spring Physics Engine for buttery-smooth damping and inertia
+  const phiTarget = useMotionValue(0);
+  const springPhi = useSpring(phiTarget, {
+    mass: 0.8,
+    stiffness: 140,
+    damping: 24,
+    restDelta: 0.0001,
+  });
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -116,13 +122,13 @@ export function Globe({ className = "" }: { className?: string }) {
       devicePixelRatio: Math.min(typeof window !== "undefined" ? window.devicePixelRatio : 2, 2),
       width: initialWidth,
       height: initialWidth,
-      phi: phiRef.current,
+      phi: 0,
       theta: thetaRef.current,
       dark: 1,
       diffuse: 1.3,
       mapSamples: 16000,
       mapBrightness: 6,
-      // Single unified cohesive dark matrix
+      // Unified sleek dark matrix
       baseColor: [0.15, 0.24, 0.13],
       markerColor: ACID_COLOR,
       glowColor: [0.18, 0.32, 0.1],
@@ -141,27 +147,25 @@ export function Globe({ className = "" }: { className?: string }) {
       })),
     });
 
-    // Pause rendering when scrolled offscreen for 100% smooth GPU efficiency
+    // Pause rendering when scrolled offscreen for 100% GPU efficiency
     const observer = new IntersectionObserver(([entry]) => {
       isVisibleOnScreen = entry.isIntersecting;
     });
     observer.observe(canvas);
 
-    // High-performance 60 FPS loop using direct DOM ref updates (0 React re-renders!)
+    // High-performance 60 FPS animation loop driven by Spring Physics
     function animate() {
       if (isVisibleOnScreen) {
         if (pointerInteracting.current === null) {
-          dragVelocity.current *= 0.92;
-          phiRef.current += 0.0035 + dragVelocity.current;
-        } else {
-          phiRef.current += pointerInteractionMovement.current;
-          dragVelocity.current = pointerInteractionMovement.current;
-          pointerInteractionMovement.current = 0;
+          // Continuous silky-smooth auto rotation
+          phiTarget.set(phiTarget.get() + 0.0035);
         }
 
+        const currentPhi = springPhi.get();
         const currentWidth = (widthRef.current || 460) * 2;
+
         globe?.update({
-          phi: phiRef.current,
+          phi: currentPhi,
           theta: thetaRef.current,
           width: currentWidth,
           height: currentWidth,
@@ -171,7 +175,7 @@ export function Globe({ className = "" }: { className?: string }) {
         for (const marker of MARKERS) {
           const el = markerDomMap.current.get(marker.id);
           if (el) {
-            const proj = project3D(marker.location[0], marker.location[1], phiRef.current, thetaRef.current, 0.82);
+            const proj = project3D(marker.location[0], marker.location[1], currentPhi, thetaRef.current, 0.82);
             el.style.transform = `translate3d(-50%, -100%, 0) scale(${proj.scale})`;
             el.style.left = `${proj.x * 100}%`;
             el.style.top = `${proj.y * 100}%`;
@@ -186,7 +190,7 @@ export function Globe({ className = "" }: { className?: string }) {
           if (el) {
             const midLat = (arc.from[0] + arc.to[0]) / 2 + 18;
             const midLon = (arc.from[1] + arc.to[1]) / 2;
-            const proj = project3D(midLat, midLon, phiRef.current, thetaRef.current, 0.97);
+            const proj = project3D(midLat, midLon, currentPhi, thetaRef.current, 0.97);
             el.style.transform = `translate3d(-50%, -50%, 0) scale(${proj.scale})`;
             el.style.left = `${proj.x * 100}%`;
             el.style.top = `${proj.y * 100}%`;
@@ -208,7 +212,7 @@ export function Globe({ className = "" }: { className?: string }) {
         globe?.destroy();
       } catch {}
     };
-  }, []);
+  }, [phiTarget, springPhi]);
 
   return (
     <div
@@ -228,44 +232,30 @@ export function Globe({ className = "" }: { className?: string }) {
       <div className="absolute inset-0 rounded-full border border-white/[0.04] pointer-events-none" />
       <div className="absolute inset-8 rounded-full border border-[#c8ff3d]/[0.08] border-dashed pointer-events-none" />
 
-      {/* WebGL Canvas */}
+      {/* WebGL Canvas with spring drag controls */}
       <canvas
         ref={canvasRef}
-        className="w-full h-full cursor-grab active:cursor-grabbing opacity-95 transition-opacity duration-300 z-10"
+        className="w-full h-full cursor-grab active:cursor-grabbing opacity-95 transition-opacity duration-300 z-10 touch-none"
         onPointerDown={(e) => {
           pointerInteracting.current = e.clientX;
-          pointerInteractionMovement.current = 0;
+          (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
           canvasRef.current?.classList.add("cursor-grabbing");
         }}
-        onPointerUp={() => {
+        onPointerUp={(e) => {
           pointerInteracting.current = null;
+          (e.target as HTMLElement).releasePointerCapture?.(e.pointerId);
           canvasRef.current?.classList.remove("cursor-grabbing");
         }}
         onPointerOut={() => {
           pointerInteracting.current = null;
           canvasRef.current?.classList.remove("cursor-grabbing");
         }}
-        onMouseMove={(e) => {
+        onPointerMove={(e) => {
           if (pointerInteracting.current !== null) {
             const delta = e.clientX - pointerInteracting.current;
             pointerInteracting.current = e.clientX;
-            pointerInteractionMovement.current = delta * 0.005;
-          }
-        }}
-        onTouchStart={(e) => {
-          if (e.touches[0]) {
-            pointerInteracting.current = e.touches[0].clientX;
-            pointerInteractionMovement.current = 0;
-          }
-        }}
-        onTouchEnd={() => {
-          pointerInteracting.current = null;
-        }}
-        onTouchMove={(e) => {
-          if (pointerInteracting.current !== null && e.touches[0]) {
-            const delta = e.touches[0].clientX - pointerInteracting.current;
-            pointerInteracting.current = e.touches[0].clientX;
-            pointerInteractionMovement.current = delta * 0.005;
+            // Update spring motion target immediately
+            phiTarget.set(phiTarget.get() + delta * 0.005);
           }
         }}
       />
@@ -290,7 +280,7 @@ export function Globe({ className = "" }: { className?: string }) {
         ))}
       </div>
 
-      {/* 3D Projected Interactive City Pins & Badges (Unified Acid Theme) */}
+      {/* 3D Projected Interactive City Pins & Badges */}
       <div className="absolute inset-0 pointer-events-none z-30 overflow-hidden">
         {MARKERS.map((city) => (
           <div
