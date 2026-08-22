@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { PixelCard } from "./PixelCard";
 import {
   PixelArrowUpRight,
@@ -10,34 +10,10 @@ import {
   PixelClose,
   PixelSend,
   PixelSparkles,
-  PixelZap,
 } from "./PixelIcons";
 
 type Msg = { role: "user" | "assistant"; content: string };
 const suggestions = ["What does Mehedi build?", "Explore the 8-agent project", "Can Mehedi build my SaaS?"];
-
-const IDLE_TRANSFORMATIONS = [
-  {
-    id: "ready",
-    text: "AI READY · ASK ME ANYTHING",
-    icon: "sparkle" as const,
-  },
-  {
-    id: "guide",
-    text: "MEHEDI’S GUIDE · CLICK TO CHAT",
-    icon: "bot" as const,
-  },
-  {
-    id: "workflows",
-    text: "20+ SYSTEMS & AGENTS LIVE",
-    icon: "zap" as const,
-  },
-  {
-    id: "explore",
-    text: "EXPLORE AUTOMATION STACK",
-    icon: "chat" as const,
-  },
-];
 
 function PixelTransitionOverlay({
   mode,
@@ -187,7 +163,8 @@ function PixelTransitionOverlay({
 export function AIAssistant() {
   const [open, setOpen] = useState(false);
   const [transitionMode, setTransitionMode] = useState<"open" | "close" | null>(null);
-  const [idleTransform, setIdleTransform] = useState<(typeof IDLE_TRANSFORMATIONS)[number] | null>(null);
+  const [isIdleActive, setIsIdleActive] = useState(false);
+  const [idleVariant, setIdleVariant] = useState<"flip" | "hop" | "glitch" | "pulse">("flip");
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([
@@ -203,33 +180,32 @@ export function AIAssistant() {
     messageEnd.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages, loading]);
 
-  // Full section transformation idle cycle
+  // Clean, subtle 8-bit arcade idle animation cycle
   useEffect(() => {
     if (open) {
-      setIdleTransform(null);
+      setIsIdleActive(false);
       return;
     }
 
     let timeoutId: NodeJS.Timeout;
     let resetId: NodeJS.Timeout;
 
-    function triggerNextTransform() {
-      // Trigger a random transformation every 5.5 to 8.5 seconds
-      const delay = 5500 + Math.random() * 3000;
+    function scheduleIdle() {
+      const delay = 4500 + Math.random() * 3500;
       timeoutId = setTimeout(() => {
-        const chosen = IDLE_TRANSFORMATIONS[Math.floor(Math.random() * IDLE_TRANSFORMATIONS.length)];
-        setIdleTransform(chosen);
+        const variants: Array<"flip" | "hop" | "glitch" | "pulse"> = ["flip", "hop", "glitch", "pulse"];
+        const next = variants[Math.floor(Math.random() * variants.length)];
+        setIdleVariant(next);
+        setIsIdleActive(true);
 
-        // Transform back to original resting state after 2.4s
         resetId = setTimeout(() => {
-          setIdleTransform(null);
-          triggerNextTransform();
-        }, 2400);
+          setIsIdleActive(false);
+          scheduleIdle();
+        }, 900);
       }, delay);
     }
 
-    triggerNextTransform();
-
+    scheduleIdle();
     return () => {
       clearTimeout(timeoutId);
       clearTimeout(resetId);
@@ -237,7 +213,7 @@ export function AIAssistant() {
   }, [open]);
 
   function handleOpen() {
-    setIdleTransform(null);
+    setIsIdleActive(false);
     setTransitionMode("open");
     setOpen(true);
   }
@@ -278,20 +254,6 @@ export function AIAssistant() {
 
   const showSuggestions = !input.trim() && messages.length <= 1;
 
-  function renderTransformIcon(type: "sparkle" | "bot" | "zap" | "chat") {
-    switch (type) {
-      case "sparkle":
-        return <PixelSparkles size={16} className="text-[#c8ff3d] animate-spin-slow" />;
-      case "bot":
-        return <PixelBot size={17} className="text-[#c8ff3d]" />;
-      case "zap":
-        return <PixelZap size={16} className="text-[#c8ff3d]" />;
-      case "chat":
-      default:
-        return <PixelChat size={17} className="text-[#c8ff3d]" />;
-    }
-  }
-
   return (
     <div className="fixed bottom-5 right-5 z-[99999] pointer-events-none" style={{ transformOrigin: "bottom right" }}>
       <motion.div
@@ -312,44 +274,14 @@ export function AIAssistant() {
             variant="primaryButton"
             gridSize={6}
             onClick={handleOpen}
-            className={`ai-launcher ${idleTransform ? "ai-launcher-transformed" : ""}`}
+            className={`ai-launcher ${isIdleActive ? `is-idle-${idleVariant}` : ""}`}
             aria-label="Open AI assistant"
           >
-            <AnimatePresence mode="wait">
-              {idleTransform ? (
-                <motion.span
-                  key={idleTransform.id}
-                  initial={{ opacity: 0, y: 5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -5 }}
-                  transition={{ duration: 0.18 }}
-                  className="inline-flex items-center gap-2.5 whitespace-nowrap"
-                >
-                  <span className="ai-launcher-icon-wrap">
-                    {renderTransformIcon(idleTransform.icon)}
-                  </span>
-                  <span className="text-[9.5px] font-bold tracking-wider text-[#c8ff3d]">
-                    {idleTransform.text}
-                  </span>
-                  <PixelArrowUpRight size={13} className="text-[#c8ff3d]" />
-                </motion.span>
-              ) : (
-                <motion.span
-                  key="default"
-                  initial={{ opacity: 0, y: 5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -5 }}
-                  transition={{ duration: 0.18 }}
-                  className="inline-flex items-center gap-2.5 whitespace-nowrap"
-                >
-                  <span className="ai-launcher-icon-wrap">
-                    <PixelChat size={17} />
-                  </span>
-                  <span>Ask My AI</span>
-                  <PixelArrowUpRight size={14} className="ai-launcher-arrow" />
-                </motion.span>
-              )}
-            </AnimatePresence>
+            <span className="ai-launcher-icon">
+              <PixelChat size={17} />
+            </span>
+            <span>Ask My AI</span>
+            <PixelArrowUpRight size={14} className="ai-launcher-arrow" />
           </PixelCard>
         ) : (
           <div className="ai-shell" role="dialog" aria-modal="true" aria-label="Mehedi portfolio assistant">
