@@ -1,18 +1,24 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { PixelBot } from "./PixelIcons";
 
 export function AdminSecretTrigger() {
-  const router = useRouter();
   const [triggered, setTriggered] = useState(false);
 
   useEffect(() => {
     let keyBuffer = "";
     let resetTimer: NodeJS.Timeout;
+    let redirectTimer: NodeJS.Timeout;
 
     function handleKeyDown(e: KeyboardEvent) {
+      // Allow ESC to cancel overlay
+      if (e.key === "Escape") {
+        setTriggered(false);
+        clearTimeout(redirectTimer);
+        return;
+      }
+
       // Don't trigger if user is actively typing in a form field
       const target = e.target as HTMLElement | null;
       if (
@@ -24,7 +30,7 @@ export function AdminSecretTrigger() {
         return;
       }
 
-      // Check shortcut Ctrl+Shift+A or Ctrl+Alt+A
+      // Shortcut: Ctrl+Shift+A or Cmd+Shift+A
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === "A" || e.key === "a")) {
         e.preventDefault();
         activateAdmin();
@@ -32,7 +38,7 @@ export function AdminSecretTrigger() {
       }
 
       // Buffer character typing for "admin"
-      if (e.key && e.key.length === 1) {
+      if (e.key && e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
         keyBuffer += e.key.toLowerCase();
         if (keyBuffer.length > 8) {
           keyBuffer = keyBuffer.slice(-8);
@@ -44,6 +50,7 @@ export function AdminSecretTrigger() {
         }, 2000);
 
         if (keyBuffer.endsWith("admin")) {
+          keyBuffer = "";
           activateAdmin();
         }
       }
@@ -51,23 +58,30 @@ export function AdminSecretTrigger() {
 
     function activateAdmin() {
       setTriggered(true);
-      setTimeout(() => {
-        router.push("/admin");
-      }, 500);
+      clearTimeout(redirectTimer);
+      redirectTimer = setTimeout(() => {
+        window.location.href = "/admin";
+      }, 400);
     }
 
     window.addEventListener("keydown", handleKeyDown);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       clearTimeout(resetTimer);
+      clearTimeout(redirectTimer);
     };
-  }, [router]);
+  }, []);
 
   if (!triggered) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999999] bg-black/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center animate-in fade-in duration-200">
-      <div className="p-6 bg-[#0c120c] border-2 border-[#c8ff3d] rounded-xl shadow-[0_0_40px_rgba(200,255,61,0.4)] space-y-4 max-w-sm">
+    <div
+      onClick={() => {
+        window.location.href = "/admin";
+      }}
+      className="fixed inset-0 z-[9999999] bg-black/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center animate-in fade-in duration-200 cursor-pointer select-none"
+    >
+      <div className="p-6 bg-[#0c120c] border-2 border-[#c8ff3d] rounded-xl shadow-[0_0_40px_rgba(200,255,61,0.5)] space-y-4 max-w-sm">
         <div className="size-16 rounded-lg bg-[#c8ff3d20] border border-[#c8ff3d] grid place-items-center mx-auto text-[#c8ff3d] animate-pulse">
           <PixelBot size={32} />
         </div>
@@ -80,7 +94,10 @@ export function AdminSecretTrigger() {
           </p>
         </div>
         <div className="w-full h-1.5 bg-[#1a2619] rounded-full overflow-hidden">
-          <div className="h-full bg-[#c8ff3d] animate-[pixelProgress_0.6s_ease-out_forwards]" />
+          <div className="h-full bg-[#c8ff3d] animate-[pixelProgress_0.4s_ease-out_forwards]" />
+        </div>
+        <div className="pt-1 text-[10px] font-mono text-[#838e7f]">
+          Redirecting to /admin... (Click to jump immediately)
         </div>
       </div>
     </div>
