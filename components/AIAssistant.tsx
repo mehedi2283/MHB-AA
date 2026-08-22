@@ -165,6 +165,7 @@ function PixelTransitionOverlay({
 export function AIAssistant() {
   const [open, setOpen] = useState(false);
   const [transitionMode, setTransitionMode] = useState<"open" | "close" | null>(null);
+  const [idleEffect, setIdleEffect] = useState<"bounce" | "wink" | "sparkle" | "ping" | null>(null);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([
@@ -179,6 +180,40 @@ export function AIAssistant() {
   useEffect(() => {
     messageEnd.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages, loading]);
+
+  // Randomized playful 8-bit idle animation cycle when chat is closed
+  useEffect(() => {
+    if (open) {
+      setIdleEffect(null);
+      return;
+    }
+
+    let timeoutId: NodeJS.Timeout;
+    let resetId: NodeJS.Timeout;
+
+    function triggerNextIdle() {
+      // Trigger a random animation every 4.5 to 8.5 seconds
+      const delay = 4500 + Math.random() * 4000;
+      timeoutId = setTimeout(() => {
+        const effects: Array<"bounce" | "wink" | "sparkle" | "ping"> = ["bounce", "wink", "sparkle", "ping"];
+        const chosen = effects[Math.floor(Math.random() * effects.length)];
+        setIdleEffect(chosen);
+
+        // Settle back to resting state after 1.3s
+        resetId = setTimeout(() => {
+          setIdleEffect(null);
+          triggerNextIdle();
+        }, 1300);
+      }, delay);
+    }
+
+    triggerNextIdle();
+
+    return () => {
+      clearTimeout(timeoutId);
+      clearTimeout(resetId);
+    };
+  }, [open]);
 
   function handleOpen() {
     setTransitionMode("open");
@@ -241,14 +276,22 @@ export function AIAssistant() {
             variant="primaryButton"
             gridSize={6}
             onClick={handleOpen}
-            className="ai-launcher"
+            className={`ai-launcher ${idleEffect ? `is-idle-${idleEffect}` : ""}`}
             aria-label="Open AI assistant"
           >
-            <span>
+            <span className="ai-launcher-icon-wrap">
               <PixelChat size={17} />
+              {idleEffect === "sparkle" && (
+                <span className="ai-idle-sparkle" aria-hidden="true">
+                  <PixelSparkles size={11} />
+                </span>
+              )}
+              {idleEffect === "ping" && (
+                <span className="ai-idle-ping-ring" aria-hidden="true" />
+              )}
             </span>
             Ask My AI
-            <PixelArrowUpRight size={14} />
+            <PixelArrowUpRight size={14} className="ai-launcher-arrow" />
           </PixelCard>
         ) : (
           <div className="ai-shell" role="dialog" aria-modal="true" aria-label="Mehedi portfolio assistant">
