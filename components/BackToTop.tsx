@@ -1,11 +1,16 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import { PixelArrowUp } from "./PixelIcons";
 import { PixelCard } from "./PixelCard";
 
-function BackToTopPixelOverlay({ onComplete }: { onComplete?: () => void }) {
+function BackToTopPixelTransition({
+  mode,
+  onComplete,
+}: {
+  mode: "enter" | "exit";
+  onComplete?: () => void;
+}) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
@@ -31,21 +36,43 @@ function BackToTopPixelOverlay({ onComplete }: { onComplete?: () => void }) {
     const colors = [
       "rgba(200, 255, 61, 0.95)", // Acid Neon
       "rgba(255, 255, 255, 0.95)", // Cyber White
-      "rgba(200, 255, 61, 0.60)",
-      "rgba(255, 255, 255, 0.40)",
+      "rgba(200, 255, 61, 0.65)",
+      "rgba(255, 255, 255, 0.45)",
     ];
 
-    for (let r = 0; r < rows; r++) {
-      for (let c = 0; c < cols; c++) {
-        const diagNorm = (c + (rows - 1 - r)) / (cols + rows);
-        const baseDelay = diagNorm * 120;
-        grid.push({
-          x: c * pixelSize,
-          y: r * pixelSize,
-          delay: baseDelay + Math.random() * 30,
-          duration: 90 + Math.random() * 50,
-          color: colors[Math.floor(Math.random() * colors.length)],
-        });
+    if (mode === "enter") {
+      // Come from BOTTOM-RIGHT to TOP-LEFT
+      const maxDist = (cols - 1) + (rows - 1);
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const distFromBottomRight = (cols - 1 - c) + (rows - 1 - r);
+          const norm = distFromBottomRight / (maxDist || 1);
+          const baseDelay = norm * 160;
+          grid.push({
+            x: c * pixelSize,
+            y: r * pixelSize,
+            delay: baseDelay + Math.random() * 25,
+            duration: 90 + Math.random() * 40,
+            color: colors[Math.floor(Math.random() * colors.length)],
+          });
+        }
+      }
+    } else {
+      // Go from TOP-LEFT to BOTTOM-RIGHT
+      const maxDist = (cols - 1) + (rows - 1);
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const distFromTopLeft = c + r;
+          const norm = distFromTopLeft / (maxDist || 1);
+          const baseDelay = norm * 150;
+          grid.push({
+            x: c * pixelSize,
+            y: r * pixelSize,
+            delay: baseDelay + Math.random() * 25,
+            duration: 80 + Math.random() * 40,
+            color: colors[Math.floor(Math.random() * colors.length)],
+          });
+        }
       }
     }
 
@@ -59,95 +86,130 @@ function BackToTopPixelOverlay({ onComplete }: { onComplete?: () => void }) {
 
       let animating = false;
 
-      for (const p of grid) {
-        if (elapsed < p.delay) {
-          ctx.fillStyle = "rgba(13, 17, 13, 0.95)";
-          ctx.fillRect(p.x, p.y, pixelSize - 1, pixelSize - 1);
-          animating = true;
-        } else if (elapsed < p.delay + p.duration) {
-          const progress = (elapsed - p.delay) / p.duration;
-          ctx.fillStyle = p.color;
-          ctx.globalAlpha = 1 - progress;
-          ctx.fillRect(p.x, p.y, pixelSize - 1, pixelSize - 1);
-          if (progress < 0.4) {
-            ctx.fillStyle = "#ffffff";
-            ctx.fillRect(p.x + 2, p.y + 2, pixelSize - 4, pixelSize - 4);
+      if (mode === "enter") {
+        for (const p of grid) {
+          if (elapsed < p.delay) {
+            ctx.fillStyle = "rgba(13, 17, 13, 0.98)";
+            ctx.fillRect(p.x, p.y, pixelSize - 1, pixelSize - 1);
+            animating = true;
+          } else if (elapsed < p.delay + p.duration) {
+            const progress = (elapsed - p.delay) / p.duration;
+            ctx.fillStyle = p.color;
+            ctx.globalAlpha = 1 - progress;
+            ctx.fillRect(p.x, p.y, pixelSize - 1, pixelSize - 1);
+            if (progress < 0.35) {
+              ctx.fillStyle = "#ffffff";
+              ctx.fillRect(p.x + 2, p.y + 2, pixelSize - 4, pixelSize - 4);
+            }
+            ctx.globalAlpha = 1;
+            animating = true;
           }
-          ctx.globalAlpha = 1;
-          animating = true;
+        }
+      } else {
+        // Exit: pixels cascade from top-left to bottom-right
+        for (const p of grid) {
+          if (elapsed >= p.delay + p.duration) {
+            ctx.fillStyle = "rgba(13, 17, 13, 0.98)";
+            ctx.fillRect(p.x, p.y, pixelSize - 1, pixelSize - 1);
+          } else if (elapsed >= p.delay) {
+            const progress = (elapsed - p.delay) / p.duration;
+            ctx.fillStyle = p.color;
+            ctx.globalAlpha = progress;
+            ctx.fillRect(p.x, p.y, pixelSize - 1, pixelSize - 1);
+            if (progress > 0.6) {
+              ctx.fillStyle = "#ffffff";
+              ctx.fillRect(p.x + 2, p.y + 2, pixelSize - 4, pixelSize - 4);
+            }
+            ctx.globalAlpha = 1;
+            animating = true;
+          } else {
+            animating = true;
+          }
         }
       }
 
-      if (animating && elapsed < 260) {
+      if (animating && elapsed < 290) {
         animationId = requestAnimationFrame(render);
       } else {
-        ctx.clearRect(0, 0, width, height);
+        if (mode === "enter") {
+          ctx.clearRect(0, 0, width, height);
+        }
         onComplete?.();
       }
     }
 
     animationId = requestAnimationFrame(render);
     return () => cancelAnimationFrame(animationId);
-  }, [onComplete]);
+  }, [mode, onComplete]);
 
   return (
     <canvas
       ref={canvasRef}
-      className="pointer-events-none absolute inset-0 z-30 h-full w-full rounded"
+      className="pointer-events-none absolute inset-0 z-40 h-full w-full rounded"
       style={{ imageRendering: "pixelated" }}
     />
   );
 }
 
 export function BackToTop() {
-  const [visible, setVisible] = useState(false);
-  const [isPixelating, setIsPixelating] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [transitionMode, setTransitionMode] = useState<"enter" | "exit" | null>(null);
 
   useEffect(() => {
     function handleScroll() {
       if (window.scrollY > 300) {
-        setVisible((prev) => {
-          if (!prev) setIsPixelating(true);
-          return true;
-        });
+        if (!mounted && transitionMode !== "enter") {
+          setMounted(true);
+          setTransitionMode("enter");
+        }
       } else {
-        setVisible(false);
+        if (mounted && transitionMode !== "exit") {
+          setTransitionMode("exit");
+        }
       }
     }
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [mounted, transitionMode]);
 
   function scrollToTop() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
+  function handleTransitionComplete() {
+    if (transitionMode === "exit") {
+      setMounted(false);
+      setTransitionMode(null);
+    } else {
+      setTransitionMode(null);
+    }
+  }
+
+  if (!mounted) return null;
+
   return (
-    <AnimatePresence>
-      {visible && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.85, y: 15 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.8, y: 10, transition: { duration: 0.18 } }}
-          transition={{ type: "spring", stiffness: 380, damping: 28 }}
-          className="fixed bottom-[86px] right-6 z-50 pointer-events-auto"
+    <div className="fixed bottom-[86px] right-6 z-50 pointer-events-auto">
+      <div className="relative overflow-hidden rounded">
+        {transitionMode && (
+          <BackToTopPixelTransition
+            mode={transitionMode}
+            onComplete={handleTransitionComplete}
+          />
+        )}
+        <PixelCard
+          as="button"
+          variant="glass"
+          gridSize={6}
+          onClick={scrollToTop}
+          className="back-to-top-btn"
+          aria-label="Back to top"
         >
-          {isPixelating && <BackToTopPixelOverlay onComplete={() => setIsPixelating(false)} />}
-          <PixelCard
-            as="button"
-            variant="glass"
-            gridSize={6}
-            onClick={scrollToTop}
-            className="back-to-top-btn"
-            aria-label="Back to top"
-          >
-            <span>BACK TO TOP</span>
-            <PixelArrowUp size={13} />
-          </PixelCard>
-        </motion.div>
-      )}
-    </AnimatePresence>
+          <span>BACK TO TOP</span>
+          <PixelArrowUp size={13} />
+        </PixelCard>
+      </div>
+    </div>
   );
 }
