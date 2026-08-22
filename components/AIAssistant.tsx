@@ -252,113 +252,100 @@ export function AIAssistant() {
   const showSuggestions = !input.trim() && messages.length <= 1;
 
   return (
-    <div className="fixed bottom-5 right-5 z-[99999] pointer-events-none" style={{ transformOrigin: "bottom right" }}>
-      <motion.div
-        layout
-        transition={{
-          type: "spring",
-          stiffness: 440,
-          damping: 30,
-          mass: 0.75,
-        }}
-        className={`pointer-events-auto origin-bottom-right ${
-          open ? "ai-shell-active" : "ai-launcher-active"
-        }`}
-      >
-        {!open ? (
-          <PixelCard
-            as="button"
-            variant="primaryButton"
-            gridSize={6}
-            onClick={handleOpen}
-            className={`ai-launcher ${isIdleActive ? "is-idle-chomp" : ""}`}
-            aria-label="Open AI assistant"
-          >
-            <div className="ai-launcher-character">
-              <PixelPacman size={18} />
-            </div>
-            <div className="ai-launcher-dots" aria-hidden="true">
-              <i />
-              <i />
-              <i />
-            </div>
-            <span className="ai-launcher-text">Ask My AI</span>
-            <PixelArrowUpRight size={14} className="ai-launcher-arrow" />
-          </PixelCard>
-        ) : (
-          <div className="ai-shell" role="dialog" aria-modal="true" aria-label="Mehedi portfolio assistant">
-            {/* Evolving Pixel Transition (Radiates from bottom-right on open, cascades top-to-bottom on close) */}
-            {transitionMode && (
-              <PixelTransitionOverlay mode={transitionMode} onComplete={handleTransitionComplete} />
-            )}
-
-            <header className="ai-header">
-              <div className="ai-avatar">
-                <PixelBot size={20} />
-              </div>
-              <div>
-                <small>PERSONAL AI / v1.0</small>
-                <strong>Mehedi’s portfolio guide</strong>
-                <span>
-                  <i />
-                  Online · portfolio knowledge
-                </span>
-              </div>
-              <button onClick={handleClose} aria-label="Close assistant" type="button">
-                <PixelClose size={18} />
-              </button>
-            </header>
-
-            <div className="ai-messages scrollbar-hidden">
-              {messages.map((message, index) => (
-                <div className={`ai-message ${message.role}`} key={index}>
-                  {message.role === "assistant" && <PixelSparkles size={14} />}
-                  <p>{message.content}</p>
-                </div>
-              ))}
-              {loading && (
-                <div className="ai-thinking">
-                  <i />
-                  <i />
-                  <i />
-                </div>
-              )}
-              <div ref={messageEnd} aria-hidden="true" />
-            </div>
-
-            {showSuggestions && (
-              <>
-                <div className="ai-quick-label">START WITH A QUESTION</div>
-                <div className="ai-suggestions">
-                  {suggestions.map((suggestion) => (
-                    <button onClick={() => send(suggestion)} key={suggestion} type="button">
-                      <span>{suggestion}</span>
-                      <PixelArrowUpRight size={13} />
-                    </button>
-                  ))}
-                </div>
-              </>
-            )}
-
-            <div className="ai-composer">
-              <input
-                value={input}
-                onChange={(event) => setInput(event.target.value)}
-                onKeyDown={(event) => event.key === "Enter" && send()}
-                placeholder="Ask about my work…"
-                aria-label="Ask about Mehedi’s work"
-              />
-              <button onClick={() => send()} disabled={loading || !input.trim()} aria-label="Send message" type="button">
-                <PixelSend size={17} />
-              </button>
-            </div>
-            <footer className="ai-footer">
-              <span>Powered by portfolio knowledge</span>
-              <span>↵ to send</span>
-            </footer>
+    <div className="fixed bottom-5 right-5 z-[99999] pointer-events-auto">
+      {!open ? (
+        <PixelCard
+          as="button"
+          variant="primaryButton"
+          gridSize={6}
+          onClick={handleOpen}
+          className={`ai-launcher ${isIdleActive ? "is-idle-chomp" : ""}`}
+          aria-label="Open AI assistant"
+        >
+          <div className="ai-launcher-character">
+            <PixelPacman size={18} />
           </div>
-        )}
-      </motion.div>
+          <div className="ai-launcher-dots" aria-hidden="true">
+            <i />
+            <i />
+            <i />
+          </div>
+          <span className="ai-launcher-text">Ask My AI</span>
+          <PixelArrowUpRight size={14} className="ai-launcher-arrow" />
+        </PixelCard>
+      ) : (
+        <div className="ai-shell" role="dialog" aria-modal="true" aria-label="Mehedi portfolio assistant">
+          {/* Authentic Pixel Transition (Diagonal wipe from bottom-right on open, top-left on close) */}
+          {transitionMode && (
+            <PixelTransitionOverlay mode={transitionMode} onComplete={handleTransitionComplete} />
+          )}
+
+          <header className="ai-header">
+            <div className="ai-avatar">
+              <PixelBot size={20} />
+            </div>
+            <div>
+              <small>PERSONAL AI / v1.0</small>
+              <strong>Mehedi’s portfolio guide</strong>
+              <span>
+                <i />
+                Online · portfolio knowledge
+              </span>
+            </div>
+            <button onClick={handleClose} aria-label="Close assistant" type="button">
+              <PixelClose size={18} />
+            </button>
+          </header>
+
+          <div className="ai-messages scrollbar-hidden">
+            {messages.map((message, index) => (
+              <div className={`ai-message ${message.role}`} key={index}>
+                {message.role === "assistant" && <PixelSparkles size={14} />}
+                <p>{message.content}</p>
+              </div>
+            ))}
+            {loading && (
+              <div className="ai-thinking">
+                <i />
+                <i />
+                <i />
+              </div>
+            )}
+            <div ref={messageEnd} aria-hidden="true" />
+          </div>
+
+          {showSuggestions && (
+            <>
+              <div className="ai-quick-label">START WITH A QUESTION</div>
+              <div className="ai-suggestions">
+                {suggestions.map((suggestion) => (
+                  <button onClick={() => send(suggestion)} key={suggestion} type="button">
+                    <span>{suggestion}</span>
+                    <PixelArrowUpRight size={13} />
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+
+          <div className="ai-composer">
+            <input
+              value={input}
+              onChange={(event) => setInput(event.target.value)}
+              onKeyDown={(event) => event.key === "Enter" && send()}
+              placeholder="Ask about my work…"
+              aria-label="Ask about Mehedi’s work"
+            />
+            <button onClick={() => send()} disabled={loading || !input.trim()} aria-label="Send message" type="button">
+              <PixelSend size={17} />
+            </button>
+          </div>
+          <footer className="ai-footer">
+            <span>Powered by portfolio knowledge</span>
+            <span>↵ to send</span>
+          </footer>
+        </div>
+      )}
     </div>
   );
 }
