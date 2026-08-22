@@ -84,13 +84,20 @@ export function Globe({ className = "" }: { className?: string }) {
   const markerDomMap = useRef<Map<string, HTMLDivElement>>(new Map());
   const arcDomMap = useRef<Map<string, HTMLDivElement>>(new Map());
 
-  const pointerInteracting = useRef<number | null>(null);
+  const pointerInteracting = useRef<{ x: number; y: number } | null>(null);
   const widthRef = useRef(0);
-  const thetaRef = useRef(0.24);
 
-  // Framer Motion Spring Physics Engine for buttery-smooth damping and inertia
+  // Framer Motion Spring Physics Engine for buttery-smooth horizontal & vertical damping
   const phiTarget = useMotionValue(0);
   const springPhi = useSpring(phiTarget, {
+    mass: 0.8,
+    stiffness: 140,
+    damping: 24,
+    restDelta: 0.0001,
+  });
+
+  const thetaTarget = useMotionValue(0.24);
+  const springTheta = useSpring(thetaTarget, {
     mass: 0.8,
     stiffness: 140,
     damping: 24,
@@ -123,7 +130,7 @@ export function Globe({ className = "" }: { className?: string }) {
       width: initialWidth,
       height: initialWidth,
       phi: 0,
-      theta: thetaRef.current,
+      theta: 0.24,
       dark: 1,
       diffuse: 1.3,
       mapSamples: 16000,
@@ -153,7 +160,7 @@ export function Globe({ className = "" }: { className?: string }) {
     });
     observer.observe(canvas);
 
-    // High-performance 60 FPS animation loop driven by Spring Physics
+    // High-performance 60 FPS animation loop driven by 2-axis Spring Physics
     function animate() {
       if (isVisibleOnScreen) {
         if (pointerInteracting.current === null) {
@@ -162,20 +169,21 @@ export function Globe({ className = "" }: { className?: string }) {
         }
 
         const currentPhi = springPhi.get();
+        const currentTheta = springTheta.get();
         const currentWidth = (widthRef.current || 460) * 2;
 
         globe?.update({
           phi: currentPhi,
-          theta: thetaRef.current,
+          theta: currentTheta,
           width: currentWidth,
           height: currentWidth,
         });
 
-        // 60 FPS Direct DOM transforms for Markers
+        // 60 FPS Direct DOM transforms for Markers (tracking both phi and theta)
         for (const marker of MARKERS) {
           const el = markerDomMap.current.get(marker.id);
           if (el) {
-            const proj = project3D(marker.location[0], marker.location[1], currentPhi, thetaRef.current, 0.82);
+            const proj = project3D(marker.location[0], marker.location[1], currentPhi, currentTheta, 0.82);
             el.style.transform = `translate3d(-50%, -100%, 0) scale(${proj.scale})`;
             el.style.left = `${proj.x * 100}%`;
             el.style.top = `${proj.y * 100}%`;
@@ -184,13 +192,13 @@ export function Globe({ className = "" }: { className?: string }) {
           }
         }
 
-        // 60 FPS Direct DOM transforms for Arcs
+        // 60 FPS Direct DOM transforms for Arcs (tracking both phi and theta)
         for (const arc of ARCS) {
           const el = arcDomMap.current.get(arc.id);
           if (el) {
             const midLat = (arc.from[0] + arc.to[0]) / 2 + 18;
             const midLon = (arc.from[1] + arc.to[1]) / 2;
-            const proj = project3D(midLat, midLon, currentPhi, thetaRef.current, 0.97);
+            const proj = project3D(midLat, midLon, currentPhi, currentTheta, 0.97);
             el.style.transform = `translate3d(-50%, -50%, 0) scale(${proj.scale})`;
             el.style.left = `${proj.x * 100}%`;
             el.style.top = `${proj.y * 100}%`;
@@ -212,7 +220,7 @@ export function Globe({ className = "" }: { className?: string }) {
         globe?.destroy();
       } catch {}
     };
-  }, [phiTarget, springPhi]);
+  }, [phiTarget, springPhi, thetaTarget, springTheta]);
 
   return (
     <div
@@ -232,12 +240,12 @@ export function Globe({ className = "" }: { className?: string }) {
       <div className="absolute inset-0 rounded-full border border-white/[0.04] pointer-events-none" />
       <div className="absolute inset-8 rounded-full border border-[#c8ff3d]/[0.08] border-dashed pointer-events-none" />
 
-      {/* WebGL Canvas with spring drag controls */}
+      {/* WebGL Canvas with 2-axis (X and Y) spring drag controls */}
       <canvas
         ref={canvasRef}
         className="w-full h-full cursor-grab active:cursor-grabbing opacity-95 transition-opacity duration-300 z-10 touch-none"
         onPointerDown={(e) => {
-          pointerInteracting.current = e.clientX;
+          pointerInteracting.current = { x: e.clientX, y: e.clientY };
           (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
           canvasRef.current?.classList.add("cursor-grabbing");
         }}
@@ -252,10 +260,16 @@ export function Globe({ className = "" }: { className?: string }) {
         }}
         onPointerMove={(e) => {
           if (pointerInteracting.current !== null) {
-            const delta = e.clientX - pointerInteracting.current;
-            pointerInteracting.current = e.clientX;
-            // Update spring motion target immediately
-            phiTarget.set(phiTarget.get() + delta * 0.005);
+            const deltaX = e.clientX - pointerInteracting.current.x;
+            const deltaY = e.clientY - pointerInteracting.current.y;
+            pointerInteracting.current = { x: e.clientX, y: e.clientY };
+
+            // Horizontal rotation (left / right)
+            phiTarget.set(phiTarget.get() + deltaX * 0.005);
+
+            // Vertical tilt (up / down) - clamped to prevent inversion
+            const nextTheta = Math.max(-0.65, Math.min(0.85, thetaTarget.get() - deltaY * 0.005));
+            thetaTarget.set(nextTheta);
           }
         }}
       />
