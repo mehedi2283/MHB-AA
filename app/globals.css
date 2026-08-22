@@ -51,6 +51,27 @@
 }
 
 /* ==========================================================================
+   Custom Pixel Cursor - Hide Default OS Mouse Cursor
+   ========================================================================== */
+@media (hover: hover) and (pointer: fine) {
+    *,
+    *::before,
+    *::after,
+    html,
+    body,
+    a,
+    button,
+    input,
+    select,
+    textarea,
+    [role="button"],
+    .cursor-pointer,
+    .btn {
+        cursor: none !important;
+    }
+}
+
+/* ==========================================================================
    Luxury Minimal Scrollbar Design System
    ========================================================================== */
 html,
