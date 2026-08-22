@@ -2124,15 +2124,17 @@ select {
 /* Floating Back To Top button under chatbot */
 .back-to-top-btn {
     position: relative;
+    width: 154px;
     height: 38px;
-    padding: 0 14px;
+    padding: 0 12px;
     border: 1px solid #ffffff20;
     border-radius: var(--ui-radius);
     background: #0d110d;
     color: #a4ada0;
     display: flex;
     align-items: center;
-    gap: 7px;
+    justify-content: space-between;
+    gap: 6px;
     font-size: 9px;
     font-weight: 700;
     letter-spacing: .12em;
@@ -2140,6 +2142,8 @@ select {
     cursor: pointer;
     transition: border-color .25s ease, color .25s ease, background .25s ease;
     overflow: visible !important;
+    white-space: nowrap;
+    box-sizing: border-box;
 }
 
 .back-to-top-btn:hover {

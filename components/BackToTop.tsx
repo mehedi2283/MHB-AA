@@ -247,11 +247,11 @@ export function BackToTop() {
             />
           </svg>
 
-          <span>BACK TO TOP</span>
-          <span className="font-mono text-[9px] font-bold text-[#c8ff3d] tracking-tighter">
+          <span className="flex-shrink-0">BACK TO TOP</span>
+          <span className="w-[30px] text-right font-mono text-[9px] font-bold text-[#c8ff3d] tabular-nums tracking-tighter inline-block flex-shrink-0">
             {scrollProgress}%
           </span>
-          <PixelArrowUp size={13} />
+          <PixelArrowUp size={13} className="flex-shrink-0 text-[#c8ff3d]" />
         </PixelCard>
       </div>
     </div>
