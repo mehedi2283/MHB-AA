@@ -1,7 +1,18 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Bot, CheckCircle2, Key, LoaderCircle, Save, Sparkles, TestTube2, AlertCircle, ExternalLink } from "lucide-react";
+import {
+  Bot,
+  CheckCircle2,
+  Key,
+  LoaderCircle,
+  Save,
+  Sparkles,
+  TestTube2,
+  AlertCircle,
+  ExternalLink,
+  ShieldCheck,
+} from "lucide-react";
 
 export type ProviderType = "openai" | "anthropic" | "gemini";
 
@@ -13,27 +24,29 @@ interface ProviderOption {
 
 export const PROVIDER_MODELS: Record<ProviderType, ProviderOption[]> = {
   gemini: [
-    { id: "gemini-2.0-flash", name: "Gemini 2.0 Flash (Fastest & Recommended)", recommended: true },
-    { id: "gemini-1.5-flash", name: "Gemini 1.5 Flash (Lightweight)" },
-    { id: "gemini-1.5-pro", name: "Gemini 1.5 Pro (Advanced Reasoning)" },
+    { id: "gemini-2.5-flash", name: "Gemini 2.5 Flash (Fastest & Recommended)", recommended: true },
+    { id: "gemini-2.5-pro", name: "Gemini 2.5 Pro (Advanced Reasoning)" },
+    { id: "gemini-2.5-flash-lite", name: "Gemini 2.5 Flash-Lite (Ultra Lightweight)" },
+    { id: "gemini-3.6-flash", name: "Gemini 3.6 Flash (Frontier Preview)" },
+    { id: "gemini-flash-latest", name: "Gemini Flash Latest (Always Latest Stable)" },
   ],
   openai: [
     { id: "gpt-4o-mini", name: "GPT-4o Mini (Fast & Efficient)", recommended: true },
     { id: "gpt-4o", name: "GPT-4o (High Performance)" },
-    { id: "gpt-4.1-mini", name: "GPT-4.1 Mini" },
     { id: "o3-mini", name: "o3-mini (Reasoning Model)" },
+    { id: "gpt-4.5-preview", name: "GPT-4.5 Preview (Frontier Scale)" },
   ],
   anthropic: [
-    { id: "claude-3-5-haiku-latest", name: "Claude 3.5 Haiku (Fast & Cost-Efficient)", recommended: true },
+    { id: "claude-3-7-sonnet-latest", name: "Claude 3.7 Sonnet (Hybrid Reasoning)", recommended: true },
     { id: "claude-3-5-sonnet-latest", name: "Claude 3.5 Sonnet (State of the Art)" },
-    { id: "claude-3-opus-latest", name: "Claude 3 Opus" },
+    { id: "claude-3-5-haiku-latest", name: "Claude 3.5 Haiku (Fast & Cost-Efficient)" },
   ],
 };
 
 const PROVIDER_KEY_LINKS: Record<ProviderType, { label: string; url: string }> = {
-  gemini: { label: "Get Gemini API Key (Google AI Studio)", url: "https://aistudio.google.com/app/apikey" },
-  openai: { label: "Get OpenAI API Key (OpenAI Platform)", url: "https://platform.openai.com/api-keys" },
-  anthropic: { label: "Get Anthropic API Key (Anthropic Console)", url: "https://console.anthropic.com/settings/keys" },
+  gemini: { label: "Get Gemini Key (Google AI Studio)", url: "https://aistudio.google.com/app/apikey" },
+  openai: { label: "Get OpenAI Key (OpenAI Platform)", url: "https://platform.openai.com/api-keys" },
+  anthropic: { label: "Get Anthropic Key (Anthropic Console)", url: "https://console.anthropic.com/settings/keys" },
 };
 
 type Form = {
@@ -51,7 +64,7 @@ type Form = {
 
 const initial: Form = {
   activeProvider: "gemini",
-  model: "gemini-2.0-flash",
+  model: "gemini-2.5-flash",
   apiKey: "",
   systemPrompt:
     "You are the concise, professional guide for Mehedi’s personal portfolio. Never invent results or guarantees.",
@@ -65,6 +78,7 @@ const initial: Form = {
 
 export function AISettingsForm() {
   const [form, setForm] = useState<Form>(initial);
+  const [hasApiKey, setHasApiKey] = useState(false);
   const [status, setStatus] = useState("");
   const [statusType, setStatusType] = useState<"info" | "success" | "error">("info");
   const [busy, setBusy] = useState(false);
@@ -77,7 +91,7 @@ export function AISettingsForm() {
         if (data) {
           const provider: ProviderType = data.activeProvider || "gemini";
           const currentModel: string = data.model || PROVIDER_MODELS[provider][0].id;
-          const knownModel = PROVIDER_MODELS[provider].some((m) => m.id === currentModel);
+          const knownModel = PROVIDER_MODELS[provider]?.some((m) => m.id === currentModel);
 
           setForm((current) => ({
             ...current,
@@ -86,6 +100,7 @@ export function AISettingsForm() {
             model: currentModel,
             apiKey: "",
           }));
+          setHasApiKey(Boolean(data.hasApiKey));
           setIsCustomModel(!knownModel);
         }
       });
@@ -126,8 +141,9 @@ export function AISettingsForm() {
       const data = await response.json();
       setBusy(false);
       if (response.ok) {
-        setStatus("Configuration saved & encrypted securely.");
+        setStatus("Configuration & API key securely saved in database.");
         setStatusType("success");
+        setHasApiKey(true);
         update("apiKey", "");
       } else {
         setStatus(data.error || "Unable to save configuration.");
@@ -142,26 +158,26 @@ export function AISettingsForm() {
 
   async function test() {
     setBusy(true);
-    setStatus("Testing the configured provider connection…");
+    setStatus("Testing live model connection…");
     setStatusType("info");
     try {
       const response = await fetch("/api/ai/chat", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
-          messages: [{ role: "user", content: "Reply with one short sentence describing Mehedi’s portfolio." }],
+          messages: [{ role: "user", content: "Say hello and give a one-sentence overview of Mehedi's portfolio." }],
         }),
       });
       const data = await response.json();
       setBusy(false);
       if (!response.ok) {
-        setStatus("Provider test failed. Please check your API key and model selection.");
+        setStatus("Provider test failed. Please verify your API key and model selection.");
         setStatusType("error");
       } else if (data.provider === "local") {
-        setStatus("The provider failed to respond, so the local fallback answered. Please verify your API key.");
+        setStatus("Provider credentials missing or invalid; answering via knowledge fallback. Please save a valid API key.");
         setStatusType("error");
       } else {
-        setStatus(`Connected successfully via ${data.provider.toUpperCase()}: "${data.message}"`);
+        setStatus(`✓ Connected to ${data.provider.toUpperCase()} (${data.model || form.model}): "${data.message}"`);
         setStatusType("success");
       }
     } catch {
@@ -180,7 +196,7 @@ export function AISettingsForm() {
         <div>
           <div className="admin-kicker">Operations / Assistant</div>
           <h1>AI Assistant Configuration</h1>
-          <p>Configure model routing, API credentials, and behavioral controls. Secrets are encrypted before storage.</p>
+          <p>Configure model routing, API credentials, and behavioral controls. All keys are encrypted in Supabase.</p>
         </div>
         <Bot size={28} strokeWidth={1.3} className="text-[var(--acid)]" />
       </header>
@@ -191,7 +207,7 @@ export function AISettingsForm() {
           <span>01</span>
           <div>
             <h2>Provider & Model Routing</h2>
-            <p>Select your preferred AI provider and matching model.</p>
+            <p>Select your AI provider and modern model. API keys are saved directly into your database.</p>
           </div>
         </div>
 
@@ -204,15 +220,15 @@ export function AISettingsForm() {
               onChange={(e) => handleProviderChange(e.target.value as ProviderType)}
               className="admin-input font-medium bg-[#0c100c]"
             >
-              <option value="gemini">Google Gemini (Recommended)</option>
+              <option value="gemini">Google Gemini (Recommended & Fast)</option>
               <option value="openai">OpenAI</option>
               <option value="anthropic">Anthropic Claude</option>
             </select>
           </label>
 
-          {/* Model Dropdown Automatically Synced */}
+          {/* Model Dropdown */}
           <label className="admin-field">
-            <span>Model Selection</span>
+            <span>Model Selection (Latest 2025/2026 Models)</span>
             <select
               value={isCustomModel ? "custom" : form.model}
               onChange={(e) => handleModelSelect(e.target.value)}
@@ -227,24 +243,29 @@ export function AISettingsForm() {
             </select>
           </label>
 
-          {/* Custom Model Text Input if selected */}
+          {/* Custom Model Text Input */}
           {isCustomModel && (
             <label className="admin-field admin-field-wide">
               <span>Custom Model Identifier</span>
               <input
                 value={form.model}
                 onChange={(e) => update("model", e.target.value)}
-                placeholder="e.g. gemini-2.0-pro-exp or gpt-4o-2024-08-06"
+                placeholder="e.g. gemini-2.5-pro or gpt-4o"
                 className="admin-input font-mono text-xs"
               />
             </label>
           )}
 
-          {/* API Key Field with Helper Link */}
+          {/* API Key Field with Helper Link & Database Status */}
           <label className="admin-field admin-field-wide">
             <div className="flex items-center justify-between pb-1">
               <span className="flex items-center gap-1.5">
                 <Key size={13} /> API Key
+                {hasApiKey && (
+                  <span className="inline-flex items-center gap-1 text-[10px] text-[var(--acid)] font-mono bg-[var(--acid)]/10 px-2 py-0.5 rounded border border-[var(--acid)]/25">
+                    <ShieldCheck size={11} /> Saved in Database
+                  </span>
+                )}
               </span>
               {keyLink && (
                 <a
@@ -262,7 +283,11 @@ export function AISettingsForm() {
               onChange={(e) => update("apiKey", e.target.value)}
               type="password"
               className="admin-input font-mono"
-              placeholder="Paste new API key to replace saved credentials (saved keys remain encrypted)"
+              placeholder={
+                hasApiKey
+                  ? "•••••••••••••••••••• (API key is saved in database. Enter a new key only to replace it)"
+                  : "Paste your API key here (e.g. AIzaSy...)"
+              }
               autoComplete="new-password"
             />
           </label>
@@ -374,7 +399,15 @@ export function AISettingsForm() {
           {statusType === "success" && <CheckCircle2 size={15} className="text-[var(--acid)]" />}
           {statusType === "error" && <AlertCircle size={15} className="text-red-400" />}
           {statusType === "info" && <Sparkles size={15} className="text-white/60" />}
-          <span className={statusType === "error" ? "text-red-400" : statusType === "success" ? "text-[var(--acid)]" : "text-white/70"}>
+          <span
+            className={
+              statusType === "error"
+                ? "text-red-400"
+                : statusType === "success"
+                ? "text-[var(--acid)] font-semibold"
+                : "text-white/70"
+            }
+          >
             {status || "Credentials are encrypted before database storage."}
           </span>
         </div>
