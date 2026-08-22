@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { PixelArrowUpRight } from "./PixelIcons";
 import type { ProjectItem } from "@/lib/site-content";
 import { PixelCard } from "./PixelCard";
@@ -9,40 +10,45 @@ export function ProjectCards({ projects }: { projects: ProjectItem[] }) {
   return (
     <div className="deployment-list">
       {projects.map((project, index) => (
-        <PixelCard
+        <Link
           key={project.slug}
-          as="a"
           href={`/projects/${project.slug}`}
-          variant="glass"
-          gridSize={10}
-          className="deployment-card group"
+          prefetch={true}
+          className="block no-underline"
         >
-          <div className="deployment-index">DEPLOYMENT / {project.number}</div>
-          <div className="deployment-copy">
-            <div className="deployment-client">
-              <span />
-              {project.client}
+          <PixelCard
+            as="div"
+            variant="glass"
+            gridSize={10}
+            className="deployment-card group cursor-pointer"
+          >
+            <div className="deployment-index">DEPLOYMENT / {project.number}</div>
+            <div className="deployment-copy">
+              <div className="deployment-client">
+                <span />
+                {project.client}
+              </div>
+              <h3>{project.title}</h3>
+              <p>{project.summary}</p>
+              <div className="deployment-tags">
+                {project.tags.map((tag) => (
+                  <span key={tag}>{tag}</span>
+                ))}
+              </div>
             </div>
-            <h3>{project.title}</h3>
-            <p>{project.summary}</p>
-            <div className="deployment-tags">
-              {project.tags.map((tag) => (
-                <span key={tag}>{tag}</span>
+            <div className="deployment-map" aria-hidden="true">
+              {(architecture[index] || project.tags.slice(0, 3)).map((node, nodeIndex) => (
+                <div className="deployment-node" key={node}>
+                  <i>{nodeIndex + 1}</i>
+                  {node}
+                </div>
               ))}
             </div>
-          </div>
-          <div className="deployment-map" aria-hidden="true">
-            {(architecture[index] || project.tags.slice(0, 3)).map((node, nodeIndex) => (
-              <div className="deployment-node" key={node}>
-                <i>{nodeIndex + 1}</i>
-                {node}
-              </div>
-            ))}
-          </div>
-          <div className="deployment-open">
-            View case study <PixelArrowUpRight size={16} />
-          </div>
-        </PixelCard>
+            <div className="deployment-open">
+              View case study <PixelArrowUpRight size={16} />
+            </div>
+          </PixelCard>
+        </Link>
       ))}
     </div>
   );

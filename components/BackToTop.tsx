@@ -19,7 +19,7 @@ function BackToTopPixelTransition({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const width = (canvas.width = canvas.offsetWidth || 140);
+    const width = (canvas.width = canvas.offsetWidth || 150);
     const height = (canvas.height = canvas.offsetHeight || 38);
     const pixelSize = 8;
     const cols = Math.ceil(width / pixelSize);
@@ -154,10 +154,16 @@ function BackToTopPixelTransition({
 export function BackToTop() {
   const [mounted, setMounted] = useState(false);
   const [transitionMode, setTransitionMode] = useState<"enter" | "exit" | null>(null);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
     function handleScroll() {
-      if (window.scrollY > 300) {
+      const scrollY = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const p = docHeight > 0 ? Math.min(100, Math.max(0, Math.round((scrollY / docHeight) * 100))) : 0;
+      setScrollProgress(p);
+
+      if (scrollY > 280) {
         if (!mounted && transitionMode !== "enter") {
           setMounted(true);
           setTransitionMode("enter");
@@ -203,10 +209,48 @@ export function BackToTop() {
           variant="glass"
           gridSize={6}
           onClick={scrollToTop}
-          className="back-to-top-btn"
+          className="back-to-top-btn group relative"
           aria-label="Back to top"
         >
+          {/* 8-Bit Pixel Perimeter Progress Ring */}
+          <svg
+            className="pointer-events-none absolute inset-0 h-full w-full"
+            style={{ shapeRendering: "crispEdges" }}
+          >
+            <rect
+              x="1"
+              y="1"
+              width="calc(100% - 2px)"
+              height="calc(100% - 2px)"
+              fill="none"
+              stroke="rgba(200, 255, 61, 0.15)"
+              strokeWidth="2"
+              strokeDasharray="4 2"
+              rx="4"
+            />
+            <rect
+              x="1"
+              y="1"
+              width="calc(100% - 2px)"
+              height="calc(100% - 2px)"
+              fill="none"
+              stroke="#c8ff3d"
+              strokeWidth="2"
+              pathLength="100"
+              strokeDasharray="100"
+              strokeDashoffset={100 - scrollProgress}
+              rx="4"
+              style={{
+                transition: "stroke-dashoffset 0.15s ease-out",
+                filter: "drop-shadow(0 0 4px rgba(200, 255, 61, 0.6))",
+              }}
+            />
+          </svg>
+
           <span>BACK TO TOP</span>
+          <span className="font-mono text-[9px] font-bold text-[#c8ff3d] tracking-tighter">
+            {scrollProgress}%
+          </span>
           <PixelArrowUp size={13} />
         </PixelCard>
       </div>
