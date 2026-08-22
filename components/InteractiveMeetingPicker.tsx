@@ -341,8 +341,8 @@ export function InteractiveMeetingPicker({
             Times shown in your local time with host equivalent:
           </div>
 
-          {/* Time Slot Buttons with Dual Timezone & Booked Status */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-56 overflow-y-auto pr-1">
+          {/* Time Slot Buttons with Dual Timezone & Booked Status - Clean No-Scroll Grid */}
+          <div className="grid grid-cols-2 gap-2">
             {availableSlots.map((slot) => {
               const isSelected = selectedTime === slot;
               const isBooked = busySlots.includes(slot);
@@ -368,7 +368,7 @@ export function InteractiveMeetingPicker({
                     </span>
                     {isSelected && !isBooked && <PixelCheck size={13} className="text-[#070a07]" />}
                     {isBooked && (
-                      <span className="text-[9px] px-1.5 py-0.2 bg-rose-950/80 border border-rose-800/80 text-rose-300 rounded font-bold">
+                      <span className="text-[9px] px-1 py-0.2 bg-rose-950/80 border border-rose-800/80 text-rose-300 rounded font-bold">
                         BOOKED
                       </span>
                     )}
