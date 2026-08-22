@@ -180,18 +180,6 @@ export function AIAssistant() {
     messageEnd.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages, loading]);
 
-  useEffect(() => {
-    if (!open) return;
-    const htmlOverflow = document.documentElement.style.overflow;
-    const bodyOverflow = document.body.style.overflow;
-    document.documentElement.style.overflow = "hidden";
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.documentElement.style.overflow = htmlOverflow;
-      document.body.style.overflow = bodyOverflow;
-    };
-  }, [open]);
-
   function handleOpen() {
     setTransitionMode("open");
     setOpen(true);
