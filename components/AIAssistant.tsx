@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUpRight, Bot, MessageCircle, Send, Sparkles, X } from "lucide-react";
 import { PixelCard } from "./PixelCard";
 
@@ -51,12 +52,12 @@ function PixelTransitionOverlay({
         for (let c = 0; c < cols; c++) {
           const distFromBottomRight = Math.hypot(cols - 1 - c, rows - 1 - r);
           const diagNorm = distFromBottomRight / maxDist; // 0 at bottom-right, 1 at top-left
-          const baseDelay = diagNorm * 220;
+          const baseDelay = diagNorm * 200;
           grid.push({
             x: c * pixelSize,
             y: r * pixelSize,
-            delay: baseDelay + Math.random() * 45,
-            duration: 130 + Math.random() * 65,
+            delay: baseDelay + Math.random() * 40,
+            duration: 120 + Math.random() * 60,
             color: colors[Math.floor(Math.random() * colors.length)],
           });
         }
@@ -68,12 +69,12 @@ function PixelTransitionOverlay({
         for (let c = 0; c < cols; c++) {
           const distFromTopLeft = Math.hypot(c, r);
           const diagNorm = distFromTopLeft / maxDist; // 0 at top-left, 1 at bottom-right
-          const baseDelay = diagNorm * 200;
+          const baseDelay = diagNorm * 180;
           grid.push({
             x: c * pixelSize,
             y: r * pixelSize,
-            delay: baseDelay + Math.random() * 40,
-            duration: 110 + Math.random() * 50,
+            delay: baseDelay + Math.random() * 35,
+            duration: 100 + Math.random() * 45,
             color: colors[Math.floor(Math.random() * colors.length)],
           });
         }
@@ -131,7 +132,7 @@ function PixelTransitionOverlay({
         }
       }
 
-      if (animating && elapsed < 350) {
+      if (animating && elapsed < 320) {
         animationId = requestAnimationFrame(render);
       } else {
         if (mode === "open") {
@@ -226,9 +227,20 @@ export function AIAssistant() {
   const showSuggestions = !input.trim() && messages.length <= 1;
 
   return (
-    <>
-      {!open && (
-        <div className="fixed bottom-5 right-5 z-40">
+    <div className="fixed bottom-5 right-5 z-[99999] pointer-events-none" style={{ transformOrigin: "bottom right" }}>
+      <motion.div
+        layout
+        transition={{
+          type: "spring",
+          stiffness: 420,
+          damping: 32,
+          mass: 0.8,
+        }}
+        className={`pointer-events-auto origin-bottom-right transition-all ${
+          open ? "ai-shell-active" : "ai-launcher-active"
+        }`}
+      >
+        {!open ? (
           <PixelCard
             as="button"
             variant="primaryButton"
@@ -243,90 +255,80 @@ export function AIAssistant() {
             Ask My AI
             <ArrowUpRight size={14} />
           </PixelCard>
-        </div>
-      )}
-
-      {open && (
-        <div
-          className="ai-shell"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Mehedi portfolio assistant"
-        >
-          {/* Full-box Pixel Transition Overlay (Open dissolve or Top-to-Bottom Close Curtain) */}
-          {transitionMode && (
-            <PixelTransitionOverlay
-              mode={transitionMode}
-              onComplete={handleTransitionComplete}
-            />
-          )}
-
-          <header className="ai-header">
-            <div className="ai-avatar">
-              <Bot size={19} />
-            </div>
-            <div>
-              <small>PERSONAL AI / v1.0</small>
-              <strong>Mehedi’s portfolio guide</strong>
-              <span>
-                <i />
-                Online · portfolio knowledge
-              </span>
-            </div>
-            <button onClick={handleClose} aria-label="Close assistant" type="button">
-              <X size={19} />
-            </button>
-          </header>
-
-          <div className="ai-messages scrollbar-hidden">
-            {messages.map((message, index) => (
-              <div className={`ai-message ${message.role}`} key={index}>
-                {message.role === "assistant" && <Sparkles size={13} />}
-                <p>{message.content}</p>
-              </div>
-            ))}
-            {loading && (
-              <div className="ai-thinking">
-                <i />
-                <i />
-                <i />
-              </div>
+        ) : (
+          <div className="ai-shell" role="dialog" aria-modal="true" aria-label="Mehedi portfolio assistant">
+            {/* Evolving Pixel Transition (Radiates from bottom-right on open, cascades top-to-bottom on close) */}
+            {transitionMode && (
+              <PixelTransitionOverlay mode={transitionMode} onComplete={handleTransitionComplete} />
             )}
-            <div ref={messageEnd} aria-hidden="true" />
-          </div>
 
-          {showSuggestions && (
-            <>
-              <div className="ai-quick-label">START WITH A QUESTION</div>
-              <div className="ai-suggestions">
-                {suggestions.map((suggestion) => (
-                  <button onClick={() => send(suggestion)} key={suggestion} type="button">
-                    <span>{suggestion}</span>
-                    <ArrowUpRight size={13} />
-                  </button>
-                ))}
+            <header className="ai-header">
+              <div className="ai-avatar">
+                <Bot size={19} />
               </div>
-            </>
-          )}
+              <div>
+                <small>PERSONAL AI / v1.0</small>
+                <strong>Mehedi’s portfolio guide</strong>
+                <span>
+                  <i />
+                  Online · portfolio knowledge
+                </span>
+              </div>
+              <button onClick={handleClose} aria-label="Close assistant" type="button">
+                <X size={19} />
+              </button>
+            </header>
 
-          <div className="ai-composer">
-            <input
-              value={input}
-              onChange={(event) => setInput(event.target.value)}
-              onKeyDown={(event) => event.key === "Enter" && send()}
-              placeholder="Ask about my work…"
-              aria-label="Ask about Mehedi’s work"
-            />
-            <button onClick={() => send()} disabled={loading || !input.trim()} aria-label="Send message" type="button">
-              <Send size={17} />
-            </button>
+            <div className="ai-messages scrollbar-hidden">
+              {messages.map((message, index) => (
+                <div className={`ai-message ${message.role}`} key={index}>
+                  {message.role === "assistant" && <Sparkles size={13} />}
+                  <p>{message.content}</p>
+                </div>
+              ))}
+              {loading && (
+                <div className="ai-thinking">
+                  <i />
+                  <i />
+                  <i />
+                </div>
+              )}
+              <div ref={messageEnd} aria-hidden="true" />
+            </div>
+
+            {showSuggestions && (
+              <>
+                <div className="ai-quick-label">START WITH A QUESTION</div>
+                <div className="ai-suggestions">
+                  {suggestions.map((suggestion) => (
+                    <button onClick={() => send(suggestion)} key={suggestion} type="button">
+                      <span>{suggestion}</span>
+                      <ArrowUpRight size={13} />
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+
+            <div className="ai-composer">
+              <input
+                value={input}
+                onChange={(event) => setInput(event.target.value)}
+                onKeyDown={(event) => event.key === "Enter" && send()}
+                placeholder="Ask about my work…"
+                aria-label="Ask about Mehedi’s work"
+              />
+              <button onClick={() => send()} disabled={loading || !input.trim()} aria-label="Send message" type="button">
+                <Send size={17} />
+              </button>
+            </div>
+            <footer className="ai-footer">
+              <span>Powered by portfolio knowledge</span>
+              <span>↵ to send</span>
+            </footer>
           </div>
-          <footer className="ai-footer">
-            <span>Powered by portfolio knowledge</span>
-            <span>↵ to send</span>
-          </footer>
-        </div>
-      )}
-    </>
+        )}
+      </motion.div>
+    </div>
   );
 }

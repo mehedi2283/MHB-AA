@@ -2081,10 +2081,8 @@ select {
 }
 
 .ai-shell {
-    position: fixed;
+    position: relative;
     z-index: 99999 !important;
-    right: 20px;
-    bottom: 20px;
     width: 420px;
     height: min(680px, calc(100vh - 40px));
     display: flex;
@@ -2095,6 +2093,7 @@ select {
     background: #0b0e0b;
     box-shadow: 0 30px 100px #000c;
     color: #eef1e9;
+    transform-origin: bottom right;
 }
 
 .ai-shell:before {
