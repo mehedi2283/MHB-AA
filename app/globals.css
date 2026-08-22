@@ -2039,10 +2039,10 @@ select {
     box-shadow: 0 0 24px #c8ff3d40;
 }
 
-/* Floating Back To Top button above chatbot */
+/* Floating Back To Top button under chatbot */
 .back-to-top-btn {
     position: fixed !important;
-    z-index: 9990 !important;
+    z-index: 50 !important;
     right: 24px !important;
     bottom: 86px !important;
     left: auto !important;
@@ -2082,7 +2082,7 @@ select {
 
 .ai-shell {
     position: fixed;
-    z-index: 60;
+    z-index: 99999 !important;
     right: 20px;
     bottom: 20px;
     width: 420px;
@@ -2094,7 +2094,7 @@ select {
     border-radius: var(--ui-radius);
     background: #0b0e0b;
     box-shadow: 0 30px 100px #000c;
-    color: #eef1e9
+    color: #eef1e9;
 }
 
 .ai-shell:before {
@@ -5906,8 +5906,23 @@ pre *,
 /* ==========================================================================
    Universal Bold Weight (700) for all Small Pixel Text & UI Elements
    ========================================================================== */
+body,
+p,
+span,
 small,
 small *,
+a,
+li,
+label,
+input,
+textarea,
+select,
+button,
+time,
+strong,
+b,
+code,
+pre,
 .badge,
 .tag,
 .kicker,
@@ -5944,6 +5959,8 @@ small *,
 .case-capabilities-list span,
 .ai-quick-label,
 .ai-suggestions button,
-.ai-footer span {
+.ai-footer span,
+.ai-message p,
+.ai-composer input {
     font-weight: 700 !important;
 }
