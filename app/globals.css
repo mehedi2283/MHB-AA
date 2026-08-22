@@ -4947,10 +4947,34 @@ select {
 }
 
 .admin-loader {
-    min-height: 180px;
-    display: grid;
-    place-items: center;
-    color: var(--admin-accent)
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: var(--acid, #c8ff3d);
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+.admin-loader::before {
+    content: "▪ ▪ ▪";
+    font-size: 24px;
+    letter-spacing: 6px;
+    color: #c8ff3d;
+    animation: dotBlink 1s infinite alternate steps(3);
+}
+
+.admin-loader::after {
+    content: "[ LOADING SYSTEM RECORDS... ]";
+    font-size: 11px;
+    letter-spacing: .12em;
+    color: #a4ada0;
+    font-weight: bold;
+}
+
+.admin-loader svg {
+    display: none !important;
 }
 
 /* admin authentication */

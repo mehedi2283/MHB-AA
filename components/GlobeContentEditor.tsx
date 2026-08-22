@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Globe as GlobeIcon, LoaderCircle, Plus, Save, Trash2, MapPin, Navigation } from "lucide-react";
 import type { GlobeMarker, GlobeArc, SiteContent } from "@/lib/site-content";
 import { Globe } from "@/components/magicui/globe";
+import { PixelLoader } from "./PixelLoader";
 
 export interface CityPreset {
   name: string;
@@ -254,8 +255,8 @@ export function GlobeContentEditor() {
 
   if (!content || (busy && !content)) {
     return (
-      <div className="admin-loader">
-        <LoaderCircle className="animate-spin" />
+      <div className="admin-page admin-page-wide py-20 flex justify-center items-center">
+        <PixelLoader label="INITIALIZING 3D GLOBE & CLIENT TELEMETRY..." />
       </div>
     );
   }
