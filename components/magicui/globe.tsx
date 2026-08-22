@@ -267,8 +267,8 @@ export function Globe({ className = "" }: { className?: string }) {
             // Horizontal rotation (left / right)
             phiTarget.set(phiTarget.get() + deltaX * 0.005);
 
-            // Vertical tilt (up / down) - clamped to prevent inversion
-            const nextTheta = Math.max(-0.65, Math.min(0.85, thetaTarget.get() - deltaY * 0.005));
+            // Vertical tilt (up / down) - naturally follows drag direction
+            const nextTheta = Math.max(-0.65, Math.min(0.85, thetaTarget.get() + deltaY * 0.005));
             thetaTarget.set(nextTheta);
           }
         }}
