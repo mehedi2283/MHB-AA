@@ -1994,102 +1994,125 @@ select {
     margin-top: 6px
 }
 
-/* opaque portfolio assistant */
+/* AI Launcher - 8-Bit Retro Arcade Pac-Man / Android Bot Assistant Button */
 .ai-launcher {
-    position: fixed !important;
-    z-index: 9990 !important;
-    right: 24px !important;
-    bottom: 24px !important;
-    left: auto !important;
-    top: auto !important;
-    height: 50px;
-    padding: 0 17px 0 8px;
-    border: 1px solid #d9ff7466;
+    position: relative;
+    height: 44px;
+    padding: 0 16px 0 12px;
+    border: 1px solid rgba(200, 255, 61, 0.4);
     border-radius: var(--ui-radius);
-    background: #0d110d;
-    color: #e8eee2;
-    display: flex;
+    background: #0b0e0b;
+    color: #ffffff;
+    display: inline-flex;
     align-items: center;
-    gap: 9px;
-    font-size: 12px;
+    gap: 8px;
+    font-size: 11px;
     font-weight: 700;
-    box-shadow: 0 14px 45px rgba(0, 0, 0, 0.7);
+    letter-spacing: .08em;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
     cursor: pointer;
-    transition: border-color .25s ease, box-shadow .25s ease;
-    overflow: visible !important;
-}
-
-.ai-launcher>span {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    display: grid;
-    place-items: center;
-    background: var(--acid);
-    color: #090b08;
-    flex-shrink: 0;
-}
-
-.ai-launcher>svg {
-    color: var(--acid);
+    transition: border-color .25s ease, box-shadow .25s ease, background .25s ease;
+    white-space: nowrap;
+    overflow: visible;
 }
 
 .ai-launcher:hover {
     border-color: var(--acid);
-    box-shadow: 0 0 24px #c8ff3d40;
+    background: #111710;
+    box-shadow: 0 0 24px rgba(200, 255, 61, 0.35);
 }
 
-/* AI Launcher Idle Micro-Animations */
-.ai-launcher .ai-launcher-icon {
+.ai-launcher-character {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.25s ease;
+    color: var(--acid);
+    flex-shrink: 0;
 }
 
-.ai-launcher.is-idle-flip .ai-launcher-icon {
-    animation: pixelCoinFlip 0.85s cubic-bezier(0.45, 0.05, 0.55, 0.95);
+/* 8-Bit Pac-Man Chomp & Idle Keyframes */
+.pixel-pacman-icon {
+    transform-origin: center;
+    animation: pacmanWiggle 1.4s ease-in-out infinite alternate;
 }
 
-.ai-launcher.is-idle-hop {
-    animation: pixelButtonHop 0.85s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+.pixel-pacman-mouth {
+    transform-origin: 8px 8px;
+    animation: pacmanChomp 0.38s steps(2, start) infinite alternate;
 }
 
-.ai-launcher.is-idle-hop .ai-launcher-arrow {
-    animation: aiArrowNudge 0.85s ease;
+.ai-launcher-dots {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    margin-right: 2px;
 }
 
-.ai-launcher.is-idle-glitch {
-    animation: pixelGlitchPulse 0.85s ease;
+.ai-launcher-dots i {
+    width: 3px;
+    height: 3px;
+    background: var(--acid);
+    border-radius: 0px;
+    display: inline-block;
+    animation: dotBlink 1.1s steps(2, start) infinite;
 }
 
-.ai-launcher.is-idle-pulse {
+.ai-launcher-dots i:nth-child(2) {
+    animation-delay: 0.22s;
+}
+
+.ai-launcher-dots i:nth-child(3) {
+    animation-delay: 0.44s;
+}
+
+.ai-launcher-text {
+    font-family: var(--font-pixeloid-sans), sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #ffffff;
+}
+
+.ai-launcher-arrow {
+    color: var(--acid);
+    transition: transform 0.2s ease;
+}
+
+.ai-launcher:hover .ai-launcher-arrow {
+    transform: translate(2px, -2px);
+    color: #ffffff;
+}
+
+/* Idle Arcade Burst / Chomp Run */
+.ai-launcher.is-idle-chomp {
     border-color: var(--acid) !important;
-    box-shadow: 0 0 24px rgba(200, 255, 61, 0.55) !important;
+    box-shadow: 0 0 24px rgba(200, 255, 61, 0.5) !important;
 }
 
-@keyframes pixelCoinFlip {
-    0% { transform: scaleX(1); }
-    50% { transform: scaleX(0) scaleY(1.2); filter: drop-shadow(0 0 8px var(--acid)); color: #ffffff; }
-    100% { transform: scaleX(1); }
+.ai-launcher.is-idle-chomp .pixel-pacman-icon {
+    animation: pacmanDash 0.85s steps(4) forwards;
 }
 
-@keyframes pixelButtonHop {
-    0%, 100% { transform: translateY(0); }
-    35% { transform: translateY(-5px); box-shadow: 0 0 24px rgba(200, 255, 61, 0.45); }
-    65% { transform: translateY(-2px); }
+@keyframes pacmanChomp {
+    0% { transform: scale(0.2); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
 }
 
-@keyframes aiArrowNudge {
-    0%, 100% { transform: translate(0, 0); }
-    35% { transform: translate(3px, -3px); color: #ffffff; }
+@keyframes pacmanWiggle {
+    0% { transform: rotate(-4deg); }
+    100% { transform: rotate(4deg); }
 }
 
-@keyframes pixelGlitchPulse {
-    0%, 100% { transform: translate(0, 0); filter: none; }
-    25% { transform: translate(-2px, 1px); filter: drop-shadow(-2px 0 var(--acid)) drop-shadow(2px 0 #ffffff); }
-    50% { transform: translate(2px, -1px); filter: drop-shadow(2px 0 var(--acid)) drop-shadow(-2px 0 #ffffff); }
-    75% { transform: translate(-1px, 0); }
+@keyframes pacmanDash {
+    0% { transform: translateX(0); }
+    40% { transform: translateX(5px) scale(1.15); filter: drop-shadow(0 0 8px var(--acid)); }
+    70% { transform: translateX(2px); }
+    100% { transform: translateX(0); }
+}
+
+@keyframes dotBlink {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; box-shadow: 0 0 4px var(--acid); }
 }
 
 /* Floating Back To Top button under chatbot */

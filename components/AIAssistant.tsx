@@ -8,6 +8,7 @@ import {
   PixelBot,
   PixelChat,
   PixelClose,
+  PixelPacman,
   PixelSend,
   PixelSparkles,
 } from "./PixelIcons";
@@ -164,7 +165,6 @@ export function AIAssistant() {
   const [open, setOpen] = useState(false);
   const [transitionMode, setTransitionMode] = useState<"open" | "close" | null>(null);
   const [isIdleActive, setIsIdleActive] = useState(false);
-  const [idleVariant, setIdleVariant] = useState<"flip" | "hop" | "glitch" | "pulse">("flip");
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([
@@ -180,7 +180,7 @@ export function AIAssistant() {
     messageEnd.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages, loading]);
 
-  // Clean, subtle 8-bit arcade idle animation cycle
+  // Clean 8-bit Pac-Man arcade idle burst cycle
   useEffect(() => {
     if (open) {
       setIsIdleActive(false);
@@ -193,15 +193,12 @@ export function AIAssistant() {
     function scheduleIdle() {
       const delay = 4500 + Math.random() * 3500;
       timeoutId = setTimeout(() => {
-        const variants: Array<"flip" | "hop" | "glitch" | "pulse"> = ["flip", "hop", "glitch", "pulse"];
-        const next = variants[Math.floor(Math.random() * variants.length)];
-        setIdleVariant(next);
         setIsIdleActive(true);
 
         resetId = setTimeout(() => {
           setIsIdleActive(false);
           scheduleIdle();
-        }, 900);
+        }, 950);
       }, delay);
     }
 
@@ -274,13 +271,18 @@ export function AIAssistant() {
             variant="primaryButton"
             gridSize={6}
             onClick={handleOpen}
-            className={`ai-launcher ${isIdleActive ? `is-idle-${idleVariant}` : ""}`}
+            className={`ai-launcher ${isIdleActive ? "is-idle-chomp" : ""}`}
             aria-label="Open AI assistant"
           >
-            <span className="ai-launcher-icon">
-              <PixelChat size={17} />
-            </span>
-            <span>Ask My AI</span>
+            <div className="ai-launcher-character">
+              <PixelPacman size={18} />
+            </div>
+            <div className="ai-launcher-dots" aria-hidden="true">
+              <i />
+              <i />
+              <i />
+            </div>
+            <span className="ai-launcher-text">Ask My AI</span>
             <PixelArrowUpRight size={14} className="ai-launcher-arrow" />
           </PixelCard>
         ) : (

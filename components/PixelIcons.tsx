@@ -523,3 +523,61 @@ export function PixelShield({ size = 16, className = "", ...props }: PixelIconPr
     </svg>
   );
 }
+
+// 8-Bit Pixel Pac-Man Character (Animated Chomp)
+export function PixelPacman({ size = 18, className = "", ...props }: PixelIconProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 16 16"
+      fill="currentColor"
+      shapeRendering="crispEdges"
+      className={`pixel-pacman-icon ${className}`}
+      {...props}
+    >
+      <rect x="5" y="1" width="6" height="2" />
+      <rect x="3" y="3" width="10" height="2" />
+      <rect x="2" y="5" width="12" height="2" />
+      <rect x="1" y="7" width="14" height="2" />
+      <rect x="1" y="9" width="14" height="2" />
+      <rect x="2" y="11" width="12" height="2" />
+      <rect x="3" y="13" width="10" height="2" />
+      <rect x="5" y="15" width="6" height="1" />
+      {/* Eye */}
+      <rect x="8" y="3" width="2" height="2" fill="#090c08" />
+      {/* Animated mouth cutout */}
+      <polygon points="16,8 8,8 16,13" fill="#090c08" className="pixel-pacman-mouth" />
+    </svg>
+  );
+}
+
+// 8-Bit Pixel Android Bot Assistant
+export function PixelAndroidBot({ size = 18, className = "", ...props }: PixelIconProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 16 16"
+      fill="currentColor"
+      shapeRendering="crispEdges"
+      className={`pixel-android-icon ${className}`}
+      {...props}
+    >
+      {/* Antennas */}
+      <rect x="3" y="1" width="1" height="2" />
+      <rect x="12" y="1" width="1" height="2" />
+      {/* Head Dome */}
+      <rect x="4" y="3" width="8" height="1" />
+      <rect x="2" y="4" width="12" height="4" />
+      {/* Eyes */}
+      <rect x="4" y="5" width="2" height="2" fill="#090c08" />
+      <rect x="10" y="5" width="2" height="2" fill="#090c08" />
+      {/* Body */}
+      <rect x="2" y="9" width="12" height="6" />
+      {/* Arms */}
+      <rect x="0" y="9" width="1" height="5" />
+      <rect x="15" y="9" width="1" height="5" />
+    </svg>
+  );
+}
