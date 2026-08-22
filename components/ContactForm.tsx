@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { ChevronDown, ExternalLink, LoaderCircle, Video } from "lucide-react";
 import { PixelCalendar, PixelCheck, PixelSend } from "./PixelIcons";
 import { PixelCard } from "./PixelCard";
+import { InteractiveMeetingPicker } from "./InteractiveMeetingPicker";
 
 const projectTypes = [
   "Workflow automation",
@@ -14,12 +15,6 @@ const projectTypes = [
 ];
 const budgets = ["Under $1,000", "$1,000–$3,000", "$3,000–$5,000", "$5,000+"];
 const timelines = ["As soon as possible", "Within 1 month", "1–3 months", "Exploring options"];
-const meetingTimeSlots = [
-  "Morning (09:00 AM – 12:00 PM)",
-  "Afternoon (01:00 PM – 05:00 PM)",
-  "Evening (06:00 PM – 09:00 PM)",
-  "Flexible / Anytime",
-];
 
 function PortfolioSelect({
   name,
@@ -129,16 +124,16 @@ function PortfolioSelect({
 export function ContactForm() {
   const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">("idle");
   const [wantMeeting, setWantMeeting] = useState(false);
+  const [meetingDate, setMeetingDate] = useState("");
+  const [meetingTime, setMeetingTime] = useState("");
   const [submittedData, setSubmittedData] = useState<{
     name?: string;
     email?: string;
     meetingDate?: string;
     meetingTime?: string;
     projectType?: string;
+    meetUrl?: string;
   } | null>(null);
-
-  // Tomorrow's date in YYYY-MM-DD for min date attribute
-  const tomorrowStr = new Date(Date.now() + 86400000).toISOString().split("T")[0];
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -147,9 +142,14 @@ export function ContactForm() {
     const values = Object.fromEntries(new FormData(form).entries());
 
     try {
+      const finalDate = wantMeeting ? (meetingDate || String(values.meetingDate || "")) : undefined;
+      const finalTime = wantMeeting ? (meetingTime || String(values.meetingTime || "")) : undefined;
+
       const payload = {
         ...values,
         meetingRequested: wantMeeting,
+        meetingDate: finalDate,
+        meetingTime: finalTime,
         meetingPlatform: wantMeeting ? "Google Meet (Online)" : undefined,
       };
 
@@ -159,14 +159,16 @@ export function ContactForm() {
         body: JSON.stringify(payload),
       });
 
-      if (!response.ok) throw new Error("Unable to send");
+      const resData = await response.json();
+      if (!response.ok) throw new Error(resData.error || "Unable to send");
 
       setSubmittedData({
         name: String(values.name || ""),
         email: String(values.email || ""),
-        meetingDate: wantMeeting ? String(values.meetingDate || "") : undefined,
-        meetingTime: wantMeeting ? String(values.meetingTime || "") : undefined,
+        meetingDate: finalDate,
+        meetingTime: finalTime,
         projectType: String(values.projectType || ""),
+        meetUrl: resData.meetUrl,
       });
 
       setStatus("done");
@@ -183,8 +185,8 @@ export function ContactForm() {
     const details = encodeURIComponent(
       `Project Brief Discussion: ${submittedData.projectType || "AI & Automation"}\nClient Email: ${submittedData.email}\nPlatform: Google Meet\n\nScheduled via Mehedi's Portfolio.`
     );
-    const location = encodeURIComponent("Google Meet (Online Video Call)");
-    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&details=${details}&location=${location}&dates=${cleanDate}T090000Z/${cleanDate}T100000Z`;
+    const location = encodeURIComponent(submittedData.meetUrl || "Google Meet (Online Video Call)");
+    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&details=${details}&location=${location}&dates=${cleanDate}T100000Z/${cleanDate}T104500Z`;
   }
 
   if (status === "done") {
@@ -200,10 +202,14 @@ export function ContactForm() {
           <p className="text-sm text-[#a4ada0] leading-relaxed">
             {submittedData?.meetingDate ? (
               <>
-                Received your brief and meeting request for{" "}
-                <strong className="text-[#c8ff3d]">{submittedData.meetingDate}</strong> (
-                {submittedData.meetingTime || "Flexible"}). I will review it and send a Google Meet
-                invite to <strong className="text-white">{submittedData.email}</strong>.
+                Received your brief and discovery meeting request for{" "}
+                <strong className="text-[#c8ff3d]">{submittedData.meetingDate}</strong> at{" "}
+                <strong className="text-[#c8ff3d]">{submittedData.meetingTime || "11:00 AM"}</strong>.
+                {submittedData.meetUrl ? (
+                  <> A Google Calendar event and Google Meet link have been automatically generated and sent to <strong className="text-white">{submittedData.email}</strong>.</>
+                ) : (
+                  <> I will review it personally and send a Google Meet invite directly to <strong className="text-white">{submittedData.email}</strong>.</>
+                )}
               </>
             ) : (
               "I’ll review your brief personally and reply to your email with a focused next step."
@@ -275,8 +281,8 @@ export function ContactForm() {
         <PortfolioSelect name="timeline" placeholder="Select a timeline" options={timelines} />
       </div>
 
-      {/* Online Meeting / Google Calendar Booking Toggle */}
-      <div className="contact-form-wide border border-[#ffffff15] hover:border-[#c8ff3d44] bg-[#0c120c] p-4 rounded-lg space-y-3 transition">
+      {/* Online Meeting / Interactive Calendar & Time Slot Picker */}
+      <div className="contact-form-wide border border-[#ffffff15] hover:border-[#c8ff3d44] bg-[#0c120c] p-4 rounded-lg space-y-4 transition">
         <label className="flex items-center justify-between cursor-pointer select-none">
           <div className="flex items-center gap-3">
             <input
@@ -295,26 +301,17 @@ export function ContactForm() {
           </span>
         </label>
 
+        {/* Visual 8-Bit Interactive Calendar & Date-based Time Slot Selector */}
         {wantMeeting && (
-          <div className="grid sm:grid-cols-2 gap-4 pt-2 border-t border-[#ffffff10] animate-in fade-in duration-200">
-            <label className="label">
-              <span className="text-[#c8ff3d]">Preferred Meeting Date *</span>
-              <input
-                type="date"
-                name="meetingDate"
-                min={tomorrowStr}
-                required={wantMeeting}
-                className="input font-mono text-xs text-[#e8eee2] bg-[#070907] cursor-pointer border-[#c8ff3d44] focus:border-[#c8ff3d]"
-              />
-            </label>
-            <div className="label">
-              <span className="text-[#c8ff3d]">Preferred Time Slot</span>
-              <PortfolioSelect
-                name="meetingTime"
-                placeholder="Select a time window"
-                options={meetingTimeSlots}
-              />
-            </div>
+          <div className="pt-2 animate-in fade-in duration-200">
+            <InteractiveMeetingPicker
+              onSelect={(date, time) => {
+                setMeetingDate(date);
+                setMeetingTime(time);
+              }}
+              initialDate={meetingDate}
+              initialTime={meetingTime}
+            />
           </div>
         )}
       </div>

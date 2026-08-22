@@ -98,11 +98,11 @@ export function AIConversationsViewer() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="admin-kicker">AI TELEMETRY / USER LOGS</div>
-          <h1 className="text-xl font-bold tracking-wider text-[#ffffff] flex items-center gap-2.5">
-            <PixelChat size={20} className="text-[#c8ff3d]" />
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-wide text-white flex items-center gap-3 mt-1">
+            <PixelChat size={28} className="text-[#c8ff3d]" />
             AI Conversations by User
           </h1>
-          <p className="text-xs text-[#a4ada0] mt-1">
+          <p className="text-sm text-[#a4ada0] mt-2 leading-relaxed">
             Browse real-time conversations, user queries, and AI answers grouped per visitor session.
           </p>
         </div>

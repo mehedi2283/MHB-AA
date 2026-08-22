@@ -140,13 +140,13 @@ export function IntegrationsSettingsForm() {
   return (
     <div className="max-w-4xl space-y-8">
       {/* Header */}
-      <div>
+      <div className="pb-2 border-b border-[#ffffff10]">
         <div className="admin-kicker">CONTROL ROOM / DIRECT INTEGRATIONS</div>
-        <h1 className="text-xl font-bold tracking-wider text-[#ffffff] flex items-center gap-2.5">
-          <PixelCalendar size={22} className="text-[#c8ff3d]" />
+        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-wide text-white flex items-center gap-3 mt-1">
+          <PixelCalendar size={28} className="text-[#c8ff3d]" />
           Google Account & Direct Sync
         </h1>
-        <p className="text-xs text-[#a4ada0] mt-1">
+        <p className="text-sm text-[#a4ada0] mt-2 leading-relaxed max-w-2xl">
           Directly connect your Google Account with 1-click OAuth to sync Google Calendar discovery meetings and send Gmail notifications.
         </p>
       </div>
