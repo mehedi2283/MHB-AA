@@ -2039,6 +2039,19 @@ select {
     box-shadow: 0 0 24px #c8ff3d40;
 }
 
+.ai-launcher-transformed {
+    border-color: var(--acid) !important;
+    background: #111710 !important;
+    box-shadow: 0 0 28px rgba(200, 255, 61, 0.35) !important;
+    transform: translateY(-2px);
+    transition: all 0.25s ease;
+}
+
+.ai-launcher-transformed::after {
+    opacity: 1 !important;
+    box-shadow: 0 0 10px var(--acid);
+}
+
 /* AI Launcher Idle Micro-Animations */
 .ai-launcher-icon-wrap {
     position: relative;
