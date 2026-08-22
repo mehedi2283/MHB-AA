@@ -275,20 +275,37 @@ select {
 .os-nav-connect {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 8px 11px;
-    border: 1px solid #ffffff22;
-    background: #09090999;
-    color: var(--acid);
-    font-size: 8px;
-    letter-spacing: .14em;
+    gap: 7px;
+    padding: 8px 16px;
+    border: 1px solid #d9ff74;
+    border-radius: var(--ui-radius);
+    background: var(--acid);
+    color: #090c08;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .12em;
     text-transform: uppercase;
-    transition: .2s
+    box-shadow: 0 0 18px rgba(200, 255, 61, 0.28);
+    cursor: pointer;
+    transition: transform .18s ease, box-shadow .2s ease, background .2s ease;
+    overflow: visible;
 }
 
 .os-nav-connect:hover {
-    background: var(--acid);
-    color: #080908
+    background: #d4ff55;
+    color: #090c08;
+    box-shadow: 0 0 28px rgba(200, 255, 61, 0.55);
+    transform: translateY(-1px);
+}
+
+.os-nav-connect svg {
+    transition: transform .2s ease;
+    color: #090c08;
+    stroke-width: 2.5px;
+}
+
+.os-nav-connect:hover svg {
+    transform: translate(2px, -2px);
 }
 
 .os-menu-button {
