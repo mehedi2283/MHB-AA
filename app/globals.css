@@ -47,7 +47,7 @@
     --font-pixeloid-sans: var(--font-pixeloid-sans, 'Pixeloid Sans');
     --font-pixeloid-mono: var(--font-pixeloid-mono, 'Pixeloid Mono');
     --font-readable: var(--font-pixeloid-sans), 'Pixeloid Sans', sans-serif;
-    --font-display: var(--font-pixel-game), 'Pixel Game', 'Pixeloid Sans', sans-serif;
+    --font-display: var(--font-pixeloid-sans), 'Pixeloid Sans', sans-serif;
 }
 
 * {
@@ -1713,7 +1713,7 @@ select {
 }
 
 .workflow-step strong {
-    font-family: var(--font-pixel-game), 'Pixel Game', sans-serif !important;
+    font-family: var(--font-pixeloid-sans), 'Pixeloid Sans', sans-serif !important;
     font-size: 8.5px;
     font-weight: 700;
     color: #c8cec3;
@@ -5584,10 +5584,25 @@ label {
     }
 }
 
-/* Pixel / Display font — headings and titles */
+/* Consistent Headline Typography across Full Project */
+h1,
+h2,
+h3,
+h4,
 .os-page h1,
 .os-page h2,
 .os-page h3,
+.case-page h1,
+.case-page h2,
+.case-page h3,
+.case-hero h1,
+.case-hero-copy h1,
+.case-section-intro h2,
+.case-build-copy h2,
+.case-build-copy h3,
+.case-quote h2,
+.case-cta h2,
+.case-cta-shell h2,
 .os-metric strong,
 .case-architecture-number,
 .admin-page-header h1,
@@ -5597,21 +5612,32 @@ label {
 .admin-metric strong,
 .admin-auth-context h1,
 .admin-auth-form h2 {
-    font-family: var(--font-pixel-game), 'Pixel Game', var(--font-pixeloid-sans), 'Pixeloid Sans', sans-serif !important;
+    font-family: var(--font-pixeloid-sans), 'Pixeloid Sans', sans-serif !important;
     font-weight: 700;
-    letter-spacing: .01em
+    letter-spacing: .01em;
 }
 
+h1 *,
+h2 *,
+h3 *,
+h4 *,
 .os-page h1 *,
 .os-page h2 *,
 .os-page h3 *,
+.case-page h1 *,
+.case-page h2 *,
+.case-page h3 *,
+.case-hero h1 *,
+.case-hero-copy h1 *,
+.case-section-intro h2 *,
+.case-build-copy h2 *,
 .admin-page-header h1 *,
 .admin-panel-heading h2 *,
 .admin-modal-head h2 *,
 .admin-section-heading h2 *,
 .admin-auth-context h1 *,
 .admin-auth-form h2 * {
-    font-family: var(--font-pixel-game), 'Pixel Game', var(--font-pixeloid-sans), 'Pixeloid Sans', sans-serif !important
+    font-family: var(--font-pixeloid-sans), 'Pixeloid Sans', sans-serif !important;
 }
 
 .os-hero h1 {
