@@ -39,6 +39,8 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true }
 };
 
+import { AdminSecretTrigger } from "@/components/AdminSecretTrigger";
+
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const structuredData = {
     "@context": "https://schema.org",
@@ -60,6 +62,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         suppressHydrationWarning
         className={`${pixelGameFont.variable} ${pixeloidSans.variable} ${pixeloidMono.variable} ${pixeloidSans.className}`}
       >
+        <AdminSecretTrigger />
         {children}
         <script
           type="application/ld+json"
