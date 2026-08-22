@@ -144,17 +144,22 @@ export async function POST(req: NextRequest) {
       console.error("Google background sync error:", googleErr);
     }
 
-    // 2. Save Inquiry to Supabase
+    // 2. Save Inquiry & Lead to Supabase
     try {
-      await createDocument("inquiries", {
+      const recordPayload = {
         ...submission,
         meetUrl,
         calendarEventLink,
         submissionStatus: "new",
         ipHash: crypto.createHash("sha256").update(ip).digest("hex"),
-        status: "new",
-        visible: false,
-      });
+        status: "published",
+        visible: true,
+      };
+
+      await Promise.all([
+        createDocument("inquiries", recordPayload),
+        createDocument("leads", recordPayload),
+      ]);
     } catch (dbErr) {
       console.error("Database save error:", dbErr);
     }

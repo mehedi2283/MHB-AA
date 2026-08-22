@@ -52,6 +52,30 @@ const fields: Record<string, Field[]> = {
     { key: "title", label: "Step" },
     { key: "order", label: "Order", kind: "number" },
   ],
+  inquiries: [
+    { key: "name", label: "Client Name" },
+    { key: "email", label: "Email Address" },
+    { key: "company", label: "Company" },
+    { key: "projectType", label: "Project Type" },
+    { key: "budget", label: "Budget Range" },
+    { key: "timeline", label: "Timeline" },
+    { key: "meetingDate", label: "Meeting Date" },
+    { key: "meetingTime", label: "Meeting Time" },
+    { key: "meetUrl", label: "Google Meet URL" },
+    { key: "message", label: "Client Brief / Message", multiline: true },
+  ],
+  leads: [
+    { key: "name", label: "Lead Name" },
+    { key: "email", label: "Email Address" },
+    { key: "company", label: "Company" },
+    { key: "projectType", label: "Project Interest" },
+    { key: "budget", label: "Budget" },
+    { key: "timeline", label: "Timeline" },
+    { key: "meetingDate", label: "Scheduled Meeting Date" },
+    { key: "meetingTime", label: "Scheduled Time" },
+    { key: "meetUrl", label: "Google Meet Room" },
+    { key: "message", label: "Project Brief", multiline: true },
+  ],
 };
 
 function toPairs(value: unknown): [string, string][] {
@@ -157,8 +181,22 @@ export function ContentManager({ collection }: { collection: string }) {
           <div className="admin-collection-row" key={item._id}>
             <span className="admin-row-index">{String(index + 1).padStart(2, "0")}</span>
             <div className="admin-row-main">
-              <strong>{item.title || item.name || item.email || "Untitled"}</strong>
-              <span><i className={item.visible === false ? "is-muted" : ""} />{item.status || "new"} / {item.visible === false ? "hidden" : "visible"}</span>
+              <strong>{String(item.name || item.title || item.email || "Untitled")}</strong>
+              <span className="flex flex-wrap items-center gap-2 mt-0.5 text-xs text-[#a4ada0]">
+                {Boolean(item.email) && <span className="text-[#c8ff3d] font-mono">{String(item.email)}</span>}
+                {Boolean(item.projectType) && <span>· {String(item.projectType)}</span>}
+                {Boolean(item.budget) && <span>· {String(item.budget)}</span>}
+                {Boolean(item.meetingDate) && (
+                  <span className="text-white font-mono bg-[#162215] px-1.5 py-0.5 rounded border border-[#c8ff3d33]">
+                    📅 {String(item.meetingDate)} at {String(item.meetingTime || "11:00 AM")}
+                  </span>
+                )}
+                {Boolean(item.meetUrl) && (
+                  <a href={String(item.meetUrl)} target="_blank" rel="noreferrer" className="text-[#c8ff3d] underline text-[11px]">
+                    📹 Google Meet
+                  </a>
+                )}
+              </span>
             </div>
             <div className="admin-row-actions">
               {editable && <button className="admin-button admin-button-quiet" onClick={() => setEditing(item)}>Edit</button>}
