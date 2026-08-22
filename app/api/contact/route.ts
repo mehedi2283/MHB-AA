@@ -21,6 +21,7 @@ const schema = z.object({
   meetingRequested: z.union([z.boolean(), z.string()]).optional(),
   meetingDate: z.string().max(50).optional(),
   meetingTime: z.string().max(100).optional(),
+  timezone: z.string().max(100).optional(),
   meetingPlatform: z.string().max(50).optional(),
   website: z.string().max(0).optional(),
 });
@@ -50,8 +51,7 @@ export async function POST(req: NextRequest) {
         // If user requested a discovery meeting
         if (submission.meetingRequested && submission.meetingDate) {
           const datePart = submission.meetingDate.split("T")[0];
-          // Default to 10:00 AM UTC or parse time if provided
-          let timeHour = "10";
+          let timeHour = "15";
           let timeMin = "00";
           if (submission.meetingTime) {
             const match = submission.meetingTime.match(/(\d+):(\d+)\s*(AM|PM)/i);
@@ -66,15 +66,22 @@ export async function POST(req: NextRequest) {
             }
           }
 
-          const startIso = `${datePart}T${timeHour}:${timeMin}:00Z`;
-          const endHour = String((parseInt(timeHour, 10) + 1) % 24).padStart(2, "0");
-          const endIso = `${datePart}T${endHour}:${timeMin}:00Z`;
+          // Compute 45 minute duration
+          const startMinutes = parseInt(timeHour, 10) * 60 + parseInt(timeMin, 10);
+          const endMinutes = startMinutes + 45;
+          const endHour = String(Math.floor(endMinutes / 60) % 24).padStart(2, "0");
+          const endMin = String(endMinutes % 60).padStart(2, "0");
+
+          const startIso = `${datePart}T${timeHour}:${timeMin}:00`;
+          const endIso = `${datePart}T${endHour}:${endMin}:00`;
+          const tz = submission.timezone || "Asia/Dhaka";
 
           const eventResult = await createGoogleCalendarEvent({
             summary: `Discovery Call · Mehedi & ${submission.name}`,
             description: `Project Type: ${submission.projectType}\nBudget: ${submission.budget}\nTimeline: ${submission.timeline}\nClient Email: ${submission.email}\nCompany: ${submission.company || "N/A"}\n\nClient Brief:\n${submission.message}`,
             startDateTime: startIso,
             endDateTime: endIso,
+            timeZone: tz,
             attendeeEmail: submission.email,
           });
 
@@ -87,7 +94,7 @@ export async function POST(req: NextRequest) {
           await sendGmailMessage({
             to: submission.email,
             subject: `Discovery Call Confirmed · Mehedi & ${submission.name}`,
-            bodyText: `Hi ${submission.name},\n\nThank you for reaching out! Your discovery call has been placed on Google Calendar.\n\nMeeting Details:\n• Date: ${submission.meetingDate}\n• Time: ${submission.meetingTime || "11:00 AM"}\n• Project: ${submission.projectType}\n• Google Meet Link: ${meetUrl || "Will be provided in calendar invite"}\n\nI look forward to speaking with you.\n\nBest regards,\nMehedi\nAI & Automation Specialist\nhttps://mehedi.ai`,
+            bodyText: `Hi ${submission.name},\n\nThank you for reaching out! Your discovery call has been placed on Google Calendar.\n\nMeeting Details:\n• Date: ${submission.meetingDate}\n• Time: ${submission.meetingTime || "03:00 PM"}\n• Project: ${submission.projectType}\n• Google Meet Link: ${meetUrl || "Will be provided in calendar invite"}\n\nI look forward to speaking with you.\n\nBest regards,\nMehedi\nAI & Automation Specialist\nhttps://mehedi.ai`,
           });
         }
 

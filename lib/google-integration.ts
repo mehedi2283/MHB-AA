@@ -129,19 +129,28 @@ export async function getValidGoogleAccessToken(): Promise<string | null> {
 export async function createGoogleCalendarEvent(params: {
   summary: string;
   description: string;
-  startDateTime: string; // ISO string e.g. "2026-08-25T10:00:00Z"
-  endDateTime: string; // ISO string
+  startDateTime: string; // e.g. "2026-08-25T15:00:00"
+  endDateTime: string; // e.g. "2026-08-25T15:45:00"
+  timeZone?: string; // e.g. "Asia/Dhaka", "America/New_York"
   attendeeEmail?: string;
 }): Promise<{ eventId?: string; meetUrl?: string; htmlLink?: string } | null> {
   const token = await getValidGoogleAccessToken();
   if (!token) return null;
 
   try {
+    const tz = params.timeZone || Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+
     const eventPayload: Record<string, unknown> = {
       summary: params.summary,
       description: params.description,
-      start: { dateTime: params.startDateTime },
-      end: { dateTime: params.endDateTime },
+      start: {
+        dateTime: params.startDateTime,
+        timeZone: tz,
+      },
+      end: {
+        dateTime: params.endDateTime,
+        timeZone: tz,
+      },
       conferenceData: {
         createRequest: {
           requestId: `meet_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,

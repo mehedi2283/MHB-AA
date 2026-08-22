@@ -145,11 +145,13 @@ export function ContactForm() {
       const finalDate = wantMeeting ? (meetingDate || String(values.meetingDate || "")) : undefined;
       const finalTime = wantMeeting ? (meetingTime || String(values.meetingTime || "")) : undefined;
 
+      const clientTz = Intl.DateTimeFormat().resolvedOptions().timeZone || "Asia/Dhaka";
       const payload = {
         ...values,
         meetingRequested: wantMeeting,
         meetingDate: finalDate,
         meetingTime: finalTime,
+        timezone: clientTz,
         meetingPlatform: wantMeeting ? "Google Meet (Online)" : undefined,
       };
 
