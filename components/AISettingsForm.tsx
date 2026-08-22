@@ -25,8 +25,9 @@ interface ProviderOption {
 export const PROVIDER_MODELS: Record<ProviderType, ProviderOption[]> = {
   gemini: [
     { id: "gemini-2.5-flash", name: "Gemini 2.5 Flash (Fastest & Recommended)", recommended: true },
+    { id: "gemini-3.5-flash", name: "Gemini 3.5 Flash (Latest Flash Series)" },
+    { id: "gemini-3.5-flash-lite", name: "Gemini 3.5 Flash-Lite (Ultra Lightweight)" },
     { id: "gemini-2.5-pro", name: "Gemini 2.5 Pro (Advanced Reasoning)" },
-    { id: "gemini-2.5-flash-lite", name: "Gemini 2.5 Flash-Lite (Ultra Lightweight)" },
     { id: "gemini-3.6-flash", name: "Gemini 3.6 Flash (Frontier Preview)" },
     { id: "gemini-flash-latest", name: "Gemini Flash Latest (Always Latest Stable)" },
   ],

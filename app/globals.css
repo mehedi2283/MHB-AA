@@ -5903,6 +5903,47 @@ pre *,
     transform: none !important;
 }
 
-
-
-
+/* ==========================================================================
+   Universal Bold Weight (700) for all Small Pixel Text & UI Elements
+   ========================================================================== */
+small,
+small *,
+.badge,
+.tag,
+.kicker,
+.admin-kicker,
+.admin-nav-label,
+.admin-brand small,
+.admin-field span,
+.admin-section-heading span,
+.admin-button,
+.workflow-step-index,
+.workflow-step small,
+.workflow-step strong,
+.workflow-event-log span,
+.workflow-event-log strong,
+.workflow-inspector-top,
+.workflow-inspector-row span,
+.workflow-node-stats small,
+.workflow-node-stats strong,
+.os-meta,
+.os-card-tag,
+.os-tool-tag,
+.os-stat-label,
+.os-marquee-container,
+.pill,
+.chip,
+.btn,
+.os-action-primary,
+.os-action-ghost,
+.os-nav-connect,
+.os-nav-link,
+.case-tag,
+.case-stat-label,
+.case-architecture-status span,
+.case-capabilities-list span,
+.ai-quick-label,
+.ai-suggestions button,
+.ai-footer span {
+    font-weight: 700 !important;
+}

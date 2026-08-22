@@ -3,6 +3,7 @@ import { z } from "zod";
 import { supabaseAdmin } from "@/lib/supabase";
 import { decryptSecret } from "@/lib/crypto";
 import { rateLimit } from "@/lib/rate-limit";
+import { getSiteContent, getPublicCollections } from "@/lib/site-content";
 
 const bodySchema = z.object({
   messages: z
@@ -19,17 +20,83 @@ const bodySchema = z.object({
 const basePrompt =
   "You are the concise, professional guide for Mehedi's personal portfolio. Describe Mehedi as an independent AI & Automation Specialist with 2+ years of hands-on experience and 1+ year of client delivery. Explain his AI agents, workflow automation, CRM/outreach systems and SaaS MVP capabilities. Known work: 13+ workflow gaming venue member lifecycle; Gazi AI outreach SaaS; eight-agent UK skincare ecosystem. Never present him as an agency or team. Never invent results, testimonials, prices or guarantees. Ask one useful discovery question at a time. Suggest the contact form for project, contract or employment opportunities.";
 
+async function buildDynamicKnowledgePrompt(customSystemPrompt?: string): Promise<string> {
+  try {
+    const [content, collections] = await Promise.all([getSiteContent(), getPublicCollections()]);
+
+    const projectKnowledge = collections.projects
+      .map(
+        (p) =>
+          `• Project: ${p.title} (Client: ${p.client || "Client System"})\n  Summary: ${p.summary || ""}\n  Tech Stack/Tags: ${
+            p.tags?.join(", ") || ""
+          }${p.solution ? `\n  Solution: ${p.solution}` : ""}`
+      )
+      .join("\n\n");
+
+    const servicesKnowledge = collections.services
+      .map((s) => `• Service: ${s.title}\n  Details: ${s.description}\n  Deliverables/Tools: ${s.tools?.join(", ") || ""}`)
+      .join("\n");
+
+    const metricsKnowledge = content.metrics
+      ?.map((m) => `${m.value} ${m.label}`)
+      .join(" | ");
+
+    const workflowKnowledge = content.workflowNodes
+      ?.map((n) => `Step ${n.name}: ${n.desc} (Tools: ${n.tools} -> Benefit: ${n.benefit})`)
+      .join("\n");
+
+    return `${customSystemPrompt || basePrompt}
+
+=== LIVE DATABASE KNOWLEDGE & PORTFOLIO TRUTH ===
+Name: Mehedi (Independent AI & Automation Specialist)
+Bio Intro: ${content.about?.intro || ""}
+Experience: ${content.about?.profileBody || ""}
+Key Metrics: ${metricsKnowledge || "50+ workflows engineered | 20+ projects delivered | 15+ platforms connected"}
+
+Client Projects in Database:
+${projectKnowledge}
+
+Services & Capabilities in Database:
+${servicesKnowledge}
+
+6-Step Automation Workflow in Database:
+${workflowKnowledge}
+
+Instructions:
+1. Ground all answers in the live database knowledge above.
+2. Maintain a confident, concise, and professional tone.
+3. Never invent unverified results, fake pricing, or agency team members.
+4. Suggest booking a discovery call or submitting the contact form for hiring, freelance contracts, or consultations.`;
+  } catch (err) {
+    console.error("Failed to build dynamic database prompt, using fallback:", err);
+    return `${customSystemPrompt || basePrompt}\n\nThis is Mehedi’s personal portfolio. Refer to its public identity as Mehedi / AI.`;
+  }
+}
+
 function sanitizeMessagesForProvider(messages: { role: string; content: string }[]) {
-  // Providers (Gemini, Anthropic) require the first message to be from 'user'
+  // Providers (Gemini, Anthropic) require the first message in the conversation history to be from 'user'
   const firstUserIdx = messages.findIndex((m) => m.role === "user");
   const filtered = firstUserIdx >= 0 ? messages.slice(firstUserIdx) : messages;
   return filtered.filter((m) => m.content && m.content.trim().length > 0);
 }
 
+function normalizeModel(provider: string, model: string): string {
+  const clean = model.replace(/^models\//, "");
+  if (provider === "gemini") {
+    if (clean === "gemini-2.5-flash-lite") return "gemini-3.5-flash-lite";
+    if (clean === "gemini-2.0-flash" || clean === "gemini-1.5-flash") return "gemini-2.5-flash";
+    if (clean === "gemini-1.5-pro") return "gemini-2.5-pro";
+  }
+  if (provider === "openai") {
+    if (clean === "gpt-4.1-mini") return "gpt-4o-mini";
+  }
+  return clean;
+}
+
 async function callProvider(
   provider: string,
   key: string,
-  model: string,
+  rawModel: string,
   prompt: string,
   rawMessages: { role: string; content: string }[],
   temperature: number,
@@ -40,10 +107,11 @@ async function callProvider(
     throw new Error("No user messages to process");
   }
 
+  const model = normalizeModel(provider, rawModel);
+
   // 1. Google Gemini API
   if (provider === "gemini") {
-    const cleanModel = model.replace(/^models\//, "");
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${cleanModel}:generateContent?key=${key}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
 
     const payload = {
       system_instruction: { parts: [{ text: prompt }] },
@@ -184,6 +252,9 @@ export async function POST(req: NextRequest) {
 
       const configs = (configRows.data || []).map((row) => row.data);
 
+      // Build live dynamic knowledge prompt from Supabase database tables
+      const fullKnowledgePrompt = await buildDynamicKnowledgePrompt(settings.systemPrompt);
+
       for (const provider of order) {
         const c = configs.find((item) => item?.provider === provider);
         if (!c?.encryptedApiKey || !c.enabled) continue;
@@ -193,13 +264,12 @@ export async function POST(req: NextRequest) {
           if (!apiKey) continue;
 
           const modelToUse = c.model || settings.model || (provider === "gemini" ? "gemini-2.5-flash" : "gpt-4o-mini");
-          const prompt = `${settings.systemPrompt || basePrompt}\n\nThis is Mehedi’s personal portfolio. Refer to its public identity as Mehedi / AI.`;
 
           message = await callProvider(
             provider,
             apiKey,
             modelToUse,
-            prompt,
+            fullKnowledgePrompt,
             messages,
             settings.temperature ?? 0.3,
             settings.maxTokens ?? 500
@@ -219,7 +289,7 @@ export async function POST(req: NextRequest) {
         message = localReply(lastUserMsg);
       }
 
-      // Log conversation to CMS documents
+      // Log conversation to CMS documents in Supabase
       await db.from("cms_documents").insert({
         collection: "aiConversations",
         data: {
@@ -240,6 +310,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message, provider: usedProvider, model: usedModel });
   } catch (err) {
     console.error("Chat API error:", err);
-    return NextResponse.json({ error: "Invalid chat request format.", details: err instanceof Error ? err.message : String(err) }, { status: 400 });
+    return NextResponse.json(
+      { error: "Invalid chat request format.", details: err instanceof Error ? err.message : String(err) },
+      { status: 400 }
+    );
   }
 }
