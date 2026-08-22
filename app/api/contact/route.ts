@@ -1,8 +1,10 @@
-import { NextRequest,NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createDocument } from "@/lib/supabase-data";
 import { rateLimit } from "@/lib/rate-limit";
+import { createGoogleCalendarEvent, sendGmailMessage } from "@/lib/google-integration";
 import crypto from "crypto";
+
 const schema = z.object({
   name: z.string().trim().min(2).max(100),
   email: z.string().email().max(200),
@@ -17,4 +19,68 @@ const schema = z.object({
   meetingPlatform: z.string().max(50).optional(),
   website: z.string().max(0).optional(),
 });
-export async function POST(req:NextRequest){const ip=req.headers.get("x-forwarded-for")?.split(",")[0]||"local";if(!rateLimit(`contact:${ip}`,4,3600000))return NextResponse.json({error:"Too many submissions"},{status:429});try{const data=schema.parse(await req.json());if(data.website)return NextResponse.json({ok:true});const {website:_,...submission}=data;void _;await createDocument("inquiries",{...submission,submissionStatus:"new",ipHash:crypto.createHash("sha256").update(ip).digest("hex"),status:"new",visible:false});return NextResponse.json({ok:true},{status:201})}catch(e){if(e instanceof z.ZodError)return NextResponse.json({error:"Please check the submitted fields"},{status:400});return NextResponse.json({error:"Unable to save the inquiry"},{status:503})}}
+
+export async function POST(req: NextRequest) {
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0] || "local";
+  if (!rateLimit(`contact:${ip}`, 4, 3600000)) {
+    return NextResponse.json({ error: "Too many submissions" }, { status: 429 });
+  }
+
+  try {
+    const data = schema.parse(await req.json());
+    if (data.website) return NextResponse.json({ ok: true });
+    const { website: _, ...submission } = data;
+    void _;
+
+    let meetUrl: string | undefined = undefined;
+    let calendarEventLink: string | undefined = undefined;
+
+    // Direct Google Calendar & Meet Auto-Creation if Google account is connected
+    if (submission.meetingRequested && submission.meetingDate) {
+      try {
+        const datePart = submission.meetingDate.split("T")[0];
+        const startIso = `${datePart}T10:00:00Z`;
+        const endIso = `${datePart}T10:45:00Z`;
+
+        const eventResult = await createGoogleCalendarEvent({
+          summary: `Discovery Call · Mehedi & ${submission.name}`,
+          description: `Project Type: ${submission.projectType}\nBudget: ${submission.budget}\nTimeline: ${submission.timeline}\nClient Email: ${submission.email}\nCompany: ${submission.company || "N/A"}\n\nClient Brief:\n${submission.message}`,
+          startDateTime: startIso,
+          endDateTime: endIso,
+          attendeeEmail: submission.email,
+        });
+
+        if (eventResult?.meetUrl) {
+          meetUrl = eventResult.meetUrl;
+          calendarEventLink = eventResult.htmlLink;
+
+          // Send confirmation email via Gmail
+          await sendGmailMessage({
+            to: submission.email,
+            subject: `Discovery Call Confirmed · Mehedi & ${submission.name}`,
+            bodyText: `Hi ${submission.name},\n\nThank you for reaching out! Your discovery call has been placed on Google Calendar.\n\nDate: ${submission.meetingDate}\nTime Window: ${submission.meetingTime || "Flexible"}\nGoogle Meet Link: ${meetUrl}\n\nI look forward to discussing your ${submission.projectType} project.\n\nBest regards,\nMehedi\nAI & Automation Specialist\nhttps://mehedi.ai`,
+          });
+        }
+      } catch (calErr) {
+        console.error("Google Calendar auto-event creation failed:", calErr);
+      }
+    }
+
+    await createDocument("inquiries", {
+      ...submission,
+      meetUrl,
+      calendarEventLink,
+      submissionStatus: "new",
+      ipHash: crypto.createHash("sha256").update(ip).digest("hex"),
+      status: "new",
+      visible: false,
+    });
+
+    return NextResponse.json({ ok: true, meetUrl, calendarEventLink }, { status: 201 });
+  } catch (e) {
+    if (e instanceof z.ZodError) {
+      return NextResponse.json({ error: "Please check the submitted fields" }, { status: 400 });
+    }
+    return NextResponse.json({ error: "Unable to save the inquiry" }, { status: 503 });
+  }
+}
