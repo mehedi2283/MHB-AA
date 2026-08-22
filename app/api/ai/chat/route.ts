@@ -47,6 +47,18 @@ async function buildDynamicKnowledgePrompt(customSystemPrompt?: string): Promise
       ?.map((n) => `Step ${n.name}: ${n.desc} (Tools: ${n.tools} -> Benefit: ${n.benefit})`)
       .join("\n");
 
+    let calendarSnippet = "";
+    try {
+      const googleRes = await supabaseAdmin().from("app_settings").select("data").eq("key", "integrations:google").maybeSingle();
+      const googleData = googleRes.data?.data || {};
+      if (googleData.googleCalendarUrl && googleData.autoShareCalendarInChat !== false) {
+        calendarSnippet = `\n• Direct Google Calendar Booking Link: ${googleData.googleCalendarUrl}\n(You may provide this direct Google Calendar link whenever the user asks for a booking link or wants to schedule a discovery call!)`;
+      }
+      if (googleData.googleMeetUrl) {
+        calendarSnippet += `\n• Direct Google Meet Room: ${googleData.googleMeetUrl}`;
+      }
+    } catch {}
+
     return `${customSystemPrompt || basePrompt}
 
 === LIVE DATABASE KNOWLEDGE & PORTFOLIO TRUTH ===
@@ -67,13 +79,13 @@ ${workflowKnowledge}
 Meeting & Discovery Call Scheduling:
 • Online Platform: Google Meet & Google Calendar
 • Availability: 1-on-1 discovery calls for system architecture, automation audits, and SaaS builds.
-• Booking Instructions: Visitors can select their preferred date and time slot in the Contact Form at the bottom of the page, or tell you their preferred day/time and email in chat.
+• Booking Instructions: Visitors can select their preferred date and time slot in the Contact Form at the bottom of the page, or tell you their preferred day/time and email in chat.${calendarSnippet}
 • Timezones: Accommodates US (EST/PST), UK/Europe (GMT/CET), Middle East (GST), and APAC.
 
 Instructions:
 1. Ground all answers in the live database knowledge above.
 2. Maintain a confident, concise, and professional tone.
-3. If the user asks about booking a call, meeting, or scheduling time to chat, explain that Mehedi hosts discovery calls on Google Meet and guide them to select their preferred date and time slot in the Contact Form below.
+3. If the user asks about booking a call, meeting, or scheduling time to chat, explain that Mehedi hosts discovery calls on Google Meet, provide the booking link if available, and guide them to select their preferred date and time slot in the Contact Form below.
 4. Never invent unverified results, fake pricing, or agency team members.`;
   } catch (err) {
     console.error("Failed to build dynamic database prompt, using fallback:", err);
