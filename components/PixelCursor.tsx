@@ -9,14 +9,14 @@ export function PixelCursor() {
   const [isText, setIsText] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
-  // Position state with lerp smoothing for trailing target
+  // Position state
   const mousePos = useRef({ x: -100, y: -100 });
   const trailPos = useRef({ x: -100, y: -100 });
   const cursorRef = useRef<HTMLDivElement>(null);
   const trailRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Only enable on desktop with mouse
+    // Only enable on desktop with fine mouse pointer
     if (typeof window === "undefined" || window.matchMedia("(pointer: coarse)").matches) {
       return;
     }
@@ -26,14 +26,24 @@ export function PixelCursor() {
     let animationFrameId: number;
 
     const onMouseMove = (e: MouseEvent) => {
-      mousePos.current = { x: e.clientX, y: e.clientY };
+      const x = e.clientX;
+      const y = e.clientY;
+      mousePos.current = { x, y };
+
       if (!isVisible) setIsVisible(true);
+
+      // INSTANT 0ms Update: Directly update main pointer on mousemove event
+      if (cursorRef.current) {
+        cursorRef.current.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+      }
 
       // Check if target is interactive element
       const target = e.target as HTMLElement | null;
       if (target) {
         const isInteractive =
-          target.closest("a, button, input[type='submit'], [role='button'], .btn, select, .portfolio-select, .interactive, .cursor-pointer") !== null;
+          target.closest(
+            "a, button, input[type='submit'], [role='button'], .btn, select, .portfolio-select, .interactive, .cursor-pointer"
+          ) !== null;
         const isInputField =
           target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable;
 
@@ -53,15 +63,10 @@ export function PixelCursor() {
     document.addEventListener("mouseleave", onMouseLeave);
     document.addEventListener("mouseenter", onMouseEnter);
 
-    // Smooth physics loop for the trailing reticle
+    // Fast, responsive Lerp loop for the trailing reticle (factor 0.38 for snappy follow)
     const render = () => {
-      // Lerp smoothing (factor 0.22)
-      trailPos.current.x += (mousePos.current.x - trailPos.current.x) * 0.22;
-      trailPos.current.y += (mousePos.current.y - trailPos.current.y) * 0.22;
-
-      if (cursorRef.current) {
-        cursorRef.current.style.transform = `translate3d(${mousePos.current.x}px, ${mousePos.current.y}px, 0)`;
-      }
+      trailPos.current.x += (mousePos.current.x - trailPos.current.x) * 0.38;
+      trailPos.current.y += (mousePos.current.y - trailPos.current.y) * 0.38;
 
       if (trailRef.current) {
         trailRef.current.style.transform = `translate3d(${trailPos.current.x}px, ${trailPos.current.y}px, 0)`;
@@ -86,15 +91,15 @@ export function PixelCursor() {
 
   return (
     <div
-      className={`pixel-cursor-container fixed inset-0 pointer-events-none z-[99999999] transition-opacity duration-200 ${
+      className={`pixel-cursor-container fixed inset-0 pointer-events-none z-[99999999] transition-opacity duration-150 ${
         isVisible ? "opacity-100" : "opacity-0"
       }`}
       aria-hidden="true"
     >
-      {/* 1. Main 8-Bit Pixel Pointer */}
+      {/* 1. Main Instant 8-Bit Pixel Pointer */}
       <div
         ref={cursorRef}
-        className="fixed top-0 left-0 will-change-transform"
+        className="fixed top-0 left-0 will-change-transform pointer-events-none"
         style={{ transform: "translate3d(-100px, -100px, 0)" }}
       >
         {isText ? (
@@ -107,17 +112,17 @@ export function PixelCursor() {
         ) : isHovered ? (
           /* Target Crosshair */
           <div
-            className={`-translate-x-1/2 -translate-y-1/2 transition-transform duration-100 ${
+            className={`-translate-x-1/2 -translate-y-1/2 transition-transform duration-75 ${
               isClicking ? "scale-75" : "scale-100"
             }`}
           >
-            <div className="size-2 bg-[#c8ff3d] border border-black shadow-[0_0_10px_#c8ff3d]" />
+            <div className="size-2.5 bg-[#c8ff3d] border border-black shadow-[0_0_10px_#c8ff3d]" />
           </div>
         ) : (
-          /* Authentic 8-Bit Retro Arrow Pointer */
+          /* Clean, Continuous 8-Bit Retro Arrow (Zero Broken Pixels) */
           <div
             className={`transition-transform duration-75 origin-top-left ${
-              isClicking ? "scale-90 rotate-[-5deg]" : "scale-100"
+              isClicking ? "scale-90" : "scale-100"
             }`}
           >
             <svg
@@ -126,40 +131,40 @@ export function PixelCursor() {
               viewBox="0 0 20 20"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
-              className="drop-shadow-[0_2px_6px_rgba(0,0,0,0.8)]"
+              className="drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)]"
             >
-              {/* 8-Bit Black Outer Border */}
+              {/* Outer Black Border */}
               <path
-                d="M1 1V16H4V13H7V15H10V18H13V15H10V12H7V9H16V6H13V3H10V1H1Z"
+                d="M0 0V15H3V12H5V14H7V17H9V14H7V11H12V9H9V7H7V5H5V3H3V0H0Z"
                 fill="#000000"
               />
-              {/* 8-Bit Inner Neon Green Fill */}
+              {/* Inner Acid Green Fill */}
               <path
-                d="M2 2V14H4V11H7V13H9V16H11V14H9V10H6V7H14V5H11V3H8V2H2Z"
+                d="M1 1V13H3V10H5V12H7V14H8V13H6V9H10V8H8V6H6V4H4V2H2V1H1Z"
                 fill="#c8ff3d"
               />
-              {/* Crisp Highlight Dot */}
-              <rect x="3" y="3" width="2" height="2" fill="#ffffff" />
+              {/* White Pixel Highlight */}
+              <rect x="2" y="2" width="1.5" height="1.5" fill="#ffffff" />
             </svg>
           </div>
         )}
       </div>
 
-      {/* 2. Trailing 8-Bit Target Reticle / Aura */}
+      {/* 2. Trailing Snappy 8-Bit Reticle / Aura */}
       <div
         ref={trailRef}
         className="fixed top-0 left-0 will-change-transform pointer-events-none"
         style={{ transform: "translate3d(-100px, -100px, 0)" }}
       >
         <div
-          className={`-translate-x-1/2 -translate-y-1/2 transition-all duration-200 ${
+          className={`-translate-x-1/2 -translate-y-1/2 transition-all duration-150 ${
             isHovered
-              ? "size-8 border border-[#c8ff3d] bg-[#c8ff3d10] shadow-[0_0_15px_rgba(200,255,61,0.35)] rotate-45 scale-110"
+              ? "size-8 border border-[#c8ff3d] bg-[#c8ff3d15] shadow-[0_0_15px_rgba(200,255,61,0.4)] rotate-45 scale-110"
               : isClicking
-              ? "size-4 border border-[#c8ff3d] bg-[#c8ff3d33] scale-75"
+              ? "size-3.5 border border-[#c8ff3d] bg-[#c8ff3d44] scale-75"
               : isText
               ? "size-0 opacity-0"
-              : "size-5 border border-[#c8ff3d44] bg-[#c8ff3d08] rounded-full scale-100"
+              : "size-5 border border-[#c8ff3d55] bg-[#c8ff3d08] rounded-full scale-100 shadow-[0_0_8px_rgba(200,255,61,0.2)]"
           }`}
         >
           {/* Corner Pixel Brackets on Hover */}
