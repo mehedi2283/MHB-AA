@@ -2142,8 +2142,12 @@ select {
     100% { width: 100%; }
 }
 
-/* Floating Back To Top button under chatbot */
-.back-to-top-btn {
+/* Floating Back To Top button under chatbot - Locked firmly in place with zero lift */
+.back-to-top-btn,
+.back-to-top-btn:hover,
+.back-to-top-btn:active,
+.pixel-card-container.back-to-top-btn,
+.pixel-card-container.back-to-top-btn:hover {
     position: relative;
     width: 154px;
     height: 38px;
@@ -2165,21 +2169,21 @@ select {
     overflow: visible !important;
     white-space: nowrap;
     box-sizing: border-box;
+    transform: none !important;
+    translate: none !important;
 }
 
 .back-to-top-btn:hover {
     border-color: var(--acid);
     color: #ffffff;
     background: #121712;
+    transform: none !important;
 }
 
-.back-to-top-btn svg {
-    color: var(--acid);
-    transition: transform .2s ease;
-}
-
+.back-to-top-btn svg,
 .back-to-top-btn:hover svg {
-    transform: translateY(-2px);
+    color: var(--acid);
+    transform: none !important;
 }
 
 .ai-shell {
