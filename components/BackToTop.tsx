@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { PixelArrowUp } from "./PixelIcons";
+import { ArrowUp } from "lucide-react";
 import { PixelCard } from "./PixelCard";
 
 export function BackToTop() {
@@ -23,9 +23,7 @@ export function BackToTop() {
       }
     };
 
-    // Check initial scroll on mount
     handleScroll();
-
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -40,7 +38,7 @@ export function BackToTop() {
         visible ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 translate-y-3 pointer-events-none"
       }`}
     >
-      <div className="relative overflow-hidden rounded">
+      <div className="relative overflow-hidden rounded-md">
         <PixelCard
           as="button"
           variant="glass"
@@ -49,25 +47,23 @@ export function BackToTop() {
           className="back-to-top-btn group relative select-none"
           aria-label="Back to top"
         >
-          {/* Razor-Sharp 8-Bit Pixel Perimeter Progress Ring (Locked at z-40) */}
+          {/* Razor-Sharp Clean Vector Perimeter Progress Ring */}
           <svg
             viewBox="0 0 154 38"
             className="pointer-events-none absolute inset-0 h-full w-full z-40 back-to-top-progress-ring"
-            style={{ shapeRendering: "crispEdges" }}
           >
-            {/* Background perimeter track */}
+            {/* Background subtle border track */}
             <rect
               x="1"
               y="1"
               width="152"
               height="36"
               fill="none"
-              stroke="rgba(200, 255, 61, 0.15)"
+              stroke="rgba(255, 255, 255, 0.12)"
               strokeWidth="1.5"
-              strokeDasharray="4 2"
-              rx="3"
+              rx="4"
             />
-            {/* Active glowing progress track */}
+            {/* Glowing active progress stroke */}
             <rect
               x="1"
               y="1"
@@ -79,21 +75,23 @@ export function BackToTop() {
               pathLength="100"
               strokeDasharray="100"
               strokeDashoffset={100 - scrollProgress}
-              rx="3"
+              rx="4"
               style={{
                 transition: "stroke-dashoffset 0.12s linear",
-                filter: "drop-shadow(0 0 4px rgba(200, 255, 61, 0.6))",
+                filter: "drop-shadow(0 0 5px rgba(200, 255, 61, 0.7))",
               }}
             />
           </svg>
 
-          {/* Button Text and Arrow (Relative z-40 so it stays above sparkles) */}
-          <div className="relative z-40 flex items-center justify-between w-full pointer-events-none">
-            <span className="flex-shrink-0 font-mono tracking-wider">BACK TO TOP</span>
-            <span className="w-[30px] text-right font-mono text-[9px] font-bold text-[#c8ff3d] tabular-nums tracking-tighter inline-block flex-shrink-0">
+          {/* Button Text and Arrow (Layered at z-40 for crisp clarity) */}
+          <div className="relative z-40 flex items-center justify-between w-full pointer-events-none px-0.5">
+            <span className="flex-shrink-0 text-[10.5px] font-bold text-white tracking-wider">
+              BACK TO TOP
+            </span>
+            <span className="w-[32px] text-right font-mono text-[10px] font-bold text-[#c8ff3d] tabular-nums tracking-tighter inline-block flex-shrink-0">
               {scrollProgress}%
             </span>
-            <PixelArrowUp size={13} className="back-to-top-arrow-icon flex-shrink-0 text-[#c8ff3d]" />
+            <ArrowUp size={13} strokeWidth={2.5} className="back-to-top-arrow-icon flex-shrink-0 text-[#c8ff3d]" />
           </div>
         </PixelCard>
       </div>
