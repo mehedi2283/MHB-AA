@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { Globe as GlobeIcon, LoaderCircle, Plus, Save, Trash2, MapPin, Navigation } from "lucide-react";
+import React, { useEffect, useState, useRef } from "react";
+import { Globe as GlobeIcon, LoaderCircle, Plus, Save, Trash2, MapPin, Navigation, ChevronDown, Search } from "lucide-react";
 import type { GlobeMarker, GlobeArc, SiteContent } from "@/lib/site-content";
 import { Globe } from "@/components/magicui/globe";
 import { PixelLoader } from "./PixelLoader";
@@ -98,9 +98,96 @@ function findCityByCoordinates(lat: number, lon: number): CityPreset | undefined
 }
 
 function findCityByName(name: string): CityPreset | undefined {
-  const norm = name.trim().toLowerCase();
-  return WORLD_CITIES.find(
-    (c) => c.name.toLowerCase() === norm || c.code.toLowerCase() === norm
+  return WORLD_CITIES.find((c) => c.name.toLowerCase() === name.toLowerCase());
+}
+
+function CustomCitySelect({
+  value,
+  onChange,
+  placeholder = "Choose a City",
+}: {
+  value: string;
+  onChange: (cityName: string) => void;
+  placeholder?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const selectedCity = WORLD_CITIES.find((c) => c.name === value);
+
+  const filtered = WORLD_CITIES.filter(
+    (c) =>
+      c.name.toLowerCase().includes(search.toLowerCase()) ||
+      c.country.toLowerCase().includes(search.toLowerCase()) ||
+      c.code.toLowerCase().includes(search.toLowerCase())
+  );
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    if (open) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [open]);
+
+  return (
+    <div className="relative w-full" ref={dropdownRef}>
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between bg-[#0e140e] hover:bg-[#131a13] border border-white/[0.12] hover:border-[#c8ff3d44] focus:border-[#c8ff3d] rounded-xl px-3 py-2 text-left text-xs font-mono transition cursor-pointer"
+      >
+        <span className={selectedCity ? "text-white font-bold truncate" : "text-[#5f685c] truncate"}>
+          {selectedCity ? `${selectedCity.name}, ${selectedCity.country} (${selectedCity.code})` : placeholder}
+        </span>
+        <ChevronDown size={13} className={`text-[#838e7f] flex-shrink-0 ml-1.5 transition-transform ${open ? "rotate-180 text-[#c8ff3d]" : ""}`} />
+      </button>
+
+      {open && (
+        <div className="absolute left-0 right-0 mt-1.5 bg-[#0c120c] border border-white/[0.15] rounded-xl shadow-2xl backdrop-blur-2xl p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
+          <input
+            type="text"
+            placeholder="Search city, country or code..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full bg-[#141b14] border border-white/[0.1] rounded-lg px-2.5 py-1.5 text-xs font-mono text-white placeholder:text-[#5f685c] focus:border-[#c8ff3d] focus:outline-none mb-1.5"
+            autoFocus
+          />
+          <div className="max-h-48 overflow-y-auto scrollbar-none space-y-0.5">
+            {filtered.map((city) => {
+              const isSelected = city.name === value;
+              return (
+                <button
+                  key={city.name}
+                  type="button"
+                  onClick={() => {
+                    onChange(city.name);
+                    setOpen(false);
+                    setSearch("");
+                  }}
+                  className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-mono transition text-left cursor-pointer ${
+                    isSelected ? "bg-[#182617] text-[#c8ff3d] font-bold" : "text-[#a4ada0] hover:text-white hover:bg-white/[0.06]"
+                  }`}
+                >
+                  <span className="truncate">{city.name}, {city.country}</span>
+                  <span className="text-[10px] opacity-60 flex-shrink-0 ml-2">({city.code})</span>
+                </button>
+              );
+            })}
+            {filtered.length === 0 && (
+              <div className="p-3 text-center text-xs font-mono text-[#838e7f]">
+                No cities matching "{search}"
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -330,23 +417,14 @@ export function GlobeContentEditor() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                       {/* City Dropdown - Automatically sets Lat/Lon */}
-                      <label className="admin-field text-xs">
+                      <div className="admin-field text-xs">
                         <span>Select City (Autosets Coordinates)</span>
-                        <select
-                          className="admin-input text-xs py-2 bg-[#0c100c] text-white border-white/[0.15] cursor-pointer"
+                        <CustomCitySelect
                           value={selectedValue}
-                          onChange={(e) => handleCitySelect(index, e.target.value)}
-                        >
-                          <option value="" disabled>
-                            -- Choose a City --
-                          </option>
-                          {WORLD_CITIES.map((city) => (
-                            <option key={city.name} value={city.name}>
-                              {city.name}, {city.country} ({city.code})
-                            </option>
-                          ))}
-                        </select>
-                      </label>
+                          onChange={(cityName) => handleCitySelect(index, cityName)}
+                          placeholder="-- Choose a City --"
+                        />
+                      </div>
 
                       {/* Subtitle / Project Name */}
                       <label className="admin-field text-xs">
@@ -427,42 +505,24 @@ export function GlobeContentEditor() {
                     <div className="space-y-3">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                         {/* From City Dropdown */}
-                        <label className="admin-field text-xs">
+                        <div className="admin-field text-xs">
                           <span>From Origin City</span>
-                          <select
-                            className="admin-input text-xs py-2 bg-[#0c100c] text-white border-white/[0.15] cursor-pointer"
+                          <CustomCitySelect
                             value={fromCity ? fromCity.name : ""}
-                            onChange={(e) => handleRouteCitySelect(index, "from", e.target.value)}
-                          >
-                            <option value="" disabled>
-                              -- Choose Origin City --
-                            </option>
-                            {WORLD_CITIES.map((city) => (
-                              <option key={`from-${city.name}`} value={city.name}>
-                                {city.name}, {city.country} ({city.code})
-                              </option>
-                            ))}
-                          </select>
-                        </label>
+                            onChange={(cityName) => handleRouteCitySelect(index, "from", cityName)}
+                            placeholder="-- Choose Origin City --"
+                          />
+                        </div>
 
                         {/* To City Dropdown */}
-                        <label className="admin-field text-xs">
+                        <div className="admin-field text-xs">
                           <span>To Destination City</span>
-                          <select
-                            className="admin-input text-xs py-2 bg-[#0c100c] text-white border-white/[0.15] cursor-pointer"
+                          <CustomCitySelect
                             value={toCity ? toCity.name : ""}
-                            onChange={(e) => handleRouteCitySelect(index, "to", e.target.value)}
-                          >
-                            <option value="" disabled>
-                              -- Choose Destination City --
-                            </option>
-                            {WORLD_CITIES.map((city) => (
-                              <option key={`to-${city.name}`} value={city.name}>
-                                {city.name}, {city.country} ({city.code})
-                              </option>
-                            ))}
-                          </select>
-                        </label>
+                            onChange={(cityName) => handleRouteCitySelect(index, "to", cityName)}
+                            placeholder="-- Choose Destination City --"
+                          />
+                        </div>
                       </div>
 
                       {/* Route Tag Label */}

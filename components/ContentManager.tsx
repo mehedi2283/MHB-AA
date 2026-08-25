@@ -236,8 +236,53 @@ export function ContentManager({ collection }: { collection: string }) {
             {field.multiline ? <textarea className="admin-input admin-textarea admin-textarea-tall" value={String(editing[field.key] || "")} onChange={event => setField(field, event.target.value)} /> : <input className="admin-input" type={field.kind === "number" ? "number" : "text"} value={field.kind === "list" ? (editing[field.key] as string[] || []).join(", ") : String(editing[field.key] ?? "")} onChange={event => setField(field, event.target.value)} />}
           </label>)}
 
-          <label className="admin-field"><span>Status</span><select className="admin-input" value={editing.status || "published"} onChange={event => setEditing({ ...editing, status: event.target.value })}><option>draft</option><option>published</option><option>archived</option></select></label>
-          <label className="admin-field"><span>Visibility</span><select className="admin-input" value={editing.visible === false ? "false" : "true"} onChange={event => setEditing({ ...editing, visible: event.target.value === "true" })}><option value="true">Visible</option><option value="false">Hidden</option></select></label>
+          <div className="admin-field">
+            <span>Publication Status</span>
+            <div className="flex items-center gap-1.5 pt-1">
+              {(["draft", "published", "archived"] as const).map(st => (
+                <button
+                  key={st}
+                  type="button"
+                  onClick={() => setEditing({ ...editing, status: st })}
+                  className={`text-xs font-mono uppercase px-3 py-1.5 rounded-lg border transition cursor-pointer ${
+                    (editing.status || "published") === st
+                      ? "bg-[#182617] text-[#c8ff3d] border-[#c8ff3d] font-bold"
+                      : "bg-[#101610] text-[#838e7f] hover:text-white border-white/[0.08]"
+                  }`}
+                >
+                  {st}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="admin-field">
+            <span>Visibility</span>
+            <div className="flex items-center gap-1.5 pt-1">
+              <button
+                type="button"
+                onClick={() => setEditing({ ...editing, visible: true })}
+                className={`text-xs font-mono px-3 py-1.5 rounded-lg border transition cursor-pointer ${
+                  editing.visible !== false
+                    ? "bg-[#182617] text-[#c8ff3d] border-[#c8ff3d] font-bold"
+                    : "bg-[#101610] text-[#838e7f] hover:text-white border-white/[0.08]"
+                }`}
+              >
+                Visible
+              </button>
+              <button
+                type="button"
+                onClick={() => setEditing({ ...editing, visible: false })}
+                className={`text-xs font-mono px-3 py-1.5 rounded-lg border transition cursor-pointer ${
+                  editing.visible === false
+                    ? "bg-[#2d1b1b] text-[#ff8888] border-[#ff555544] font-bold"
+                    : "bg-[#101610] text-[#838e7f] hover:text-white border-white/[0.08]"
+                }`}
+              >
+                Hidden
+              </button>
+            </div>
+          </div>
         </div>
 
         <div className="admin-modal-actions">

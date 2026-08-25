@@ -1143,17 +1143,12 @@ export function ClientHubManager() {
                 </div>
                 <div>
                   <label className="admin-label">Pipeline Stage</label>
-                  <select
-                    value={editingClient.stage || "lead"}
-                    onChange={e => setEditingClient({ ...editingClient, stage: e.target.value as ClientRecord["stage"] })}
-                    className="admin-input"
-                  >
-                    {STAGES.map(s => (
-                      <option key={s.key} value={s.key}>
-                        {s.label}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="pt-1">
+                    <CustomStageDropdown
+                      currentStage={editingClient.stage || "lead"}
+                      onChange={newStage => setEditingClient({ ...editingClient, stage: newStage })}
+                    />
+                  </div>
                 </div>
                 <div>
                   <label className="admin-label">Deal Value / Budget</label>
