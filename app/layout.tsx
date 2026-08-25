@@ -1,34 +1,11 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
+import { Inter } from "next/font/google";
 import "./globals.css";
 
-const pixelGameFont = localFont({
-  src: "./fonts/PixelGame.otf",
+const inter = Inter({
+  subsets: ["latin"],
   display: "swap",
-  variable: "--font-pixel-game",
-});
-
-const pixeloidSans = localFont({
-  src: [
-    {
-      path: "./fonts/PixeloidSans.ttf",
-      weight: "400",
-      style: "normal",
-    },
-    {
-      path: "./fonts/PixeloidSans-Bold.ttf",
-      weight: "700",
-      style: "normal",
-    },
-  ],
-  display: "swap",
-  variable: "--font-pixeloid-sans",
-});
-
-const pixeloidMono = localFont({
-  src: "./fonts/PixeloidMono.ttf",
-  display: "swap",
-  variable: "--font-pixeloid-mono",
+  variable: "--font-inter",
 });
 
 export const metadata: Metadata = {
@@ -56,11 +33,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${pixelGameFont.variable} ${pixeloidSans.variable} ${pixeloidMono.variable}`}
+      className={`${inter.variable} ${inter.className}`}
     >
       <body
         suppressHydrationWarning
-        className={`${pixelGameFont.variable} ${pixeloidSans.variable} ${pixeloidMono.variable} ${pixeloidSans.className}`}
+        className={`${inter.variable} ${inter.className}`}
       >
         <AdminSecretTrigger />
         {children}
@@ -72,5 +49,3 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     </html>
   );
 }
-
-
