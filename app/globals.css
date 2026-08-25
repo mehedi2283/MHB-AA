@@ -2136,58 +2136,38 @@ select {
     100% { width: 100%; }
 }
 
-/* Floating Back To Top button under chatbot - Locked firmly in place with zero lift */
+/* Floating Back To Top button under chatbot - Compact Luxury Mini Badge */
 .back-to-top-btn,
 .back-to-top-btn:hover,
-.back-to-top-btn:active,
-.pixel-card-container.back-to-top-btn,
-.pixel-card-container.back-to-top-btn:hover {
+.back-to-top-btn:active {
     position: relative;
-    width: 154px;
-    height: 38px;
-    padding: 0 12px;
-    border: 1px solid #ffffff20;
+    height: 28px;
+    padding: 0 10px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
     border-radius: var(--ui-radius);
-    background: #0d110d;
+    background: #090e09;
     color: #a4ada0;
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     gap: 6px;
     font-size: 9px;
     font-weight: 700;
-    letter-spacing: .12em;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    letter-spacing: .08em;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
     cursor: pointer;
-    transition: border-color .25s ease, color .25s ease, background .25s ease;
-    overflow: visible !important;
+    transition: border-color .2s ease, color .2s ease, background .2s ease, box-shadow .2s ease;
+    overflow: hidden;
     white-space: nowrap;
     box-sizing: border-box;
     transform: none !important;
-    translate: none !important;
 }
 
 .back-to-top-btn:hover {
-    border-color: var(--acid);
+    border-color: rgba(200, 255, 61, 0.6);
     color: #ffffff;
-    background: #121712;
-    transform: none !important;
-}
-
-.back-to-top-progress-ring,
-.back-to-top-btn:hover .back-to-top-progress-ring {
-    transform: none !important;
-    inset: 0 !important;
-}
-
-.back-to-top-arrow-icon {
-    color: var(--acid);
-    transition: transform .2s ease;
-}
-
-.back-to-top-btn:hover .back-to-top-arrow-icon {
-    color: var(--acid);
-    transform: translateY(-3px) !important;
+    background: #0f160f;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8), 0 0 14px rgba(200, 255, 61, 0.12);
 }
 
 .ai-shell {

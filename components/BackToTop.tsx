@@ -33,40 +33,41 @@ export function BackToTop() {
   return (
     <div
       className={`fixed bottom-[86px] right-6 z-50 transition-all duration-300 ${
-        visible ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 translate-y-3 pointer-events-none"
+        visible ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 translate-y-2 pointer-events-none"
       }`}
     >
-      <div className="relative overflow-hidden rounded shadow-[0_10px_30px_rgba(0,0,0,0.8)] border border-white/[0.12] hover:border-[#c8ff3d] transition-colors duration-200 bg-[#0d120d]/95 backdrop-blur-md">
-        <button
-          onClick={scrollToTop}
-          className="back-to-top-btn group relative select-none flex items-center justify-between w-[154px] h-[38px] px-3.5 bg-transparent border-0 cursor-pointer"
-          aria-label="Back to top"
-        >
-          {/* Button Text and Arrow */}
-          <div className="flex items-center justify-between w-full pointer-events-none">
-            <span className="text-[11px] font-bold text-white tracking-wider">
-              BACK TO TOP
-            </span>
-            <div className="flex items-center gap-1.5">
-              <span className="font-mono text-[11px] font-bold text-[#c8ff3d] tabular-nums tracking-tighter">
-                {scrollProgress}%
-              </span>
-              <ArrowUp size={13} strokeWidth={2.5} className="back-to-top-arrow-icon text-[#c8ff3d]" />
-            </div>
-          </div>
+      <button
+        onClick={scrollToTop}
+        className="back-to-top-btn group relative select-none flex items-center gap-1.5 h-[28px] px-2.5 bg-[#090e09]/95 hover:bg-[#0f160f] border border-white/[0.14] hover:border-[#c8ff3d]/60 rounded shadow-[0_8px_24px_rgba(0,0,0,0.8),0_0_12px_rgba(200,255,61,0.08)] backdrop-blur-md transition-all duration-200 cursor-pointer overflow-hidden"
+        aria-label="Back to top"
+      >
+        {/* Compact Label & Progress */}
+        <div className="flex items-center gap-1.5 pointer-events-none">
+          <span className="text-[9px] font-mono font-bold tracking-widest text-[#838e7f] group-hover:text-white transition-colors">
+            TOP
+          </span>
+          <span className="text-[8px] text-white/25">/</span>
+          <span className="font-mono text-[10px] font-bold text-[#c8ff3d] tabular-nums">
+            {scrollProgress}%
+          </span>
+          <ArrowUp
+            size={11}
+            strokeWidth={2.5}
+            className="text-[#c8ff3d] group-hover:-translate-y-0.5 transition-transform duration-200"
+          />
+        </div>
 
-          {/* Sleek Bottom Linear Progress Bar */}
-          <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#1a2619] overflow-hidden rounded-b">
-            <div
-              className="h-full bg-[#c8ff3d] shadow-[0_0_8px_#c8ff3d]"
-              style={{
-                width: `${scrollProgress}%`,
-                transition: "width 0.1s linear",
-              }}
-            />
-          </div>
-        </button>
-      </div>
+        {/* Micro Neon Linear Progress Bar */}
+        <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-[1.5px] bg-[#141e14] overflow-hidden">
+          <div
+            className="h-full bg-[#c8ff3d] shadow-[0_0_6px_#c8ff3d]"
+            style={{
+              width: `${scrollProgress}%`,
+              transition: "width 0.1s linear",
+            }}
+          />
+        </div>
+      </button>
     </div>
   );
 }
