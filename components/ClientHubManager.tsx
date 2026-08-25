@@ -1577,32 +1577,37 @@ export function ClientHubManager() {
                   </div>
                 </div>
               ) : (
-                /* Live Preview Container */
-                <div className="bg-[#070907] border border-[#233020] rounded p-5 text-white max-h-96 overflow-y-auto scrollbar-none">
-                  <div className="border-b border-[#1a2419] pb-3 mb-4 text-xs font-mono text-[#838e7f] space-y-1">
-                    <div>To: <span className="text-[#c8ff3d]">{outreachTarget.email}</span></div>
-                    <div>Subject: <span className="text-white font-bold">{outreachSubject}</span></div>
-                  </div>
-                  <div
-                    dangerouslySetInnerHTML={{ __html: outreachBody }}
-                    className="text-xs space-y-3 text-[#d0dad0] leading-relaxed"
-                  />
-                  {outreachTarget.techStack && outreachTarget.techStack.length > 0 && (
-                    <div className="mt-4 p-3 bg-[#0d120d] border border-[#233020] rounded">
-                      <div className="text-[10px] font-mono text-[#c8ff3d] mb-1 font-bold">FEATURED STACK:</div>
-                      <div className="flex flex-wrap gap-1">
-                        {outreachTarget.techStack.map((t, i) => (
-                          <span key={i} className="text-[10px] font-mono px-2 py-0.5 bg-[#141c14] border border-[#293826] text-[#c8ff3d] rounded">
-                            {t}
-                          </span>
-                        ))}
+                /* Live Preview Container (Neutral canvas outside, sleek dark card in middle) */
+                <div className="bg-[#e9ece9] p-4 sm:p-6 rounded max-h-96 overflow-y-auto scrollbar-none">
+                  <div className="max-w-xl mx-auto bg-[#0c120c] border border-[#233020] rounded shadow-[0_10px_35px_rgba(0,0,0,0.35)] overflow-hidden">
+                    <div className="h-1 bg-gradient-to-r from-[#c8ff3d] via-[#8aff00] to-[#c8ff3d]" />
+                    <div className="p-5 sm:p-6 text-white space-y-4">
+                      <div className="border-b border-[#1a2419] pb-3 text-xs font-mono text-[#838e7f] space-y-1">
+                        <div>To: <span className="text-[#c8ff3d]">{outreachTarget.email}</span></div>
+                        <div>Subject: <span className="text-white font-bold">{outreachSubject}</span></div>
+                      </div>
+                      <div
+                        dangerouslySetInnerHTML={{ __html: outreachBody }}
+                        className="text-xs space-y-3 text-[#d0dad0] leading-relaxed"
+                      />
+                      {outreachTarget.techStack && outreachTarget.techStack.length > 0 && (
+                        <div className="p-3 bg-[#080c08] border border-[#1c261b] rounded">
+                          <div className="text-[10px] font-mono text-[#c8ff3d] mb-1.5 font-bold tracking-wider">FEATURED STACK:</div>
+                          <div className="flex flex-wrap gap-1">
+                            {outreachTarget.techStack.map((t, i) => (
+                              <span key={i} className="text-[10px] font-mono px-2 py-0.5 bg-[#141c14] border border-[#293826] text-[#c8ff3d] rounded">
+                                {t}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      <div className="pt-2 text-center">
+                        <span className="inline-block bg-[#c8ff3d] text-black font-bold font-mono px-4 py-2 rounded text-xs shadow-[0_0_15px_rgba(200,255,61,0.35)]">
+                          ⚡ SCHEDULE A 15-MIN DISCOVERY CALL →
+                        </span>
                       </div>
                     </div>
-                  )}
-                  <div className="mt-5 text-center">
-                    <span className="inline-block bg-[#c8ff3d] text-black font-bold font-mono px-4 py-2 rounded text-xs">
-                      ⚡ SCHEDULE A 15-MIN DISCOVERY CALL →
-                    </span>
                   </div>
                 </div>
               )}

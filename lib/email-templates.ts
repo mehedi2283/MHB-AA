@@ -26,12 +26,12 @@ export function buildClientConfirmationHtml(data: EmailMeetingData): string {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Discovery Call Confirmed</title>
 </head>
-<body style="margin: 0; padding: 0; background-color: #060806; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #e8eee2;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #060806; padding: 30px 15px;">
+<body style="margin: 0; padding: 0; background-color: #f4f6f4; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #111827;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f4f6f4; padding: 36px 16px;">
     <tr>
       <td align="center">
-        <!-- Main Email Container -->
-        <table role="presentation" width="100%" style="max-width: 580px; background-color: #0d120d; border: 1px solid #233020; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
+        <!-- Main Email Container (Middle Card) -->
+        <table role="presentation" width="100%" style="max-width: 580px; background-color: #0c120c; border: 1px solid #233020; border-radius: 4px; overflow: hidden; box-shadow: 0 15px 40px rgba(0,0,0,0.18);">
           
           <!-- Top Neon Accent Stripe -->
           <tr>
@@ -40,7 +40,7 @@ export function buildClientConfirmationHtml(data: EmailMeetingData): string {
 
           <!-- Header -->
           <tr>
-            <td style="padding: 28px 32px 20px 32px; border-bottom: 1px solid #1c261b;">
+            <td style="padding: 28px 32px 20px 32px; background-color: #0e140e; border-bottom: 1px solid #1c261b;">
               <table width="100%" cellspacing="0" cellpadding="0">
                 <tr>
                   <td>
@@ -52,7 +52,7 @@ export function buildClientConfirmationHtml(data: EmailMeetingData): string {
                     </div>
                   </td>
                   <td align="right" valign="top">
-                    <div style="display: inline-block; padding: 4px 10px; background-color: rgba(200, 255, 61, 0.12); border: 1px solid rgba(200, 255, 61, 0.3); border-radius: 6px; color: #c8ff3d; font-size: 11px; font-weight: bold; font-family: monospace;">
+                    <div style="display: inline-block; padding: 4px 10px; background-color: rgba(200, 255, 61, 0.12); border: 1px solid rgba(200, 255, 61, 0.3); border-radius: 4px; color: #c8ff3d; font-size: 11px; font-weight: bold; font-family: monospace;">
                       GOOGLE MEET
                     </div>
                   </td>
@@ -63,7 +63,7 @@ export function buildClientConfirmationHtml(data: EmailMeetingData): string {
 
           <!-- Body Content -->
           <tr>
-            <td style="padding: 28px 32px;">
+            <td style="padding: 28px 32px; background-color: #0c120c;">
               <p style="font-size: 15px; line-height: 1.6; color: #d0dad0; margin: 0 0 22px 0;">
                 Hi <strong style="color: #ffffff;">${data.clientName}</strong>,
               </p>
@@ -72,7 +72,7 @@ export function buildClientConfirmationHtml(data: EmailMeetingData): string {
               </p>
 
               <!-- Meeting Details Box -->
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #121912; border: 1px solid #283725; border-radius: 8px; margin-bottom: 26px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #121912; border: 1px solid #283725; border-radius: 4px; margin-bottom: 26px;">
                 <tr>
                   <td style="padding: 18px 20px;">
                     <table width="100%" cellspacing="0" cellpadding="6">
@@ -102,7 +102,7 @@ export function buildClientConfirmationHtml(data: EmailMeetingData): string {
                 data.meetUrl
                   ? `
               <div style="text-align: center; margin: 28px 0;">
-                <a href="${data.meetUrl}" target="_blank" style="display: inline-block; background-color: #c8ff3d; color: #070a07; padding: 14px 28px; font-size: 13px; font-weight: 800; text-decoration: none; border-radius: 6px; letter-spacing: 0.5px; box-shadow: 0 4px 15px rgba(200, 255, 61, 0.3);">
+                <a href="${data.meetUrl}" target="_blank" style="display: inline-block; background-color: #c8ff3d; color: #070a07; padding: 14px 28px; font-size: 13px; font-weight: 800; text-decoration: none; border-radius: 4px; letter-spacing: 0.5px; box-shadow: 0 4px 15px rgba(200, 255, 61, 0.3);">
                   📹 JOIN GOOGLE MEET ROOM &rarr;
                 </a>
                 <div style="margin-top: 10px; font-size: 11px; color: #717b6d; font-family: monospace;">
@@ -113,7 +113,7 @@ export function buildClientConfirmationHtml(data: EmailMeetingData): string {
               }
 
               <!-- Client Brief Quote -->
-              <div style="border-left: 3px solid #c8ff3d; background-color: #080c08; padding: 14px 16px; border-radius: 0 6px 6px 0; margin-top: 24px;">
+              <div style="border-left: 3px solid #c8ff3d; background-color: #080c08; padding: 14px 16px; border-radius: 0 4px 4px 0; margin-top: 24px;">
                 <div style="font-size: 10px; font-family: monospace; color: #838e7f; text-transform: uppercase; margin-bottom: 6px;">
                   Your Project Brief:
                 </div>
@@ -161,12 +161,12 @@ export function buildAdminNotificationHtml(data: EmailMeetingData): string {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>New Lead Notification</title>
 </head>
-<body style="margin: 0; padding: 0; background-color: #060806; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #e8eee2;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #060806; padding: 30px 15px;">
+<body style="margin: 0; padding: 0; background-color: #f4f6f4; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #111827;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f4f6f4; padding: 36px 16px;">
     <tr>
       <td align="center">
-        <!-- Main Container -->
-        <table role="presentation" width="100%" style="max-width: 600px; background-color: #0d120d; border: 1px solid #334430; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.9);">
+        <!-- Main Container (Middle Card) -->
+        <table role="presentation" width="100%" style="max-width: 600px; background-color: #0c120c; border: 1px solid #334430; border-radius: 4px; overflow: hidden; box-shadow: 0 15px 40px rgba(0,0,0,0.18);">
           
           <!-- Top Alert Header -->
           <tr>
@@ -193,8 +193,8 @@ export function buildAdminNotificationHtml(data: EmailMeetingData): string {
 
           <!-- Client & Project Details Table -->
           <tr>
-            <td style="padding: 28px 30px;">
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #111711; border: 1px solid #233020; border-radius: 8px; margin-bottom: 22px;">
+            <td style="padding: 28px 30px; background-color: #0c120c;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #111711; border: 1px solid #233020; border-radius: 4px; margin-bottom: 22px;">
                 <tr>
                   <td style="padding: 16px 20px;">
                     <table width="100%" cellspacing="0" cellpadding="5">
@@ -250,7 +250,7 @@ export function buildAdminNotificationHtml(data: EmailMeetingData): string {
               </table>
 
               <!-- Client Problem Statement / Brief -->
-              <div style="background-color: #070a07; border: 1px solid #1c261b; padding: 16px 18px; border-radius: 8px;">
+              <div style="background-color: #070a07; border: 1px solid #1c261b; padding: 16px 18px; border-radius: 4px;">
                 <div style="font-size: 10px; font-family: monospace; color: #c8ff3d; font-weight: bold; margin-bottom: 6px; letter-spacing: 1px;">
                   CLIENT BRIEF / SYSTEM REQUIREMENTS:
                 </div>
@@ -259,7 +259,7 @@ export function buildAdminNotificationHtml(data: EmailMeetingData): string {
 
               <!-- Quick Actions -->
               <div style="text-align: center; margin-top: 24px;">
-                <a href="https://mehedi.ai/admin/inquiries" target="_blank" style="display: inline-block; background-color: #1a2517; border: 1px solid #c8ff3d; color: #c8ff3d; padding: 12px 24px; font-size: 12px; font-weight: 700; text-decoration: none; border-radius: 6px; font-family: monospace;">
+                <a href="https://mehedi.ai/admin/inquiries" target="_blank" style="display: inline-block; background-color: #1a2517; border: 1px solid #c8ff3d; color: #c8ff3d; padding: 12px 24px; font-size: 12px; font-weight: 700; text-decoration: none; border-radius: 4px; font-family: monospace;">
                   ⚡ OPEN CONTROL ROOM &rarr;
                 </a>
               </div>
@@ -288,6 +288,7 @@ export type ColdOutreachEmailData = {
 
 /**
  * Builds a high-converting, professional cold outreach email with sleek cyberpunk styling and direct CTA.
+ * Outer background is clean neutral, middle card is sleek dark luxury cyberpunk.
  */
 export function buildColdOutreachHtml(data: ColdOutreachEmailData): string {
   const siteUrl = data.portfolioUrl || process.env.NEXT_PUBLIC_SITE_URL || "https://mehedi.ai";
@@ -300,11 +301,12 @@ export function buildColdOutreachHtml(data: ColdOutreachEmailData): string {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${data.customSubject || "AI & Workflow Automation Proposal"}</title>
 </head>
-<body style="margin: 0; padding: 0; background-color: #070907; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #e8eee2;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #070907; padding: 30px 15px;">
+<body style="margin: 0; padding: 0; background-color: #f4f6f4; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #111827;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f4f6f4; padding: 36px 16px;">
     <tr>
       <td align="center">
-        <table role="presentation" width="100%" style="max-width: 580px; background-color: #0d120d; border: 1px solid #233020; border-radius: 10px; overflow: hidden; box-shadow: 0 10px 35px rgba(0,0,0,0.85);">
+        <!-- Main Email Container (Middle Page) -->
+        <table role="presentation" width="100%" style="max-width: 580px; background-color: #0c120c; border: 1px solid #233020; border-radius: 4px; overflow: hidden; box-shadow: 0 15px 40px rgba(0,0,0,0.18);">
           
           <!-- Top Neon Accent -->
           <tr>
@@ -313,7 +315,7 @@ export function buildColdOutreachHtml(data: ColdOutreachEmailData): string {
 
           <!-- Header -->
           <tr>
-            <td style="padding: 26px 32px 18px 32px; border-bottom: 1px solid #1a2419;">
+            <td style="padding: 26px 32px 18px 32px; background-color: #0e140e; border-bottom: 1px solid #1a2419;">
               <table width="100%" cellspacing="0" cellpadding="0">
                 <tr>
                   <td>
@@ -331,7 +333,7 @@ export function buildColdOutreachHtml(data: ColdOutreachEmailData): string {
 
           <!-- Body Content -->
           <tr>
-            <td style="padding: 28px 32px;">
+            <td style="padding: 28px 32px; background-color: #0c120c;">
               
               <!-- Dynamic User Written Pitch Message -->
               <div style="font-size: 14.5px; line-height: 1.7; color: #d0dad0; margin-bottom: 24px;">
@@ -342,7 +344,7 @@ export function buildColdOutreachHtml(data: ColdOutreachEmailData): string {
                 data.techStack && data.techStack.length > 0
                   ? `
               <!-- Tech Stack Highlight -->
-              <div style="background-color: #080c08; border: 1px solid #1c261b; padding: 14px 18px; border-radius: 8px; margin-bottom: 24px;">
+              <div style="background-color: #080c08; border: 1px solid #1c261b; padding: 14px 18px; border-radius: 4px; margin-bottom: 24px;">
                 <div style="font-size: 10px; font-family: monospace; color: #c8ff3d; font-weight: bold; margin-bottom: 8px; letter-spacing: 1px;">
                   FEATURED STACK & TOOLS:
                 </div>
@@ -360,7 +362,7 @@ export function buildColdOutreachHtml(data: ColdOutreachEmailData): string {
 
               <!-- Direct CTA Button -->
               <div style="text-align: center; margin: 30px 0 20px 0;">
-                <a href="${siteUrl}#contact" target="_blank" style="display: inline-block; background-color: #c8ff3d; color: #070907; padding: 13px 28px; font-size: 13px; font-weight: 800; text-decoration: none; border-radius: 6px; font-family: monospace; letter-spacing: 0.5px; box-shadow: 0 0 20px rgba(200, 255, 61, 0.4);">
+                <a href="${siteUrl}#contact" target="_blank" style="display: inline-block; background-color: #c8ff3d; color: #070907; padding: 13px 28px; font-size: 13px; font-weight: 800; text-decoration: none; border-radius: 4px; font-family: monospace; letter-spacing: 0.5px; box-shadow: 0 0 20px rgba(200, 255, 61, 0.4);">
                   ⚡ SCHEDULE A 15-MIN DISCOVERY CALL &rarr;
                 </a>
               </div>
@@ -391,4 +393,3 @@ export function buildColdOutreachHtml(data: ColdOutreachEmailData): string {
 </html>
   `.trim();
 }
-
