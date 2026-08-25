@@ -274,3 +274,121 @@ export function buildAdminNotificationHtml(data: EmailMeetingData): string {
 </html>
   `.trim();
 }
+
+export type ColdOutreachEmailData = {
+  clientName: string;
+  company?: string;
+  projectName?: string;
+  techStack?: string[];
+  customSubject?: string;
+  customBodyHtml: string;
+  portfolioUrl?: string;
+  calendlyUrl?: string;
+};
+
+/**
+ * Builds a high-converting, professional cold outreach email with sleek cyberpunk styling and direct CTA.
+ */
+export function buildColdOutreachHtml(data: ColdOutreachEmailData): string {
+  const siteUrl = data.portfolioUrl || process.env.NEXT_PUBLIC_SITE_URL || "https://mehedi.ai";
+
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${data.customSubject || "AI & Workflow Automation Proposal"}</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #070907; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #e8eee2;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #070907; padding: 30px 15px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" style="max-width: 580px; background-color: #0d120d; border: 1px solid #233020; border-radius: 10px; overflow: hidden; box-shadow: 0 10px 35px rgba(0,0,0,0.85);">
+          
+          <!-- Top Neon Accent -->
+          <tr>
+            <td height="4" style="background: linear-gradient(90deg, #c8ff3d, #8aff00, #c8ff3d);"></td>
+          </tr>
+
+          <!-- Header -->
+          <tr>
+            <td style="padding: 26px 32px 18px 32px; border-bottom: 1px solid #1a2419;">
+              <table width="100%" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td>
+                    <div style="font-size: 11px; font-weight: 700; color: #c8ff3d; letter-spacing: 2px; text-transform: uppercase; font-family: monospace;">
+                      MEHEDI · AI & AUTOMATION ARCHITECT
+                    </div>
+                    <div style="font-size: 20px; font-weight: 800; color: #ffffff; margin-top: 4px; letter-spacing: -0.5px;">
+                      ${data.customSubject || "Engineering Scalable Workflows & AI Systems"}
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Body Content -->
+          <tr>
+            <td style="padding: 28px 32px;">
+              
+              <!-- Dynamic User Written Pitch Message -->
+              <div style="font-size: 14.5px; line-height: 1.7; color: #d0dad0; margin-bottom: 24px;">
+                ${data.customBodyHtml}
+              </div>
+
+              ${
+                data.techStack && data.techStack.length > 0
+                  ? `
+              <!-- Tech Stack Highlight -->
+              <div style="background-color: #080c08; border: 1px solid #1c261b; padding: 14px 18px; border-radius: 8px; margin-bottom: 24px;">
+                <div style="font-size: 10px; font-family: monospace; color: #c8ff3d; font-weight: bold; margin-bottom: 8px; letter-spacing: 1px;">
+                  FEATURED STACK & TOOLS:
+                </div>
+                <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                  ${data.techStack
+                    .map(
+                      tag =>
+                        `<span style="display: inline-block; padding: 3px 8px; background-color: #141c14; border: 1px solid #293826; border-radius: 4px; font-size: 11px; font-family: monospace; color: #c8ff3d; margin: 2px;">${tag}</span>`
+                    )
+                    .join("")}
+                </div>
+              </div>`
+                  : ""
+              }
+
+              <!-- Direct CTA Button -->
+              <div style="text-align: center; margin: 30px 0 20px 0;">
+                <a href="${siteUrl}#contact" target="_blank" style="display: inline-block; background-color: #c8ff3d; color: #070907; padding: 13px 28px; font-size: 13px; font-weight: 800; text-decoration: none; border-radius: 6px; font-family: monospace; letter-spacing: 0.5px; box-shadow: 0 0 20px rgba(200, 255, 61, 0.4);">
+                  ⚡ SCHEDULE A 15-MIN DISCOVERY CALL &rarr;
+                </a>
+              </div>
+
+              <!-- Footer Signature -->
+              <div style="border-top: 1px solid #1a2419; margin-top: 28px; padding-top: 20px;">
+                <table width="100%" cellspacing="0" cellpadding="0">
+                  <tr>
+                    <td>
+                      <div style="font-size: 14px; font-weight: bold; color: #ffffff;">Mehedi Hasan</div>
+                      <div style="font-size: 12px; color: #838e7f;">AI Agents · n8n / Make Automations · SaaS Architecture</div>
+                      <div style="font-size: 12px; color: #c8ff3d; margin-top: 4px; font-family: monospace;">
+                        <a href="${siteUrl}" target="_blank" style="color: #c8ff3d; text-decoration: none;">${siteUrl.replace(/^https?:\/\//, "")}</a>
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `.trim();
+}
+

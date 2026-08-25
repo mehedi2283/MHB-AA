@@ -5,14 +5,14 @@ import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   ArrowUpRight, Bot, BriefcaseBusiness, FileText, Footprints, Globe, Inbox,
-  LayoutDashboard, LogOut, Menu, MessagesSquare, PanelsTopLeft, Settings, UserPlus,
+  LayoutDashboard, LogOut, Menu, MessagesSquare, PanelsTopLeft, Send, Settings, UserPlus,
   Users, Wrench, X,
 } from "lucide-react";
 
 const groups = [
   { label: "Workspace", links: [["/admin", LayoutDashboard, "Overview"], ["/admin/content/site", PanelsTopLeft, "Full website"]] },
   { label: "Collections", links: [["/admin/content/globe", Globe, "3D Globe & Clients"], ["/admin/content/projects", FileText, "Projects"], ["/admin/content/services", BriefcaseBusiness, "Services"], ["/admin/content/technologies", Wrench, "Technology"], ["/admin/content/process", Footprints, "Process"]] },
-  { label: "Operations", links: [["/admin/conversations", MessagesSquare, "AI Conversations"], ["/admin/leads", Users, "Leads"], ["/admin/inquiries", Inbox, "Inquiries"], ["/admin/ai", Bot, "AI Settings"]] },
+  { label: "Operations", links: [["/admin/clients", Send, "Clients & Outreach"], ["/admin/conversations", MessagesSquare, "AI Conversations"], ["/admin/leads", Users, "Leads"], ["/admin/inquiries", Inbox, "Inquiries"], ["/admin/ai", Bot, "AI Settings"]] },
   { label: "Access", links: [["/admin/register", UserPlus, "Add admin"], ["/admin/settings", Settings, "Settings"]] },
 ] as const;
 

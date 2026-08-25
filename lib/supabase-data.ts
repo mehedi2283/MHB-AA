@@ -1,6 +1,6 @@
 import { supabaseAdmin } from "@/lib/supabase";
 
-export const editableCollections = ["services", "projects", "technologies", "process", "leads", "inquiries", "settings", "aiConversations"] as const;
+export const editableCollections = ["services", "projects", "technologies", "process", "leads", "inquiries", "clients", "settings", "aiConversations"] as const;
 export type EditableCollection = typeof editableCollections[number];
 export function isEditableCollection(value: string): value is EditableCollection { return editableCollections.includes(value as EditableCollection); }
 
