@@ -79,73 +79,62 @@ function BackToTopPixelTransition({
     const startTime = performance.now();
     let animationId: number;
 
-    function render(now: number) {
-      if (!ctx || !canvas) return;
-      const elapsed = now - startTime;
+    const render = (time: number) => {
+      const elapsed = time - startTime;
       ctx.clearRect(0, 0, width, height);
 
-      let animating = false;
+      let allDone = true;
 
-      if (mode === "enter") {
-        for (const p of grid) {
-          if (elapsed < p.delay) {
-            ctx.fillStyle = "rgba(13, 17, 13, 0.98)";
-            ctx.fillRect(p.x, p.y, pixelSize - 1, pixelSize - 1);
-            animating = true;
-          } else if (elapsed < p.delay + p.duration) {
-            const progress = (elapsed - p.delay) / p.duration;
+      for (let i = 0; i < grid.length; i++) {
+        const p = grid[i];
+        if (elapsed < p.delay) {
+          allDone = false;
+          if (mode === "exit") {
+            // Still visible before exit
             ctx.fillStyle = p.color;
-            ctx.globalAlpha = 1 - progress;
             ctx.fillRect(p.x, p.y, pixelSize - 1, pixelSize - 1);
-            if (progress < 0.35) {
-              ctx.fillStyle = "#ffffff";
-              ctx.fillRect(p.x + 2, p.y + 2, pixelSize - 4, pixelSize - 4);
-            }
-            ctx.globalAlpha = 1;
-            animating = true;
           }
+          continue;
         }
-      } else {
-        // Exit: pixels cascade from top-left to bottom-right
-        for (const p of grid) {
-          if (elapsed >= p.delay + p.duration) {
-            ctx.fillStyle = "rgba(13, 17, 13, 0.98)";
-            ctx.fillRect(p.x, p.y, pixelSize - 1, pixelSize - 1);
-          } else if (elapsed >= p.delay) {
-            const progress = (elapsed - p.delay) / p.duration;
-            ctx.fillStyle = p.color;
-            ctx.globalAlpha = progress;
-            ctx.fillRect(p.x, p.y, pixelSize - 1, pixelSize - 1);
-            if (progress > 0.6) {
-              ctx.fillStyle = "#ffffff";
-              ctx.fillRect(p.x + 2, p.y + 2, pixelSize - 4, pixelSize - 4);
-            }
-            ctx.globalAlpha = 1;
-            animating = true;
-          } else {
-            animating = true;
-          }
-        }
-      }
 
-      if (animating && elapsed < 290) {
-        animationId = requestAnimationFrame(render);
-      } else {
+        const progress = Math.min(1, (elapsed - p.delay) / p.duration);
+        if (progress < 1) allDone = false;
+
         if (mode === "enter") {
-          ctx.clearRect(0, 0, width, height);
+          // Pixel scales up into place
+          if (progress > 0) {
+            const size = (pixelSize - 1) * progress;
+            const offset = (pixelSize - 1 - size) / 2;
+            ctx.fillStyle = p.color;
+            ctx.fillRect(p.x + offset, p.y + offset, size, size);
+          }
+        } else {
+          // Pixel scales down and disappears
+          if (progress < 1) {
+            const size = (pixelSize - 1) * (1 - progress);
+            const offset = (pixelSize - 1 - size) / 2;
+            ctx.fillStyle = p.color;
+            ctx.fillRect(p.x + offset, p.y + offset, size, size);
+          }
         }
-        onComplete?.();
       }
-    }
+
+      if (allDone) {
+        onComplete?.();
+      } else {
+        animationId = requestAnimationFrame(render);
+      }
+    };
 
     animationId = requestAnimationFrame(render);
+
     return () => cancelAnimationFrame(animationId);
   }, [mode, onComplete]);
 
   return (
     <canvas
       ref={canvasRef}
-      className="pointer-events-none absolute inset-0 z-40 h-full w-full rounded"
+      className="pointer-events-none absolute inset-0 z-50 h-full w-full rounded"
       style={{ imageRendering: "pixelated" }}
     />
   );
@@ -155,28 +144,34 @@ export function BackToTop() {
   const [mounted, setMounted] = useState(false);
   const [transitionMode, setTransitionMode] = useState<"enter" | "exit" | null>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const lastScrollY = useRef(0);
+  const isVisibleRef = useRef(false);
 
   useEffect(() => {
-    function handleScroll() {
-      const scrollY = window.scrollY;
+    const handleScroll = () => {
+      const currentY = window.scrollY;
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const p = docHeight > 0 ? Math.min(100, Math.max(0, Math.round((scrollY / docHeight) * 100))) : 0;
-      setScrollProgress(p);
+      const progress = docHeight > 0 ? Math.min(100, Math.max(0, Math.round((currentY / docHeight) * 100))) : 0;
+      setScrollProgress(progress);
 
-      if (scrollY > 280) {
-        if (!mounted && transitionMode !== "enter") {
-          setMounted(true);
-          setTransitionMode("enter");
-        }
-      } else {
-        if (mounted && transitionMode !== "exit") {
-          setTransitionMode("exit");
-        }
+      const isScrollingUp = currentY < lastScrollY.current;
+      const isPastThreshold = currentY > 300;
+      lastScrollY.current = currentY;
+
+      // Show condition: Scrolled down past 300px AND actively scrolling UP
+      const shouldShow = isPastThreshold && isScrollingUp;
+
+      if (shouldShow && !isVisibleRef.current) {
+        isVisibleRef.current = true;
+        setMounted(true);
+        setTransitionMode("enter");
+      } else if (!shouldShow && isVisibleRef.current) {
+        isVisibleRef.current = false;
+        setTransitionMode("exit");
       }
-    }
+    };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, [mounted, transitionMode]);
 
@@ -212,34 +207,35 @@ export function BackToTop() {
           className="back-to-top-btn group relative"
           aria-label="Back to top"
         >
-          {/* 8-Bit Pixel Perimeter Progress Ring */}
+          {/* Razor-Sharp 8-Bit Pixel Perimeter Progress Ring (Locked at z-40) */}
           <svg
-            className="pointer-events-none absolute inset-0 h-full w-full back-to-top-progress-ring"
-            style={{ shapeRendering: "crispEdges", transform: "none" }}
+            viewBox="0 0 154 38"
+            className="pointer-events-none absolute inset-0 h-full w-full z-40 back-to-top-progress-ring"
+            style={{ shapeRendering: "crispEdges" }}
           >
             <rect
               x="1"
               y="1"
-              width="calc(100% - 2px)"
-              height="calc(100% - 2px)"
+              width="152"
+              height="36"
               fill="none"
               stroke="rgba(200, 255, 61, 0.15)"
-              strokeWidth="2"
+              strokeWidth="1.5"
               strokeDasharray="4 2"
-              rx="4"
+              rx="3"
             />
             <rect
               x="1"
               y="1"
-              width="calc(100% - 2px)"
-              height="calc(100% - 2px)"
+              width="152"
+              height="36"
               fill="none"
               stroke="#c8ff3d"
-              strokeWidth="2"
+              strokeWidth="1.5"
               pathLength="100"
               strokeDasharray="100"
               strokeDashoffset={100 - scrollProgress}
-              rx="4"
+              rx="3"
               style={{
                 transition: "stroke-dashoffset 0.15s ease-out",
                 filter: "drop-shadow(0 0 4px rgba(200, 255, 61, 0.6))",
@@ -247,11 +243,14 @@ export function BackToTop() {
             />
           </svg>
 
-          <span className="flex-shrink-0">BACK TO TOP</span>
-          <span className="w-[30px] text-right font-mono text-[9px] font-bold text-[#c8ff3d] tabular-nums tracking-tighter inline-block flex-shrink-0">
-            {scrollProgress}%
-          </span>
-          <PixelArrowUp size={13} className="back-to-top-arrow-icon flex-shrink-0 text-[#c8ff3d]" />
+          {/* Button Text and Arrow (Relative z-40 so it stays above sparkles) */}
+          <div className="relative z-40 flex items-center justify-between w-full pointer-events-none">
+            <span className="flex-shrink-0">BACK TO TOP</span>
+            <span className="w-[30px] text-right font-mono text-[9px] font-bold text-[#c8ff3d] tabular-nums tracking-tighter inline-block flex-shrink-0">
+              {scrollProgress}%
+            </span>
+            <PixelArrowUp size={13} className="back-to-top-arrow-icon flex-shrink-0 text-[#c8ff3d]" />
+          </div>
         </PixelCard>
       </div>
     </div>
