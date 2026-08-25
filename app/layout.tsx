@@ -40,7 +40,6 @@ export const metadata: Metadata = {
 };
 
 import { AdminSecretTrigger } from "@/components/AdminSecretTrigger";
-import { PixelCursor } from "@/components/PixelCursor";
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const structuredData = {
@@ -63,7 +62,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         suppressHydrationWarning
         className={`${pixelGameFont.variable} ${pixeloidSans.variable} ${pixeloidMono.variable} ${pixeloidSans.className}`}
       >
-        <PixelCursor />
         <AdminSecretTrigger />
         {children}
         <script
