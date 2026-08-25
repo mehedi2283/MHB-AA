@@ -197,7 +197,7 @@ export function ContactForm() {
     return (
       <div className="glass card min-h-[420px] grid place-items-center text-center p-8">
         <div className="space-y-4 max-w-md">
-          <div className="size-14 rounded-full bg-[#c8ff3d18] border border-[#c8ff3d44] text-[#c8ff3d] grid place-items-center mx-auto text-2xl font-bold">
+          <div className="size-14 rounded bg-[#c8ff3d18] border border-[#c8ff3d44] text-[#c8ff3d] grid place-items-center mx-auto text-2xl font-bold">
             ✓
           </div>
           <h3 className="text-2xl font-bold text-white">Your brief is in.</h3>
@@ -284,7 +284,7 @@ export function ContactForm() {
       </div>
 
       {/* Online Meeting / Interactive Calendar & Time Slot Picker */}
-      <div className="contact-form-wide border border-[#ffffff15] hover:border-[#c8ff3d44] bg-[#0c120c] p-4 rounded-lg space-y-4 transition">
+      <div className="contact-form-wide border border-[#ffffff15] hover:border-[#c8ff3d44] bg-[#0c120c] p-4 rounded space-y-4 transition">
         <label className="flex items-center justify-between cursor-pointer select-none">
           <div className="flex items-center gap-3">
             <input

@@ -262,7 +262,7 @@ export function AIConversationsViewer() {
       {/* Inspect Conversation Modal Drawer */}
       {selectedChat && (
         <div className="fixed inset-0 z-[999999] flex items-center justify-end bg-black/70 backdrop-blur-sm p-4">
-          <div className="w-full max-w-xl h-full max-h-[90vh] bg-[#0b0e0b] border border-[#c8ff3d44] rounded-lg shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-200">
+          <div className="w-full max-w-xl h-full max-h-[90vh] bg-[#0b0e0b] border border-[#c8ff3d44] rounded shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-200">
             {/* Modal Header */}
             <header className="p-4 border-b border-[#ffffff15] bg-[#0f140f] flex items-center justify-between">
               <div className="flex items-center gap-2.5">

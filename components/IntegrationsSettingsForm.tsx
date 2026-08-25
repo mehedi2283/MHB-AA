@@ -149,7 +149,7 @@ export function IntegrationsSettingsForm() {
 
       {msg && (
         <div
-          className={`p-3.5 border rounded-lg text-xs font-mono flex items-center gap-2.5 ${
+          className={`p-3.5 border rounded text-xs font-mono flex items-center gap-2.5 ${
             msg.type === "success"
               ? "bg-[#c8ff3d12] border-[#c8ff3d44] text-[#c8ff3d]"
               : "bg-rose-950/40 border-rose-800 text-rose-300"
@@ -161,11 +161,11 @@ export function IntegrationsSettingsForm() {
       )}
 
       {/* Main Google OAuth Card */}
-      <div className="border border-[#ffffff18] bg-[#0d110d] rounded-xl p-6 space-y-6">
+      <div className="border border-[#ffffff18] bg-[#0d110d] rounded p-6 space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#ffffff10] pb-5">
           <div className="flex items-center gap-3.5">
             {/* Google SVG Icon */}
-            <div className="size-11 rounded-lg bg-[#ffffff0a] border border-[#ffffff18] grid place-items-center flex-shrink-0">
+            <div className="size-11 rounded bg-[#ffffff0a] border border-[#ffffff18] grid place-items-center flex-shrink-0">
               <svg className="size-6" viewBox="0 0 24 24">
                 <path
                   fill="#4285F4"
@@ -189,7 +189,7 @@ export function IntegrationsSettingsForm() {
               <h2 className="text-base font-bold text-white flex items-center gap-2">
                 Google Workspace Integration
                 {googleStatus?.connected && (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-mono bg-[#c8ff3d20] border border-[#c8ff3d44] text-[#c8ff3d] flex items-center gap-1 font-bold">
+                  <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-[#c8ff3d20] border border-[#c8ff3d44] text-[#c8ff3d] flex items-center gap-1 font-bold">
                     <span className="size-1.5 rounded-full bg-[#c8ff3d] animate-pulse" />
                     CONNECTED
                   </span>
@@ -206,7 +206,7 @@ export function IntegrationsSettingsForm() {
               <button
                 onClick={handleDisconnect}
                 disabled={actionLoading}
-                className="px-3.5 py-2 rounded text-xs font-mono font-bold bg-rose-950/40 border border-rose-800 text-rose-300 hover:bg-rose-900/60 transition flex items-center gap-1.5"
+                className="px-3.5 py-2 rounded text-xs font-mono font-bold bg-rose-950/40 border border-rose-800 text-rose-300 hover:bg-rose-900/60 transition flex items-center gap-1.5 cursor-pointer"
               >
                 {actionLoading ? <LoaderCircle size={14} className="animate-spin" /> : <Unlink size={14} />}
                 Disconnect Account
@@ -242,17 +242,17 @@ export function IntegrationsSettingsForm() {
 
         {/* Connected Account Details View */}
         {googleStatus?.connected && googleStatus.account ? (
-          <div className="bg-[#111710] border border-[#c8ff3d33] rounded-lg p-4 space-y-4">
+          <div className="bg-[#111710] border border-[#c8ff3d33] rounded p-4 space-y-4">
             <div className="flex items-center gap-3">
               {googleStatus.account.picture ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={googleStatus.account.picture}
                   alt={googleStatus.account.name}
-                  className="size-10 rounded-full border border-[#c8ff3d]"
+                  className="size-10 rounded border border-[#c8ff3d]"
                 />
               ) : (
-                <div className="size-10 rounded-full bg-[#c8ff3d20] border border-[#c8ff3d] grid place-items-center text-[#c8ff3d] font-bold">
+                <div className="size-10 rounded bg-[#c8ff3d20] border border-[#c8ff3d] grid place-items-center text-[#c8ff3d] font-bold">
                   {googleStatus.account.name.charAt(0)}
                 </div>
               )}
@@ -319,7 +319,7 @@ export function IntegrationsSettingsForm() {
 
           {/* Setup Guide */}
           {showGuide && (
-            <div className="mt-4 p-4 bg-[#111710] border border-[#c8ff3d33] rounded-lg text-xs text-[#a4ada0] space-y-2.5 font-mono">
+            <div className="mt-4 p-4 bg-[#111710] border border-[#c8ff3d33] rounded text-xs text-[#a4ada0] space-y-2.5 font-mono">
               <strong className="text-white block font-bold">Quick 2-Minute Google Cloud OAuth Setup:</strong>
               <ol className="list-decimal list-inside space-y-1.5 text-[11px] leading-relaxed">
                 <li>
@@ -352,7 +352,7 @@ export function IntegrationsSettingsForm() {
 
           {/* Custom Credentials Form */}
           {showCredsForm && (
-            <form onSubmit={handleSaveCredentials} className="mt-4 p-4 bg-[#0a0d0a] border border-[#ffffff18] rounded-lg space-y-4">
+            <form onSubmit={handleSaveCredentials} className="mt-4 p-4 bg-[#0a0d0a] border border-[#ffffff18] rounded space-y-4">
               <div className="grid sm:grid-cols-2 gap-4">
                 <label className="label">
                   <span className="text-xs text-[#e8eee2]">Google OAuth Client ID</span>

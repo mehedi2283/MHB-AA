@@ -45,7 +45,7 @@ export function ServiceGrid({ services }: { services: ServiceItem[] }) {
             <p className="muted text-sm mt-3 flex-1">{description}</p>
             <div className="flex flex-wrap gap-1.5 mt-5">
               {tools.map((t) => (
-                <span className="text-[10px] text-slate-400 border border-white/10 rounded-full px-2 py-1" key={t}>
+                <span className="text-[10px] text-slate-400 border border-white/10 rounded px-2 py-1" key={t}>
                   {t}
                 </span>
               ))}

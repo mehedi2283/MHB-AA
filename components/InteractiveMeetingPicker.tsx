@@ -230,7 +230,7 @@ export function InteractiveMeetingPicker({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 bg-[#080c08]/90 border border-[#c8ff3d33] rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.6)]">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 bg-[#080c08]/90 border border-[#c8ff3d33] rounded shadow-[0_4px_24px_rgba(0,0,0,0.6)]">
         
         {/* Left Column: 8-Bit Interactive Month Calendar */}
         <div className="md:col-span-6 space-y-3">
@@ -354,7 +354,7 @@ export function InteractiveMeetingPicker({
                   type="button"
                   disabled={isBooked}
                   onClick={() => !isBooked && setSelectedTime(slot)}
-                  className={`p-2 rounded-lg text-left font-mono transition flex flex-col justify-center relative ${
+                  className={`p-2 rounded text-left font-mono transition flex flex-col justify-center relative ${
                     isBooked
                       ? "bg-[#101410] border border-[#2d1b1b] text-[#717b6d] opacity-50 cursor-not-allowed"
                       : isSelected
@@ -399,9 +399,9 @@ export function InteractiveMeetingPicker({
       </div>
 
       {/* Live Selection Summary Ribbon */}
-      <div className="p-3 bg-[#111910] border border-[#c8ff3d44] rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono shadow-[0_0_15px_rgba(200,255,61,0.08)]">
+      <div className="p-3 bg-[#111910] border border-[#c8ff3d44] rounded flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono shadow-[0_0_15px_rgba(200,255,61,0.08)]">
         <div className="flex items-center gap-2">
-          <div className="size-5 rounded-full bg-[#c8ff3d] text-[#070a07] grid place-items-center font-bold text-[10px]">
+          <div className="size-5 rounded bg-[#c8ff3d] text-[#070a07] grid place-items-center font-bold text-[10px]">
             ✓
           </div>
           <div>

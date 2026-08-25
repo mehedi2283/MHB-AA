@@ -140,7 +140,7 @@ function CustomCitySelect({
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between bg-[#0e140e] hover:bg-[#131a13] border border-white/[0.12] hover:border-[#c8ff3d44] focus:border-[#c8ff3d] rounded-xl px-3 py-2 text-left text-xs font-mono transition cursor-pointer"
+        className="w-full flex items-center justify-between bg-[#0e140e] hover:bg-[#131a13] border border-white/[0.12] hover:border-[#c8ff3d44] focus:border-[#c8ff3d] rounded px-3 py-2 text-left text-xs font-mono transition cursor-pointer"
       >
         <span className={selectedCity ? "text-white font-bold truncate" : "text-[#5f685c] truncate"}>
           {selectedCity ? `${selectedCity.name}, ${selectedCity.country} (${selectedCity.code})` : placeholder}
@@ -149,13 +149,13 @@ function CustomCitySelect({
       </button>
 
       {open && (
-        <div className="absolute left-0 right-0 mt-1.5 bg-[#0c120c] border border-white/[0.15] rounded-xl shadow-2xl backdrop-blur-2xl p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
+        <div className="absolute left-0 right-0 mt-1.5 bg-[#0c120c] border border-white/[0.15] rounded shadow-2xl backdrop-blur-2xl p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
           <input
             type="text"
             placeholder="Search city, country or code..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-[#141b14] border border-white/[0.1] rounded-lg px-2.5 py-1.5 text-xs font-mono text-white placeholder:text-[#5f685c] focus:border-[#c8ff3d] focus:outline-none mb-1.5"
+            className="w-full bg-[#141b14] border border-white/[0.1] rounded px-2.5 py-1.5 text-xs font-mono text-white placeholder:text-[#5f685c] focus:border-[#c8ff3d] focus:outline-none mb-1.5"
             autoFocus
           />
           <div className="max-h-48 overflow-y-auto scrollbar-none space-y-0.5">
@@ -170,7 +170,7 @@ function CustomCitySelect({
                     setOpen(false);
                     setSearch("");
                   }}
-                  className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-mono transition text-left cursor-pointer ${
+                  className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-mono transition text-left cursor-pointer ${
                     isSelected ? "bg-[#182617] text-[#c8ff3d] font-bold" : "text-[#a4ada0] hover:text-white hover:bg-white/[0.06]"
                   }`}
                 >

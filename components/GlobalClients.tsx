@@ -102,13 +102,13 @@ export function GlobalClients() {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-12 items-center">
           {/* Left Column: Interactive 3D WebGL Globe */}
-          <div className="lg:col-span-6 relative flex flex-col items-center justify-center p-4 min-h-[420px] rounded-lg border border-white/10 bg-[#0a0d0a]/80 backdrop-blur-sm overflow-hidden">
+          <div className="lg:col-span-6 relative flex flex-col items-center justify-center p-4 min-h-[420px] rounded border border-white/10 bg-[#0a0d0a]/80 backdrop-blur-sm overflow-hidden">
             {/* Background grid matrix */}
             <div className="absolute inset-0 bg-[linear-gradient(#c8ff3d08_1px,transparent_1px),linear-gradient(90deg,#c8ff3d08_1px,transparent_1px)] bg-[size:28px_28px] opacity-40 pointer-events-none" />
             
             {/* Live radar badge */}
-            <div className="absolute top-4 left-4 z-20 flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-[#080b08]/90 text-[10px] text-[#c8ff3d] tracking-widest uppercase">
-              <span className="size-2 rounded-full bg-[#c8ff3d] animate-ping" />
+            <div className="absolute top-4 left-4 z-20 flex items-center gap-2 px-3 py-1 rounded border border-white/10 bg-[#080b08]/90 text-[10px] text-[#c8ff3d] tracking-widest uppercase">
+              <span className="size-2 rounded bg-[#c8ff3d] animate-ping" />
               <span>LIVE TELEMETRY · 9 GLOBAL HUBS</span>
             </div>
 
@@ -135,7 +135,7 @@ export function GlobalClients() {
                     variant={isSelected ? "primaryButton" : "glass"}
                     gridSize={6}
                     onClick={() => setActiveHub(hub)}
-                    className={`text-left p-4 rounded-lg border transition-all duration-200 ${
+                    className={`text-left p-4 rounded border transition-all duration-200 cursor-pointer ${
                       isSelected
                         ? "border-[#c8ff3d] bg-[#121810]"
                         : "border-white/10 bg-[#0b0e0b] hover:border-[#c8ff3d55]"
@@ -148,7 +148,7 @@ export function GlobalClients() {
                           {hub.city}
                         </strong>
                       </div>
-                      <span className="text-[9px] text-[#c8ff3d] border border-[#c8ff3d33] px-2 py-0.5 rounded-full font-mono">
+                      <span className="text-[9px] text-[#c8ff3d] border border-[#c8ff3d33] px-2 py-0.5 rounded font-mono">
                         {hub.region}
                       </span>
                     </div>
@@ -174,10 +174,10 @@ export function GlobalClients() {
               as="div"
               variant="glass"
               gridSize={8}
-              className="mt-2 p-4 rounded-lg border border-white/10 bg-gradient-to-r from-[#0c100c] to-[#080a08] flex flex-wrap items-center justify-between gap-4"
+              className="mt-2 p-4 rounded border border-white/10 bg-gradient-to-r from-[#0c100c] to-[#080a08] flex flex-wrap items-center justify-between gap-4"
             >
               <div className="flex items-center gap-3">
-                <div className="size-9 rounded-full bg-[#c8ff3d]/10 border border-[#c8ff3d]/30 grid place-items-center text-[#c8ff3d]">
+                <div className="size-9 rounded bg-[#c8ff3d]/10 border border-[#c8ff3d]/30 grid place-items-center text-[#c8ff3d]">
                   <PixelGlobe size={18} />
                 </div>
                 <div>

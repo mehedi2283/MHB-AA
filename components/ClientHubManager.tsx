@@ -171,7 +171,7 @@ function CustomSortDropdown({
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 bg-[#121812] hover:bg-[#182218] border border-white/[0.12] hover:border-[#c8ff3d44] text-xs font-mono text-white px-3 py-2 rounded-xl transition select-none cursor-pointer"
+        className="flex items-center gap-2 bg-[#121812] hover:bg-[#182218] border border-white/[0.12] hover:border-[#c8ff3d44] text-xs font-mono text-white px-3 py-2 rounded transition select-none cursor-pointer"
       >
         <ArrowUpDown size={13} className="text-[#838e7f]" />
         <span>{currentOption.label}</span>
@@ -179,7 +179,7 @@ function CustomSortDropdown({
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-1.5 w-44 bg-[#0d140d] border border-white/[0.15] rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-xl p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150">
+        <div className="absolute right-0 mt-1.5 w-44 bg-[#0d140d] border border-white/[0.15] rounded shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-xl p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150">
           <div className="text-[9px] font-mono text-[#838e7f] uppercase tracking-wider px-2 py-1 border-b border-white/[0.06] mb-1">
             SORT PIPELINE
           </div>
@@ -193,7 +193,7 @@ function CustomSortDropdown({
                   onChange(opt.key);
                   setOpen(false);
                 }}
-                className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-mono transition text-left ${
+                className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-mono transition text-left ${
                   isSelected
                     ? "bg-[#1f2e1d] text-[#c8ff3d] font-bold"
                     : "text-[#a4ada0] hover:text-white hover:bg-white/[0.06]"
@@ -244,7 +244,7 @@ function CustomStageDropdown({
           backgroundColor: currentConfig.bg,
           borderColor: currentConfig.border,
         }}
-        className="flex items-center gap-1.5 text-[10.5px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg border hover:brightness-125 transition cursor-pointer"
+        className="flex items-center gap-1.5 text-[10.5px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded border hover:brightness-125 transition cursor-pointer"
       >
         <CurrentIcon size={12} />
         <span>{currentConfig.label}</span>
@@ -252,7 +252,7 @@ function CustomStageDropdown({
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-1.5 w-48 bg-[#0d140d] border border-white/[0.15] rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-xl p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150">
+        <div className="absolute right-0 mt-1.5 w-48 bg-[#0d140d] border border-white/[0.15] rounded shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-xl p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150">
           <div className="text-[9px] font-mono text-[#838e7f] uppercase tracking-wider px-2 py-1 border-b border-white/[0.06] mb-1">
             MOVE STAGE
           </div>
@@ -267,7 +267,7 @@ function CustomStageDropdown({
                   onChange(s.key);
                   setOpen(false);
                 }}
-                className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-mono transition text-left ${
+                className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-mono transition text-left ${
                   isSelected
                     ? "bg-[#1f2e1d] text-[#c8ff3d] font-bold"
                     : "text-[#a4ada0] hover:text-white hover:bg-white/[0.06]"
@@ -551,7 +551,7 @@ export function ClientHubManager() {
       {/* Toast Notice */}
       {notice && (
         <div
-          className={`p-3.5 rounded-lg border font-mono text-xs flex items-center justify-between animate-in fade-in duration-200 ${
+          className={`p-3.5 rounded border font-mono text-xs flex items-center justify-between animate-in fade-in duration-200 ${
             notice.type === "success"
               ? "bg-[#141e12] border-[#c8ff3d] text-[#c8ff3d]"
               : "bg-[#251212] border-[#ff5555] text-[#ff8888]"
@@ -614,19 +614,19 @@ export function ClientHubManager() {
 
       {/* Metrics Bar */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="bg-[#0b100b] border border-white/[0.08] p-4 rounded-xl">
+        <div className="bg-[#0b100b] border border-white/[0.08] p-4 rounded">
           <div className="text-[10px] font-mono text-[#838e7f] uppercase tracking-wider">Total Clients & Leads</div>
           <div className="text-2xl font-bold font-mono text-white mt-1">{totalClients}</div>
         </div>
-        <div className="bg-[#0b100b] border border-white/[0.08] p-4 rounded-xl">
+        <div className="bg-[#0b100b] border border-white/[0.08] p-4 rounded">
           <div className="text-[10px] font-mono text-[#838e7f] uppercase tracking-wider">Active In-Flight</div>
           <div className="text-2xl font-bold font-mono text-[#c8ff3d] mt-1">{activeClientsCount}</div>
         </div>
-        <div className="bg-[#0b100b] border border-white/[0.08] p-4 rounded-xl">
+        <div className="bg-[#0b100b] border border-white/[0.08] p-4 rounded">
           <div className="text-[10px] font-mono text-[#838e7f] uppercase tracking-wider">Pipeline Leads</div>
           <div className="text-2xl font-bold font-mono text-[#72a4ff] mt-1">{leadsCount}</div>
         </div>
-        <div className="bg-[#0b100b] border border-white/[0.08] p-4 rounded-xl">
+        <div className="bg-[#0b100b] border border-white/[0.08] p-4 rounded">
           <div className="text-[10px] font-mono text-[#838e7f] uppercase tracking-wider">Outreach Sent</div>
           <div className="text-2xl font-bold font-mono text-[#facc15] mt-1 flex items-center gap-1.5">
             <Send size={16} />
@@ -636,11 +636,11 @@ export function ClientHubManager() {
       </div>
 
       {/* 1. Interactive Pipeline Stage Navigation Tabs */}
-      <div className="bg-[#0b100b] border border-white/[0.08] p-2.5 rounded-2xl">
+      <div className="bg-[#0b100b] border border-white/[0.08] p-2.5 rounded">
         <div className="flex flex-wrap items-center gap-2 w-full">
           <button
             onClick={() => setSelectedStage("all")}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-mono font-bold transition-all whitespace-nowrap ${
+            className={`flex items-center gap-2 px-3.5 py-2 rounded text-xs font-mono font-bold transition-all whitespace-nowrap cursor-pointer ${
               selectedStage === "all"
                 ? "bg-[#c8ff3d] text-black shadow-[0_0_20px_rgba(200,255,61,0.25)] scale-[1.02]"
                 : "bg-[#141b14] text-[#a4ada0] hover:text-white hover:bg-[#1a241a] border border-white/[0.06]"
@@ -666,7 +666,7 @@ export function ClientHubManager() {
               <button
                 key={st.key}
                 onClick={() => setSelectedStage(st.key)}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-mono transition-all whitespace-nowrap ${
+                className={`flex items-center gap-2 px-3.5 py-2 rounded text-xs font-mono transition-all whitespace-nowrap cursor-pointer ${
                   isSelected
                     ? "bg-[#192418] text-[#c8ff3d] border border-[#c8ff3d] shadow-[0_0_15px_rgba(200,255,61,0.2)] font-bold scale-[1.02]"
                     : "bg-[#141b14] text-[#a4ada0] hover:text-white hover:bg-[#1a241a] border border-white/[0.06]"
@@ -688,7 +688,7 @@ export function ClientHubManager() {
       </div>
 
       {/* 2. Unified Search, Sort & View Control Toolbar */}
-      <div className="bg-[#0b100b] border border-white/[0.08] p-3.5 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-3">
+      <div className="bg-[#0b100b] border border-white/[0.08] p-3.5 rounded flex flex-col md:flex-row items-center justify-between gap-3">
         {/* Search with Clear Button */}
         <div className="relative w-full md:max-w-md flex-1">
           <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#838e7f]" />
@@ -697,7 +697,7 @@ export function ClientHubManager() {
             placeholder="Search by client, company, tech stack (e.g. n8n), email..."
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            className="w-full bg-[#121812] border border-white/[0.12] focus:border-[#c8ff3d] rounded-xl pl-10 pr-9 py-2 text-xs text-white placeholder:text-[#5f685c] focus:outline-none font-mono transition"
+            className="w-full bg-[#121812] border border-white/[0.12] focus:border-[#c8ff3d] rounded pl-10 pr-9 py-2 text-xs text-white placeholder:text-[#5f685c] focus:outline-none font-mono transition"
           />
           {searchQuery && (
             <button
@@ -719,7 +719,7 @@ export function ClientHubManager() {
                 setSearchQuery("");
                 setSelectedStage("all");
               }}
-              className="text-[11px] font-mono text-[#ff8888] hover:text-[#ffaaaa] flex items-center gap-1 bg-[#281313] px-2.5 py-1.5 rounded-lg border border-[#ff555544] transition"
+              className="text-[11px] font-mono text-[#ff8888] hover:text-[#ffaaaa] flex items-center gap-1 bg-[#281313] px-2.5 py-1.5 rounded border border-[#ff555544] transition cursor-pointer"
             >
               <X size={12} />
               <span>Reset Filters</span>
@@ -730,10 +730,10 @@ export function ClientHubManager() {
           <CustomSortDropdown value={sortBy} onChange={setSortBy} />
 
           {/* View Mode Toggle: Grid vs List */}
-          <div className="flex items-center bg-[#121812] border border-white/[0.1] rounded-xl p-1">
+          <div className="flex items-center bg-[#121812] border border-white/[0.1] rounded p-1">
             <button
               onClick={() => setViewMode("grid")}
-              className={`p-1.5 rounded-lg transition ${
+              className={`p-1.5 rounded transition cursor-pointer ${
                 viewMode === "grid" ? "bg-[#c8ff3d] text-black font-bold" : "text-[#838e7f] hover:text-white"
               }`}
               title="Grid Card View"
@@ -742,7 +742,7 @@ export function ClientHubManager() {
             </button>
             <button
               onClick={() => setViewMode("list")}
-              className={`p-1.5 rounded-lg transition ${
+              className={`p-1.5 rounded transition cursor-pointer ${
                 viewMode === "list" ? "bg-[#c8ff3d] text-black font-bold" : "text-[#838e7f] hover:text-white"
               }`}
               title="Compact Table View"
@@ -757,8 +757,8 @@ export function ClientHubManager() {
       {loading ? (
         <PixelLoader variant="skeleton-cards" label="QUERYING CLIENT HUB IN SUPABASE..." />
       ) : filteredClients.length === 0 ? (
-        <div className="p-12 text-center border-2 border-dashed border-white/[0.08] rounded-xl bg-[#090d09]">
-          <div className="size-14 rounded-xl bg-[#141b14] border border-[#c8ff3d33] grid place-items-center mx-auto text-[#c8ff3d]">
+        <div className="p-12 text-center border-2 border-dashed border-white/[0.08] rounded bg-[#090d09]">
+          <div className="size-14 rounded bg-[#141b14] border border-[#c8ff3d33] grid place-items-center mx-auto text-[#c8ff3d]">
             <Building2 size={26} />
           </div>
           <h3 className="text-sm font-bold font-mono text-white mt-4 uppercase tracking-wider">
@@ -792,7 +792,7 @@ export function ClientHubManager() {
         </div>
       ) : viewMode === "list" ? (
         /* COMPACT CRM TABLE VIEW */
-        <div className="bg-[#0b100b] border border-white/[0.08] rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
+        <div className="bg-[#0b100b] border border-white/[0.08] rounded overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
           <div className="overflow-x-auto">
             <table className="w-full text-left font-mono text-xs">
               <thead>
@@ -876,7 +876,7 @@ export function ClientHubManager() {
                         <div className="flex items-center justify-end gap-2">
                           <button
                             onClick={() => handleOpenOutreach(client)}
-                            className="text-[11px] font-mono font-bold bg-[#1a2517] hover:bg-[#c8ff3d] text-[#c8ff3d] hover:text-black border border-[#c8ff3d] px-2.5 py-1 rounded-lg transition flex items-center gap-1"
+                            className="text-[11px] font-mono font-bold bg-[#1a2517] hover:bg-[#c8ff3d] text-[#c8ff3d] hover:text-black border border-[#c8ff3d] px-2.5 py-1 rounded transition flex items-center gap-1"
                           >
                             <Send size={11} />
                             <span>Cold Email</span>
@@ -913,7 +913,7 @@ export function ClientHubManager() {
             return (
               <div
                 key={client._id}
-                className="bg-[#0b100b] border border-white/[0.08] hover:border-[#c8ff3d44] transition-all rounded-2xl p-5 flex flex-col justify-between space-y-4 relative group shadow-[0_4px_20px_rgba(0,0,0,0.5)]"
+                className="bg-[#0b100b] border border-white/[0.08] hover:border-[#c8ff3d44] transition-all rounded p-5 flex flex-col justify-between space-y-4 relative group shadow-[0_4px_20px_rgba(0,0,0,0.5)]"
               >
                 {/* Card Top: Client Info & Stage Dropdown */}
                 <div>
@@ -967,7 +967,7 @@ export function ClientHubManager() {
                   </div>
 
                   {/* Project Details Box */}
-                  <div className="bg-[#101610] border border-white/[0.06] rounded-xl p-3.5 mt-3.5 space-y-2">
+                  <div className="bg-[#101610] border border-white/[0.06] rounded p-3.5 mt-3.5 space-y-2">
                     <div className="flex items-center justify-between">
                       <div className="text-xs font-bold font-mono text-white flex items-center gap-1.5">
                         <Wrench size={13} className="text-[#c8ff3d]" />
@@ -1019,7 +1019,7 @@ export function ClientHubManager() {
                           <button
                             key={idx}
                             onClick={() => setPreviewImage(s.url)}
-                            className="relative size-14 rounded-lg overflow-hidden border border-white/[0.12] hover:border-[#c8ff3d] transition group/img flex-shrink-0 bg-black"
+                            className="relative size-14 rounded overflow-hidden border border-white/[0.12] hover:border-[#c8ff3d] transition group/img flex-shrink-0 bg-black cursor-pointer"
                             title={s.caption || `Screenshot ${idx + 1}`}
                           >
                             <img src={s.url} alt={s.caption || "Screenshot"} className="w-full h-full object-cover" />
@@ -1047,7 +1047,7 @@ export function ClientHubManager() {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => handleOpenOutreach(client)}
-                      className="text-xs font-mono font-bold bg-[#1a2517] hover:bg-[#c8ff3d] text-[#c8ff3d] hover:text-black border border-[#c8ff3d] px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 shadow-[0_0_15px_rgba(200,255,61,0.15)]"
+                      className="text-xs font-mono font-bold bg-[#1a2517] hover:bg-[#c8ff3d] text-[#c8ff3d] hover:text-black border border-[#c8ff3d] px-3 py-1.5 rounded transition flex items-center gap-1.5 shadow-[0_0_15px_rgba(200,255,61,0.15)] cursor-pointer"
                     >
                       <Send size={12} />
                       <span>Cold Email</span>
@@ -1075,11 +1075,13 @@ export function ClientHubManager() {
         </div>
       )}
 
-      {/* CREATE / EDIT CLIENT MODAL */}
+      {/* 4. MODALS & POPUPS */}
+
+      {/* ADD / EDIT CLIENT MODAL */}
       {editingClient && (
         <div className="admin-modal-backdrop animate-in fade-in duration-150">
-          <div className="admin-modal max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="admin-modal-head sticky top-0 bg-[#0c120c] z-20 pb-3 border-b border-white/[0.08]">
+          <div className="admin-modal max-w-2xl max-h-[90vh] overflow-y-auto rounded shadow-2xl">
+            <div className="admin-modal-head sticky top-0 bg-[#0c120c] z-20 pb-3 border-b border-white/[0.08] flex items-center justify-between">
               <div>
                 <span className="font-mono text-[10px] text-[#c8ff3d] uppercase tracking-widest">
                   SUPABASE DATABASE CRM
@@ -1212,7 +1214,7 @@ export function ClientHubManager() {
                         type="button"
                         key={tech}
                         onClick={() => toggleTechStack(tech)}
-                        className={`text-[10px] font-mono px-2 py-1 rounded transition border ${
+                        className={`text-[10px] font-mono px-2 py-1 rounded transition border cursor-pointer ${
                           active
                             ? "bg-[#c8ff3d] text-black font-bold border-[#c8ff3d]"
                             : "bg-[#141b14] text-[#a4ada0] border-white/[0.08] hover:border-white/30"
@@ -1241,7 +1243,7 @@ export function ClientHubManager() {
                     type="button"
                     disabled={uploadingImage}
                     onClick={() => fileInputRef.current?.click()}
-                    className="text-xs bg-[#1a2517] border border-[#c8ff3d] text-[#c8ff3d] px-3 py-1 rounded hover:bg-[#c8ff3d] hover:text-black transition flex items-center gap-1.5"
+                    className="text-xs bg-[#1a2517] border border-[#c8ff3d] text-[#c8ff3d] px-3 py-1 rounded hover:bg-[#c8ff3d] hover:text-black transition flex items-center gap-1.5 cursor-pointer"
                   >
                     {uploadingImage ? <PixelLoader label="UPLOADING..." /> : <Upload size={12} />}
                     <span>Upload Image</span>
@@ -1252,12 +1254,12 @@ export function ClientHubManager() {
                 {editingClient.screenshots && editingClient.screenshots.length > 0 && (
                   <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
                     {editingClient.screenshots.map((s, idx) => (
-                      <div key={idx} className="relative group rounded-lg overflow-hidden border border-white/[0.12] bg-black">
+                      <div key={idx} className="relative group rounded overflow-hidden border border-white/[0.12] bg-black">
                         <img src={s.url} alt={s.caption || ""} className="w-full h-20 object-cover" />
                         <button
                           type="button"
                           onClick={() => handleRemoveScreenshot(idx)}
-                          className="absolute top-1 right-1 bg-red-600/90 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition"
+                          className="absolute top-1 right-1 bg-red-600/90 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition cursor-pointer"
                           title="Remove"
                         >
                           <X size={12} />
@@ -1408,7 +1410,7 @@ export function ClientHubManager() {
                 </div>
               ) : (
                 /* Live Preview Container */
-                <div className="bg-[#070907] border border-[#233020] rounded-xl p-5 text-white max-h-96 overflow-y-auto">
+                <div className="bg-[#070907] border border-[#233020] rounded p-5 text-white max-h-96 overflow-y-auto">
                   <div className="border-b border-[#1a2419] pb-3 mb-4 text-xs font-mono text-[#838e7f]">
                     <div>To: <span className="text-[#c8ff3d]">{outreachTarget.email}</span></div>
                     <div>Subject: <span className="text-white font-bold">{outreachSubject}</span></div>
@@ -1418,7 +1420,7 @@ export function ClientHubManager() {
                     className="text-xs space-y-3 text-[#d0dad0] leading-relaxed"
                   />
                   {outreachTarget.techStack && outreachTarget.techStack.length > 0 && (
-                    <div className="mt-4 p-3 bg-[#0d120d] border border-[#233020] rounded-lg">
+                    <div className="mt-4 p-3 bg-[#0d120d] border border-[#233020] rounded">
                       <div className="text-[10px] font-mono text-[#c8ff3d] mb-1 font-bold">FEATURED STACK:</div>
                       <div className="flex flex-wrap gap-1">
                         {outreachTarget.techStack.map((t, i) => (
@@ -1478,11 +1480,11 @@ export function ClientHubManager() {
           onClick={() => setPreviewImage(null)}
           className="fixed inset-0 z-[9999999] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 cursor-pointer"
         >
-          <div className="relative max-w-4xl max-h-[85vh] p-2 bg-[#0c120c] border border-[#c8ff3d] rounded-xl shadow-[0_0_50px_rgba(200,255,61,0.3)]">
-            <img src={previewImage} alt="Preview" className="max-w-full max-h-[80vh] object-contain rounded-lg" />
+          <div className="relative max-w-4xl max-h-[85vh] p-2 bg-[#0c120c] border border-[#c8ff3d] rounded shadow-[0_0_50px_rgba(200,255,61,0.3)]">
+            <img src={previewImage} alt="Preview" className="max-w-full max-h-[80vh] object-contain rounded" />
             <button
               onClick={() => setPreviewImage(null)}
-              className="absolute top-4 right-4 bg-black/80 text-white p-2 rounded-full border border-white/20 hover:border-[#c8ff3d] transition"
+              className="absolute top-4 right-4 bg-black/80 text-white p-2 rounded border border-white/20 hover:border-[#c8ff3d] transition cursor-pointer"
             >
               <X size={18} />
             </button>

@@ -253,7 +253,7 @@ function CustomModelDropdown({
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between bg-[#101610] hover:bg-[#141d14] border border-white/[0.12] hover:border-[#c8ff3d55] focus:border-[#c8ff3d] rounded-xl px-4 py-2.5 text-left transition shadow-[0_4px_16px_rgba(0,0,0,0.4)] group cursor-pointer"
+        className="w-full flex items-center justify-between bg-[#101610] hover:bg-[#141d14] border border-white/[0.12] hover:border-[#c8ff3d55] focus:border-[#c8ff3d] rounded px-4 py-2.5 text-left transition shadow-[0_4px_16px_rgba(0,0,0,0.4)] group cursor-pointer"
       >
         <div className="flex items-center gap-3 truncate">
           <Cpu size={16} className="text-[#c8ff3d] flex-shrink-0" />
@@ -282,7 +282,7 @@ function CustomModelDropdown({
 
       {/* Dropdown Popup Menu */}
       {open && (
-        <div className="absolute left-0 right-0 mt-2 bg-[#0c120c] border border-white/[0.15] rounded-2xl shadow-[0_15px_40px_rgba(0,0,0,0.9)] backdrop-blur-2xl p-2 z-50 animate-in fade-in zoom-in-95 duration-150 max-h-80 overflow-y-auto scrollbar-none">
+        <div className="absolute left-0 right-0 mt-2 bg-[#0c120c] border border-white/[0.15] rounded shadow-[0_15px_40px_rgba(0,0,0,0.9)] backdrop-blur-2xl p-2 z-50 animate-in fade-in zoom-in-95 duration-150 max-h-80 overflow-y-auto scrollbar-none">
           <div className="text-[10px] font-mono text-[#838e7f] uppercase tracking-wider px-3 py-1.5 border-b border-white/[0.06] mb-1 flex items-center justify-between">
             <span>AVAILABLE MODELS</span>
             <span>2025 / 2026 ARCHITECTURE</span>
@@ -299,7 +299,7 @@ function CustomModelDropdown({
                     onSelectModel(m.id);
                     setOpen(false);
                   }}
-                  className={`w-full flex items-center justify-between p-3 rounded-xl text-left transition-all group/opt ${
+                  className={`w-full flex items-center justify-between p-3 rounded text-left transition-all group/opt ${
                     isSelected
                       ? "bg-[#172516] border border-[#c8ff3d44] text-white"
                       : "hover:bg-[#131a13] border border-transparent text-[#a4ada0] hover:text-white"
@@ -333,8 +333,8 @@ function CustomModelDropdown({
                   </div>
 
                   {isSelected && (
-                    <div className="size-6 rounded-full bg-[#c8ff3d]/20 border border-[#c8ff3d] grid place-items-center flex-shrink-0 text-[#c8ff3d]">
-                      <Check size={13} strokeWidth={3} />
+                    <div className="size-5 rounded bg-[#c8ff3d]/20 border border-[#c8ff3d] grid place-items-center flex-shrink-0 text-[#c8ff3d]">
+                      <Check size={12} strokeWidth={3} />
                     </div>
                   )}
                 </button>
@@ -348,7 +348,7 @@ function CustomModelDropdown({
                 onSelectCustom();
                 setOpen(false);
               }}
-              className={`w-full flex items-center justify-between p-3 rounded-xl text-left transition border ${
+              className={`w-full flex items-center justify-between p-3 rounded text-left transition border ${
                 isCustom
                   ? "bg-[#172516] border-[#c8ff3d44] text-white"
                   : "hover:bg-[#131a13] border-transparent text-[#a4ada0] hover:text-white"
@@ -367,8 +367,8 @@ function CustomModelDropdown({
               </div>
 
               {isCustom && (
-                <div className="size-6 rounded-full bg-[#c8ff3d]/20 border border-[#c8ff3d] grid place-items-center flex-shrink-0 text-[#c8ff3d]">
-                  <Check size={13} strokeWidth={3} />
+                <div className="size-5 rounded bg-[#c8ff3d]/20 border border-[#c8ff3d] grid place-items-center flex-shrink-0 text-[#c8ff3d]">
+                  <Check size={12} strokeWidth={3} />
                 </div>
               )}
             </button>
@@ -531,12 +531,12 @@ export function AISettingsForm() {
 
         <div className="flex items-center gap-2">
           {hasApiKey ? (
-            <span className="flex items-center gap-1.5 text-xs font-mono text-[#c8ff3d] bg-[#141f12] px-3 py-1.5 rounded-xl border border-[#c8ff3d44]">
+            <span className="flex items-center gap-1.5 text-xs font-mono text-[#c8ff3d] bg-[#141f12] px-3 py-1.5 rounded border border-[#c8ff3d44]">
               <ShieldCheck size={14} />
               <span>KEY ACTIVE</span>
             </span>
           ) : (
-            <span className="flex items-center gap-1.5 text-xs font-mono text-[#facc15] bg-[#231e0c] px-3 py-1.5 rounded-xl border border-[#facc1544]">
+            <span className="flex items-center gap-1.5 text-xs font-mono text-[#facc15] bg-[#231e0c] px-3 py-1.5 rounded border border-[#facc1544]">
               <AlertCircle size={14} />
               <span>KEY REQUIRED</span>
             </span>
@@ -545,10 +545,10 @@ export function AISettingsForm() {
       </div>
 
       {/* SECTION 1: Active Provider Segmented Cards */}
-      <section className="bg-[#0b100b] border border-white/[0.08] rounded-2xl p-6 space-y-5 shadow-[0_4px_24px_rgba(0,0,0,0.5)]">
+      <section className="bg-[#0b100b] border border-white/[0.08] rounded p-6 space-y-5 shadow-[0_4px_24px_rgba(0,0,0,0.5)]">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="size-7 rounded-lg bg-[#141b14] border border-white/[0.1] grid place-items-center font-mono text-xs font-bold text-[#c8ff3d]">
+            <span className="size-7 rounded bg-[#141b14] border border-white/[0.1] grid place-items-center font-mono text-xs font-bold text-[#c8ff3d]">
               01
             </span>
             <div>
@@ -572,16 +572,16 @@ export function AISettingsForm() {
                 key={provKey}
                 type="button"
                 onClick={() => handleProviderChange(provKey)}
-                className={`relative p-4 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between space-y-3 group ${
+                className={`relative p-4 rounded border text-left transition-all cursor-pointer flex flex-col justify-between space-y-3 group ${
                   isSelected
-                    ? "bg-[#131b12] border-[#c8ff3d] shadow-[0_0_25px_rgba(200,255,61,0.15)] scale-[1.01]"
+                    ? "bg-[#131b12] border-[#c8ff3d] shadow-[0_0_25px_rgba(200,255,61,0.15)]"
                     : "bg-[#0f140f] border-white/[0.08] hover:border-white/[0.2] hover:bg-[#121912]"
                 }`}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-2.5">
                     <div
-                      className="size-9 rounded-xl grid place-items-center border"
+                      className="size-9 rounded grid place-items-center border"
                       style={{
                         backgroundColor: config.bgColor,
                         borderColor: config.borderColor,
@@ -604,7 +604,7 @@ export function AISettingsForm() {
                   </div>
 
                   <div
-                    className={`size-5 rounded-full border grid place-items-center transition ${
+                    className={`size-5 rounded border grid place-items-center transition ${
                       isSelected
                         ? "bg-[#c8ff3d] border-[#c8ff3d] text-black"
                         : "border-white/20 bg-transparent"
@@ -624,9 +624,9 @@ export function AISettingsForm() {
       </section>
 
       {/* SECTION 2: Model & Encrypted API Key */}
-      <section className="bg-[#0b100b] border border-white/[0.08] rounded-2xl p-6 space-y-5 shadow-[0_4px_24px_rgba(0,0,0,0.5)]">
+      <section className="bg-[#0b100b] border border-white/[0.08] rounded p-6 space-y-5 shadow-[0_4px_24px_rgba(0,0,0,0.5)]">
         <div className="flex items-center gap-3">
-          <span className="size-7 rounded-lg bg-[#141b14] border border-white/[0.1] grid place-items-center font-mono text-xs font-bold text-[#c8ff3d]">
+          <span className="size-7 rounded bg-[#141b14] border border-white/[0.1] grid place-items-center font-mono text-xs font-bold text-[#c8ff3d]">
             02
           </span>
           <div>
@@ -658,7 +658,7 @@ export function AISettingsForm() {
 
           {/* Custom Model Input (if selected) */}
           {isCustomModel && (
-            <div className="bg-[#121812] border border-[#c8ff3d44] rounded-xl p-3.5 space-y-1.5 animate-in fade-in duration-150">
+            <div className="bg-[#121812] border border-[#c8ff3d44] rounded p-3.5 space-y-1.5 animate-in fade-in duration-150">
               <label className="text-[11px] font-mono font-bold text-[#c8ff3d]">
                 Custom Model Identifier:
               </label>
@@ -667,7 +667,7 @@ export function AISettingsForm() {
                 value={form.model}
                 onChange={(e) => update("model", e.target.value)}
                 placeholder="e.g. gemini-2.5-pro, gpt-4o, or claude-3-7-sonnet-latest"
-                className="w-full bg-[#090d09] border border-white/[0.12] rounded-lg px-3 py-2 text-xs font-mono text-white placeholder:text-[#5f685c] focus:border-[#c8ff3d] focus:outline-none"
+                className="w-full bg-[#090d09] border border-white/[0.12] rounded px-3 py-2 text-xs font-mono text-white placeholder:text-[#5f685c] focus:border-[#c8ff3d] focus:outline-none"
               />
             </div>
           )}
@@ -708,7 +708,7 @@ export function AISettingsForm() {
                     ? "•••••••••••••••••••• (API key is saved in database. Enter new key only to replace)"
                     : "Paste your API key here..."
                 }
-                className="w-full bg-[#101610] border border-white/[0.12] focus:border-[#c8ff3d] rounded-xl pl-3.5 pr-10 py-2.5 text-xs font-mono text-white placeholder:text-[#5f685c] focus:outline-none transition shadow-[0_4px_16px_rgba(0,0,0,0.4)]"
+                className="w-full bg-[#101610] border border-white/[0.12] focus:border-[#c8ff3d] rounded pl-3.5 pr-10 py-2.5 text-xs font-mono text-white placeholder:text-[#5f685c] focus:outline-none transition shadow-[0_4px_16px_rgba(0,0,0,0.4)]"
                 autoComplete="new-password"
               />
               <button
@@ -725,10 +725,10 @@ export function AISettingsForm() {
       </section>
 
       {/* SECTION 3: System Persona & Instruction Tuning */}
-      <section className="bg-[#0b100b] border border-white/[0.08] rounded-2xl p-6 space-y-4 shadow-[0_4px_24px_rgba(0,0,0,0.5)]">
+      <section className="bg-[#0b100b] border border-white/[0.08] rounded p-6 space-y-4 shadow-[0_4px_24px_rgba(0,0,0,0.5)]">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="size-7 rounded-lg bg-[#141b14] border border-white/[0.1] grid place-items-center font-mono text-xs font-bold text-[#c8ff3d]">
+            <span className="size-7 rounded bg-[#141b14] border border-white/[0.1] grid place-items-center font-mono text-xs font-bold text-[#c8ff3d]">
               03
             </span>
             <div>
@@ -754,7 +754,7 @@ export function AISettingsForm() {
               key={idx}
               type="button"
               onClick={() => update("systemPrompt", preset.prompt)}
-              className="text-[10.5px] font-mono px-2.5 py-1 rounded-lg bg-[#131a13] hover:bg-[#1a2517] text-[#a4ada0] hover:text-[#c8ff3d] border border-white/[0.06] hover:border-[#c8ff3d44] transition whitespace-nowrap"
+              className="text-[10.5px] font-mono px-2.5 py-1 rounded bg-[#131a13] hover:bg-[#1a2517] text-[#a4ada0] hover:text-[#c8ff3d] border border-white/[0.06] hover:border-[#c8ff3d44] transition whitespace-nowrap cursor-pointer"
             >
               {preset.label}
             </button>
@@ -766,14 +766,14 @@ export function AISettingsForm() {
           onChange={(e) => update("systemPrompt", e.target.value)}
           rows={4}
           placeholder="You are the concise and professional AI guide for Mehedi's portfolio..."
-          className="w-full bg-[#101610] border border-white/[0.12] focus:border-[#c8ff3d] rounded-xl p-3.5 text-xs font-mono text-white placeholder:text-[#5f685c] focus:outline-none leading-relaxed transition shadow-[0_4px_16px_rgba(0,0,0,0.4)] resize-y min-h-[100px]"
+          className="w-full bg-[#101610] border border-white/[0.12] focus:border-[#c8ff3d] rounded p-3.5 text-xs font-mono text-white placeholder:text-[#5f685c] focus:outline-none leading-relaxed transition shadow-[0_4px_16px_rgba(0,0,0,0.4)] resize-y min-h-[100px]"
         />
       </section>
 
       {/* SECTION 4: Response Fine-Tuning & Feature Switches */}
-      <section className="bg-[#0b100b] border border-white/[0.08] rounded-2xl p-6 space-y-6 shadow-[0_4px_24px_rgba(0,0,0,0.5)]">
+      <section className="bg-[#0b100b] border border-white/[0.08] rounded p-6 space-y-6 shadow-[0_4px_24px_rgba(0,0,0,0.5)]">
         <div className="flex items-center gap-3">
-          <span className="size-7 rounded-lg bg-[#141b14] border border-white/[0.1] grid place-items-center font-mono text-xs font-bold text-[#c8ff3d]">
+          <span className="size-7 rounded bg-[#141b14] border border-white/[0.1] grid place-items-center font-mono text-xs font-bold text-[#c8ff3d]">
             04
           </span>
           <div>
@@ -787,7 +787,7 @@ export function AISettingsForm() {
         {/* Sliders & Rate Limit */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {/* Temperature Slider */}
-          <div className="bg-[#101610] border border-white/[0.06] rounded-xl p-4 space-y-2">
+          <div className="bg-[#101610] border border-white/[0.06] rounded p-4 space-y-2">
             <div className="flex items-center justify-between">
               <label className="text-xs font-mono font-bold text-white flex items-center gap-1.5">
                 <SlidersHorizontal size={13} className="text-[#c8ff3d]" />
@@ -813,7 +813,7 @@ export function AISettingsForm() {
           </div>
 
           {/* Max Output Tokens */}
-          <div className="bg-[#101610] border border-white/[0.06] rounded-xl p-4 space-y-2">
+          <div className="bg-[#101610] border border-white/[0.06] rounded p-4 space-y-2">
             <div className="flex items-center justify-between">
               <label className="text-xs font-mono font-bold text-white flex items-center gap-1.5">
                 <Cpu size={13} className="text-[#72a4ff]" />
@@ -839,7 +839,7 @@ export function AISettingsForm() {
           </div>
 
           {/* Monthly Limit */}
-          <div className="bg-[#101610] border border-white/[0.06] rounded-xl p-4 space-y-2 flex flex-col justify-between">
+          <div className="bg-[#101610] border border-white/[0.06] rounded p-4 space-y-2 flex flex-col justify-between">
             <label className="text-xs font-mono font-bold text-white flex items-center gap-1.5">
               <RefreshCw size={13} className="text-[#facc15]" />
               <span>Monthly Rate Limit</span>
@@ -850,7 +850,7 @@ export function AISettingsForm() {
               value={form.monthlyLimit}
               onChange={(e) => update("monthlyLimit", Number(e.target.value))}
               placeholder="0 = Unlimited"
-              className="w-full bg-[#090d09] border border-white/[0.12] focus:border-[#facc15] rounded-lg px-3 py-1.5 text-xs font-mono text-white placeholder:text-[#5f685c] focus:outline-none"
+              className="w-full bg-[#090d09] border border-white/[0.12] focus:border-[#facc15] rounded px-3 py-1.5 text-xs font-mono text-white placeholder:text-[#5f685c] focus:outline-none"
             />
             <div className="text-[9.5px] font-mono text-[#5f685c]">
               0 = Unlimited requests / month
@@ -861,7 +861,7 @@ export function AISettingsForm() {
         {/* Feature Switches */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 pt-2">
           {/* Lead Qualification */}
-          <label className="flex items-start gap-3 bg-[#101610] hover:bg-[#141c14] border border-white/[0.06] p-3.5 rounded-xl cursor-pointer transition select-none">
+          <label className="flex items-start gap-3 bg-[#101610] hover:bg-[#141c14] border border-white/[0.06] p-3.5 rounded cursor-pointer transition select-none">
             <input
               type="checkbox"
               checked={form.leadQualification}
@@ -877,7 +877,7 @@ export function AISettingsForm() {
           </label>
 
           {/* Appointment Booking */}
-          <label className="flex items-start gap-3 bg-[#101610] hover:bg-[#141c14] border border-white/[0.06] p-3.5 rounded-xl cursor-pointer transition select-none">
+          <label className="flex items-start gap-3 bg-[#101610] hover:bg-[#141c14] border border-white/[0.06] p-3.5 rounded cursor-pointer transition select-none">
             <input
               type="checkbox"
               checked={form.bookingEnabled}
@@ -893,7 +893,7 @@ export function AISettingsForm() {
           </label>
 
           {/* Provider Fallback */}
-          <label className="flex items-start gap-3 bg-[#101610] hover:bg-[#141c14] border border-white/[0.06] p-3.5 rounded-xl cursor-pointer transition select-none">
+          <label className="flex items-start gap-3 bg-[#101610] hover:bg-[#141c14] border border-white/[0.06] p-3.5 rounded cursor-pointer transition select-none">
             <input
               type="checkbox"
               checked={form.fallbackEnabled}
@@ -912,7 +912,7 @@ export function AISettingsForm() {
 
       {/* Test Response Preview Terminal (if test was triggered) */}
       {testOutput && (
-        <div className="bg-[#090d09] border border-[#c8ff3d44] rounded-2xl p-5 space-y-3 shadow-[0_0_30px_rgba(200,255,61,0.1)] animate-in fade-in duration-200">
+        <div className="bg-[#090d09] border border-[#c8ff3d44] rounded p-5 space-y-3 shadow-[0_0_30px_rgba(200,255,61,0.1)] animate-in fade-in duration-200">
           <div className="flex items-center justify-between border-b border-white/[0.08] pb-2.5">
             <div className="flex items-center gap-2 text-xs font-mono font-bold text-white">
               <Terminal size={14} className="text-[#c8ff3d]" />
@@ -924,14 +924,14 @@ export function AISettingsForm() {
               <span>Latency: <strong className="text-[#facc15]">{testOutput.latency}ms</strong></span>
             </div>
           </div>
-          <p className="text-xs font-mono text-[#d1d5db] leading-relaxed bg-[#101610] p-3.5 rounded-xl border border-white/[0.06]">
+          <p className="text-xs font-mono text-[#d1d5db] leading-relaxed bg-[#101610] p-3.5 rounded border border-white/[0.06]">
             {testOutput.message}
           </p>
         </div>
       )}
 
       {/* Action Bar Footer */}
-      <div className="sticky bottom-6 bg-[#0c120c]/90 backdrop-blur-xl border border-white/[0.12] p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 shadow-[0_10px_40px_rgba(0,0,0,0.8)] z-30">
+      <div className="sticky bottom-6 bg-[#0c120c]/90 backdrop-blur-xl border border-white/[0.12] p-4 rounded flex flex-col sm:flex-row items-center justify-between gap-3 shadow-[0_10px_40px_rgba(0,0,0,0.8)] z-30">
         {/* Status Message */}
         <div className="flex items-center gap-2 text-xs font-mono">
           {statusType === "success" && <CheckCircle2 size={16} className="text-[#c8ff3d] flex-shrink-0" />}
@@ -956,7 +956,7 @@ export function AISettingsForm() {
             onClick={test}
             disabled={busy}
             type="button"
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#141b14] hover:bg-[#1a2517] text-white hover:text-[#c8ff3d] border border-white/[0.1] hover:border-[#c8ff3d44] font-mono text-xs font-bold transition cursor-pointer"
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded bg-[#141b14] hover:bg-[#1a2517] text-white hover:text-[#c8ff3d] border border-white/[0.1] hover:border-[#c8ff3d44] font-mono text-xs font-bold transition cursor-pointer"
           >
             {busy ? <LoaderCircle className="animate-spin" size={14} /> : <TestTube2 size={14} />}
             <span>Test Connection</span>
@@ -966,7 +966,7 @@ export function AISettingsForm() {
             onClick={save}
             disabled={busy}
             type="button"
-            className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-[#c8ff3d] hover:bg-[#d4ff66] text-black font-mono text-xs font-bold transition shadow-[0_0_20px_rgba(200,255,61,0.25)] cursor-pointer"
+            className="flex items-center gap-1.5 px-5 py-2.5 rounded bg-[#c8ff3d] hover:bg-[#d4ff66] text-black font-mono text-xs font-bold transition shadow-[0_0_20px_rgba(200,255,61,0.25)] cursor-pointer"
           >
             {busy ? <LoaderCircle className="animate-spin" size={14} /> : <Save size={14} />}
             <span>Save Configuration</span>

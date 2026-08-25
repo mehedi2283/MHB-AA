@@ -81,8 +81,8 @@ export function AdminSecretTrigger() {
       }}
       className="fixed inset-0 z-[9999999] bg-black/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center animate-in fade-in duration-200 cursor-pointer select-none"
     >
-      <div className="p-6 bg-[#0c120c] border-2 border-[#c8ff3d] rounded-xl shadow-[0_0_40px_rgba(200,255,61,0.5)] space-y-4 max-w-sm">
-        <div className="size-16 rounded-lg bg-[#c8ff3d20] border border-[#c8ff3d] grid place-items-center mx-auto text-[#c8ff3d] animate-pulse">
+      <div className="p-6 bg-[#0c120c] border-2 border-[#c8ff3d] rounded shadow-[0_0_40px_rgba(200,255,61,0.5)] space-y-4 max-w-sm">
+        <div className="size-16 rounded bg-[#c8ff3d20] border border-[#c8ff3d] grid place-items-center mx-auto text-[#c8ff3d] animate-pulse">
           <PixelBot size={32} />
         </div>
         <div>

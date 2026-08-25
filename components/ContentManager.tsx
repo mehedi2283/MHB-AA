@@ -244,7 +244,7 @@ export function ContentManager({ collection }: { collection: string }) {
                   key={st}
                   type="button"
                   onClick={() => setEditing({ ...editing, status: st })}
-                  className={`text-xs font-mono uppercase px-3 py-1.5 rounded-lg border transition cursor-pointer ${
+                  className={`text-xs font-mono uppercase px-3 py-1.5 rounded border transition cursor-pointer ${
                     (editing.status || "published") === st
                       ? "bg-[#182617] text-[#c8ff3d] border-[#c8ff3d] font-bold"
                       : "bg-[#101610] text-[#838e7f] hover:text-white border-white/[0.08]"
@@ -262,7 +262,7 @@ export function ContentManager({ collection }: { collection: string }) {
               <button
                 type="button"
                 onClick={() => setEditing({ ...editing, visible: true })}
-                className={`text-xs font-mono px-3 py-1.5 rounded-lg border transition cursor-pointer ${
+                className={`text-xs font-mono px-3 py-1.5 rounded border transition cursor-pointer ${
                   editing.visible !== false
                     ? "bg-[#182617] text-[#c8ff3d] border-[#c8ff3d] font-bold"
                     : "bg-[#101610] text-[#838e7f] hover:text-white border-white/[0.08]"
@@ -273,7 +273,7 @@ export function ContentManager({ collection }: { collection: string }) {
               <button
                 type="button"
                 onClick={() => setEditing({ ...editing, visible: false })}
-                className={`text-xs font-mono px-3 py-1.5 rounded-lg border transition cursor-pointer ${
+                className={`text-xs font-mono px-3 py-1.5 rounded border transition cursor-pointer ${
                   editing.visible === false
                     ? "bg-[#2d1b1b] text-[#ff8888] border-[#ff555544] font-bold"
                     : "bg-[#101610] text-[#838e7f] hover:text-white border-white/[0.08]"

@@ -50,7 +50,7 @@ export function PixelLoader({
       {/* Modern Shimmering Skeleton Container */}
       <div className="skeleton-glass-card p-6 max-w-sm w-full space-y-4 border border-[#c8ff3d]/20 shadow-[0_0_30px_rgba(200,255,61,0.06)]">
         <div className="flex items-center justify-center gap-3">
-          <div className="size-9 rounded-lg bg-[#c8ff3d]/10 border border-[#c8ff3d]/30 grid place-items-center text-[#c8ff3d]">
+          <div className="size-9 rounded bg-[#c8ff3d]/10 border border-[#c8ff3d]/30 grid place-items-center text-[#c8ff3d]">
             <Loader2 size={18} className="animate-spin" />
           </div>
           <div className="text-left">
@@ -68,8 +68,8 @@ export function PixelLoader({
           <span className="text-[10.5px] font-mono font-semibold text-[#a4ada0] block">
             {label}
           </span>
-          <div className="h-1 w-full bg-white/[0.06] rounded-full overflow-hidden">
-            <div className="h-full bg-[#c8ff3d] rounded-full animate-[pixelProgress_1.2s_ease-in-out_infinite]" />
+          <div className="h-1 w-full bg-white/[0.06] rounded overflow-hidden">
+            <div className="h-full bg-[#c8ff3d] rounded animate-[pixelProgress_1.2s_ease-in-out_infinite]" />
           </div>
         </div>
       </div>
