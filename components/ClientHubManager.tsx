@@ -33,6 +33,8 @@ import {
   LayoutGrid,
   List,
   ArrowUpDown,
+  ChevronDown,
+  Check,
 } from "lucide-react";
 import { PixelLoader } from "./PixelLoader";
 
@@ -132,6 +134,158 @@ const OUTREACH_TEMPLATES = [
 <p>Best regards,<br>Mehedi</p>`,
   },
 ];
+
+function CustomSortDropdown({
+  value,
+  onChange,
+}: {
+  value: "newest" | "oldest" | "name_asc" | "deal_high";
+  onChange: (val: "newest" | "oldest" | "name_asc" | "deal_high") => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const options: { key: "newest" | "oldest" | "name_asc" | "deal_high"; label: string }[] = [
+    { key: "newest", label: "Newest Added" },
+    { key: "oldest", label: "Oldest Added" },
+    { key: "deal_high", label: "Highest Value" },
+    { key: "name_asc", label: "Name (A-Z)" },
+  ];
+
+  const currentOption = options.find(o => o.key === value) || options[0];
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    if (open) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [open]);
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-2 bg-[#121812] hover:bg-[#182218] border border-white/[0.12] hover:border-[#c8ff3d44] text-xs font-mono text-white px-3 py-2 rounded-xl transition select-none cursor-pointer"
+      >
+        <ArrowUpDown size={13} className="text-[#838e7f]" />
+        <span>{currentOption.label}</span>
+        <ChevronDown size={13} className={`text-[#838e7f] transition-transform duration-200 ${open ? "rotate-180 text-[#c8ff3d]" : ""}`} />
+      </button>
+
+      {open && (
+        <div className="absolute right-0 mt-1.5 w-44 bg-[#0d140d] border border-white/[0.15] rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-xl p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150">
+          <div className="text-[9px] font-mono text-[#838e7f] uppercase tracking-wider px-2 py-1 border-b border-white/[0.06] mb-1">
+            SORT PIPELINE
+          </div>
+          {options.map(opt => {
+            const isSelected = opt.key === value;
+            return (
+              <button
+                key={opt.key}
+                type="button"
+                onClick={() => {
+                  onChange(opt.key);
+                  setOpen(false);
+                }}
+                className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-mono transition text-left ${
+                  isSelected
+                    ? "bg-[#1f2e1d] text-[#c8ff3d] font-bold"
+                    : "text-[#a4ada0] hover:text-white hover:bg-white/[0.06]"
+                }`}
+              >
+                <span>{opt.label}</span>
+                {isSelected && <Check size={13} className="text-[#c8ff3d]" />}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function CustomStageDropdown({
+  currentStage,
+  onChange,
+}: {
+  currentStage: ClientRecord["stage"];
+  onChange: (newStage: ClientRecord["stage"]) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const currentConfig = STAGES.find(s => s.key === currentStage) || STAGES[0];
+  const CurrentIcon = currentConfig.icon;
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    if (open) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [open]);
+
+  return (
+    <div className="relative inline-block" ref={dropdownRef}>
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        style={{
+          color: currentConfig.color,
+          backgroundColor: currentConfig.bg,
+          borderColor: currentConfig.border,
+        }}
+        className="flex items-center gap-1.5 text-[10.5px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg border hover:brightness-125 transition cursor-pointer"
+      >
+        <CurrentIcon size={12} />
+        <span>{currentConfig.label}</span>
+        <ChevronDown size={11} className={`opacity-60 transition-transform ${open ? "rotate-180 opacity-100" : ""}`} />
+      </button>
+
+      {open && (
+        <div className="absolute right-0 mt-1.5 w-48 bg-[#0d140d] border border-white/[0.15] rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-xl p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150">
+          <div className="text-[9px] font-mono text-[#838e7f] uppercase tracking-wider px-2 py-1 border-b border-white/[0.06] mb-1">
+            MOVE STAGE
+          </div>
+          {STAGES.map(s => {
+            const isSelected = s.key === currentStage;
+            const Icon = s.icon;
+            return (
+              <button
+                key={s.key}
+                type="button"
+                onClick={() => {
+                  onChange(s.key);
+                  setOpen(false);
+                }}
+                className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-mono transition text-left ${
+                  isSelected
+                    ? "bg-[#1f2e1d] text-[#c8ff3d] font-bold"
+                    : "text-[#a4ada0] hover:text-white hover:bg-white/[0.06]"
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <Icon size={13} style={{ color: s.color }} />
+                  <span>{s.label}</span>
+                </div>
+                {isSelected && <Check size={12} className="text-[#c8ff3d]" />}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function ClientHubManager() {
   const [clients, setClients] = useState<ClientRecord[]>([]);
@@ -482,8 +636,8 @@ export function ClientHubManager() {
       </div>
 
       {/* 1. Interactive Pipeline Stage Navigation Tabs */}
-      <div className="bg-[#0b100b] border border-white/[0.08] p-2 rounded-2xl">
-        <div className="flex items-center gap-2 overflow-x-auto scrollbar-none pb-1 sm:pb-0">
+      <div className="bg-[#0b100b] border border-white/[0.08] p-2.5 rounded-2xl">
+        <div className="flex flex-wrap items-center gap-2 w-full">
           <button
             onClick={() => setSelectedStage("all")}
             className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-mono font-bold transition-all whitespace-nowrap ${
@@ -572,20 +726,8 @@ export function ClientHubManager() {
             </button>
           )}
 
-          {/* Sort Selector */}
-          <div className="flex items-center gap-1.5 bg-[#121812] border border-white/[0.1] rounded-xl px-3 py-1.5">
-            <ArrowUpDown size={13} className="text-[#838e7f]" />
-            <select
-              value={sortBy}
-              onChange={e => setSortBy(e.target.value as any)}
-              className="bg-transparent text-xs font-mono text-[#a4ada0] focus:text-white outline-none cursor-pointer"
-            >
-              <option value="newest" className="bg-[#0b100b]">Newest Added</option>
-              <option value="oldest" className="bg-[#0b100b]">Oldest Added</option>
-              <option value="deal_high" className="bg-[#0b100b]">Highest Value</option>
-              <option value="name_asc" className="bg-[#0b100b]">Name (A-Z)</option>
-            </select>
-          </div>
+          {/* Custom Sort Dropdown */}
+          <CustomSortDropdown value={sortBy} onChange={setSortBy} />
 
           {/* View Mode Toggle: Grid vs List */}
           <div className="flex items-center bg-[#121812] border border-white/[0.1] rounded-xl p-1">
@@ -685,22 +827,10 @@ export function ClientHubManager() {
 
                       {/* Stage Dropdown */}
                       <td className="py-3.5 px-4">
-                        <select
-                          value={client.stage}
-                          onChange={e => handleQuickStageChange(client, e.target.value as ClientRecord["stage"])}
-                          style={{
-                            color: stageConfig.color,
-                            backgroundColor: stageConfig.bg,
-                            borderColor: stageConfig.border,
-                          }}
-                          className="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-1 rounded-md border appearance-none cursor-pointer focus:outline-none"
-                        >
-                          {STAGES.map(s => (
-                            <option key={s.key} value={s.key} className="bg-[#0f140f] text-white">
-                              {s.label}
-                            </option>
-                          ))}
-                        </select>
+                        <CustomStageDropdown
+                          currentStage={client.stage}
+                          onChange={newStage => handleQuickStageChange(client, newStage)}
+                        />
                       </td>
 
                       {/* Deal Value */}
@@ -829,25 +959,11 @@ export function ClientHubManager() {
                       </div>
                     </div>
 
-                    {/* Pipeline Stage Select Badge */}
-                    <div className="relative">
-                      <select
-                        value={client.stage}
-                        onChange={e => handleQuickStageChange(client, e.target.value as ClientRecord["stage"])}
-                        style={{
-                          color: stageConfig.color,
-                          backgroundColor: stageConfig.bg,
-                          borderColor: stageConfig.border,
-                        }}
-                        className="text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-md border appearance-none cursor-pointer focus:outline-none"
-                      >
-                        {STAGES.map(s => (
-                          <option key={s.key} value={s.key} className="bg-[#0f140f] text-white">
-                            {s.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                    {/* Custom Pipeline Stage Select Dropdown */}
+                    <CustomStageDropdown
+                      currentStage={client.stage}
+                      onChange={newStage => handleQuickStageChange(client, newStage)}
+                    />
                   </div>
 
                   {/* Project Details Box */}
