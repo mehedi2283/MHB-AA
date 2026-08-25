@@ -2293,40 +2293,49 @@ select {
 .ai-message {
     display: flex;
     align-items: flex-start;
-    gap: 7px;
+    gap: 8px;
     max-width: 88%;
-    margin-bottom: 12px
+    margin-bottom: 12px;
 }
 
 .ai-message svg {
     color: var(--acid);
     flex: none;
-    margin-top: 13px
+    margin-top: 10px;
+}
+
+.ai-message-content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
 }
 
 .ai-message p {
     margin: 0;
-    padding: 12px 14px;
+    padding: 10px 13px;
     border-radius: var(--ui-radius);
     font-size: 12px;
-    line-height: 1.65
+    line-height: 1.55;
+    white-space: pre-line;
+    word-break: break-word;
 }
 
 .ai-message.assistant p {
-    background: #151915;
-    color: #c0c7bc;
-    border-left: 2px solid #c8ff3d55
+    background: #131913;
+    color: #d2dbd0;
+    border-left: 2px solid #c8ff3d77;
 }
 
 .ai-message.user {
     margin-left: auto;
-    justify-content: flex-end
+    justify-content: flex-end;
 }
 
 .ai-message.user p {
     background: var(--acid);
     color: #0a0d08;
-    font-weight: 600
+    font-weight: 600;
 }
 
 .ai-thinking {

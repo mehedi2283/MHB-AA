@@ -171,7 +171,7 @@ export function AIAssistant() {
     {
       role: "assistant",
       content:
-        "Hi — I’m Mehedi’s portfolio guide. Ask me about his automation systems, AI projects, technical stack, or availability.",
+        "Hey there! I'm Mehedi's portfolio AI.\n\nAsk me about his custom AI agents, automated workflows (n8n/Make), or booking a discovery call.",
     },
   ]);
   const messageEnd = useRef<HTMLDivElement>(null);
@@ -314,7 +314,11 @@ export function AIAssistant() {
             {messages.map((message, index) => (
               <div className={`ai-message ${message.role}`} key={index}>
                 {message.role === "assistant" && <Sparkles size={14} />}
-                <p>{message.content}</p>
+                <div className="ai-message-content">
+                  {message.content.split(/\n\n+/).map((paragraph, pIdx) => (
+                    <p key={pIdx}>{paragraph.trim()}</p>
+                  ))}
+                </div>
               </div>
             ))}
             {loading && (
