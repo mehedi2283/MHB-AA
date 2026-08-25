@@ -4012,7 +4012,9 @@ select {
 
 /* admin control room — intentionally separate from the public portfolio */
 .admin-root,
-.admin-auth {
+.admin-auth,
+.admin-modal,
+.admin-modal-backdrop {
     --admin-bg: #0a0b09;
     --admin-side: #0e0f0d;
     --admin-panel: #121310;
@@ -4025,14 +4027,40 @@ select {
     --admin-accent: #d2ff4f;
     --admin-danger: #ff8379;
     color: var(--admin-text);
-    font-family: var(--font-pixeloid-sans), Arial, sans-serif
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", Helvetica, Arial, sans-serif !important;
+}
+
+.admin-root,
+.admin-root *:not(code):not(pre):not(.admin-code-input):not(.font-mono),
+.admin-auth,
+.admin-auth *:not(code):not(pre):not(.admin-code-input):not(.font-mono),
+.admin-modal,
+.admin-modal *:not(code):not(pre):not(.admin-code-input):not(.font-mono),
+.admin-modal-backdrop,
+.admin-modal-backdrop *:not(code):not(pre):not(.admin-code-input):not(.font-mono) {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", Helvetica, Arial, sans-serif !important;
+}
+
+.admin-root code,
+.admin-root code *,
+.admin-root pre,
+.admin-root pre *,
+.admin-root .admin-code-input,
+.admin-root .font-mono,
+.admin-auth .font-mono,
+.admin-modal code,
+.admin-modal code *,
+.admin-modal pre,
+.admin-modal pre *,
+.admin-modal .font-mono {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
 }
 
 .admin-root {
     min-height: 100svh;
     display: grid;
     grid-template-columns: 252px minmax(0, 1fr);
-    background: var(--admin-bg)
+    background: var(--admin-bg);
 }
 
 .admin-sidebar {
