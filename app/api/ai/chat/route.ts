@@ -89,13 +89,18 @@ Formatting & Tone Rules:
 1. Always format responses in 2 to 3 short, clean paragraphs with a blank line between them. Never output a single dense wall of text.
 2. Keep responses simple, natural, and concise (under 50 words whenever possible). Avoid long robotic introductions.
 3. For simple greetings (like "hi" or "hello"), respond with a warm 1-sentence welcome, followed by a blank line and a simple question about what project or workflow they want to automate.
-4. CRITICAL BOOKING RULES (NEVER HALLUCINATE A BOOKING):
-   - NEVER say "I have booked that slot for you" unless the visitor has ALREADY provided their EMAIL ADDRESS in this conversation.
-   - If the visitor suggests a time (e.g. "what about 3pm" or "can we talk tomorrow at 3pm") or asks to meet without giving their email, say:
-     "3:00 PM works great!
-
-     To send your Google Calendar invite and Google Meet link, please share your email address and name right here, or you can book via the Contact Form below."
-   - Once they provide their email address, tell them their meeting has been placed on Google Calendar and to check their inbox for the Google Meet invite.
+4. CRITICAL BOOKING RULES (STEP-BY-STEP):
+   - When a visitor wants to book or gives their email/name WITHOUT a time slot:
+     Thank them by name and proactively offer 3 clear time slots:
+     "Thanks [Name]! What time slot works best for you?
+     • Tomorrow at 11:00 AM EST
+     • Tomorrow at 3:00 PM EST
+     • Tomorrow at 6:00 PM EST
+     (Or choose your exact slot in the Contact Form below)."
+   - If a visitor gives a time slot (e.g. "3pm") WITHOUT an email:
+     Ask for their email address and name to send the calendar invite.
+   - NEVER claim a meeting is booked until BOTH their email address AND a specific time slot are confirmed by the user.
+   - Once BOTH are provided, confirm the booking and inform them that the Google Meet invite was scheduled on the calendar and sent to their email.
 5. Ground all answers in the live database knowledge above.
 6. Never invent unverified results, fake pricing, or agency team members.`;
   } catch (err) {
@@ -330,44 +335,52 @@ export async function POST(req: NextRequest) {
 
           if (emailMatch) {
             const attendeeEmail = emailMatch[1].toLowerCase();
+            const textWithoutEmail = combinedUserText.replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, " ");
+
+            // Extract Name if user stated it
+            let clientName = attendeeEmail.split("@")[0];
+            const nameMatch = textWithoutEmail.match(/(?:my name is|i am|i'm|name is|name:)\s+([a-zA-Z\s]{2,30})/i);
+            if (nameMatch) {
+              clientName = nameMatch[1].trim();
+            }
+
+            // ONLY book when user has provided an explicit time slot (e.g. "3pm", "11:00 AM", "at 4", "15:00")
+            const timeMatch =
+              textWithoutEmail.match(/\b(1[0-2]|0?[1-9])(?::([0-5][0-9]))?\s*(am|pm)\b/i) ||
+              textWithoutEmail.match(/\bat\s+(1[0-2]|0?[1-9])(?::([0-5][0-9]))?\b/i) ||
+              textWithoutEmail.match(/\b(1[0-9]|2[0-3]|0?[0-9]):([0-5][0-9])\b/);
 
             // Check if already booked for this session
             const prevInquiries = await listDocuments("inquiries");
             const alreadyBooked = prevInquiries.some(
               (inq) =>
-                (inq.email === attendeeEmail || (inq as any).sessionId === userSessionId) &&
-                (inq as any).source === "ai_chat"
+                (inq.email === attendeeEmail || (inq as Record<string, unknown>).sessionId === userSessionId) &&
+                (inq as Record<string, unknown>).source === "ai_chat" &&
+                (inq as Record<string, unknown>).submissionStatus === "meeting_scheduled"
             );
 
-            if (!alreadyBooked) {
+            if (timeMatch && !alreadyBooked) {
               const tomorrow = new Date();
               tomorrow.setDate(tomorrow.getDate() + 1);
               const datePart = tomorrow.toISOString().split("T")[0];
 
-              let timeHour = "15";
-              let timeMin = "00";
-              const timeMatch = combinedUserText.match(/(\d{1,2})(?::(\d{2}))?\s*(am|pm)?/i);
-              if (timeMatch) {
-                let h = parseInt(timeMatch[1], 10);
-                const m = timeMatch[2] || "00";
-                const p = (timeMatch[3] || "").toLowerCase();
-                if (p === "pm" && h !== 12) h += 12;
-                if (p === "am" && h === 12) h = 0;
-                if (!p && h <= 5) h += 12;
-                timeHour = String(h).padStart(2, "0");
-                timeMin = m;
-              }
+              let h = parseInt(timeMatch[1], 10);
+              const m = timeMatch[2] || "00";
+              const p = (timeMatch[3] || "").toLowerCase();
+              if (p === "pm" && h !== 12) h += 12;
+              if (p === "am" && h === 12) h = 0;
+              if (!p && h <= 5) h += 12;
+              const timeHour = String(h).padStart(2, "0");
+              const timeMin = m;
 
               const startIso = `${datePart}T${timeHour}:${timeMin}:00`;
               const endHour = String((parseInt(timeHour, 10) + 1) % 24).padStart(2, "0");
               const endIso = `${datePart}T${endHour}:${timeMin}:00`;
 
-              const clientName = attendeeEmail.split("@")[0];
-
               // 1. Create real Google Calendar Event
               const eventResult = await createGoogleCalendarEvent({
                 summary: `Discovery Call · Mehedi & ${clientName}`,
-                description: `Automated Discovery Call booked via AI Assistant.\nClient Email: ${attendeeEmail}\nSession ID: ${userSessionId}\n\nChat Conversation:\n${combinedUserText.slice(-600)}`,
+                description: `Automated Discovery Call booked via AI Assistant.\nClient Name: ${clientName}\nClient Email: ${attendeeEmail}\nSession ID: ${userSessionId}\n\nChat Conversation:\n${combinedUserText.slice(-600)}`,
                 startDateTime: startIso,
                 endDateTime: endIso,
                 attendeeEmail,
@@ -399,9 +412,9 @@ export async function POST(req: NextRequest) {
               if (googleAcc?.email) {
                 await sendGmailMessage({
                   to: googleAcc.email,
-                  subject: `🚨 In-Chat Discovery Meeting Booked: ${attendeeEmail}`,
+                  subject: `🚨 In-Chat Discovery Meeting Booked: ${clientName} (${attendeeEmail})`,
                   bodyHtml: buildAdminNotificationHtml(emailPayload),
-                  bodyText: `New discovery call scheduled via AI Chat!\nClient: ${attendeeEmail}\nDate: ${datePart} at ${timeHour}:${timeMin}\nGoogle Meet Link: ${meetUrl || "N/A"}\nhttps://mhb-aa.vercel.app/admin/inquiries`,
+                  bodyText: `New discovery call scheduled via AI Chat!\nClient: ${clientName} (${attendeeEmail})\nDate: ${datePart} at ${timeHour}:${timeMin}\nGoogle Meet Link: ${meetUrl || "N/A"}\nhttps://mhb-aa.vercel.app/admin/inquiries`,
                 });
               }
 
@@ -427,6 +440,22 @@ export async function POST(req: NextRequest) {
               if (meetUrl && !message.includes(meetUrl)) {
                 message += `\n\n✓ Discovery call confirmed on Google Calendar for ${datePart} at ${timeHour}:${timeMin}.\n\nGoogle Meet: ${meetUrl}\n\nA confirmation email has also been sent to ${attendeeEmail}!`;
               }
+            } else if (!timeMatch && !alreadyBooked) {
+              // User shared email but no time slot yet - log lead to CRM
+              await createDocument("inquiries", {
+                name: clientName,
+                email: attendeeEmail,
+                projectType: "AI & Workflow Automation Inquiry",
+                budget: "To Discuss",
+                timeline: "Immediate",
+                message: `Lead captured via AI Assistant (Awaiting time selection):\n${combinedUserText.slice(-400)}`,
+                meetingRequested: false,
+                source: "ai_chat",
+                sessionId: userSessionId,
+                submissionStatus: "new_lead",
+                status: "published",
+                visible: true,
+              });
             }
           }
         } catch (bookingErr) {
