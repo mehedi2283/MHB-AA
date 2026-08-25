@@ -6,7 +6,7 @@ import {
   PixelShield,
   PixelSparkles,
 } from "@/components/PixelIcons";
-import { CircleDot } from "lucide-react";
+import { CircleDot, Play, ArrowUp } from "lucide-react";
 import { Navigation } from "@/components/Navigation";
 import { AutomationCore } from "@/components/AutomationCore";
 import { AutomationCommand } from "@/components/AutomationCommand";
@@ -54,8 +54,8 @@ export default async function Home() {
               <PixelCard as="a" href="#projects" variant="primaryButton" gridSize={6} className="os-action-primary">
                 {content.hero.primaryCta} <PixelArrowDownRight size={17} />
               </PixelCard>
-              <PixelCard as="a" href="#playground" variant="glass" gridSize={6} className="os-action-ghost">
-                <span className="os-play">▶</span> {content.hero.secondaryCta}
+              <PixelCard as="a" href="#playground" variant="glass" gridSize={6} className="os-action-ghost inline-flex items-center gap-2">
+                <Play size={13} className="fill-current text-[#c8ff3d]" /> {content.hero.secondaryCta}
               </PixelCard>
             </div>
             <AutomationCommand />

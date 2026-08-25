@@ -4,14 +4,13 @@ import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { PixelCard } from "./PixelCard";
 import {
-  PixelArrowUpRight,
-  PixelBot,
-  PixelChat,
-  PixelClose,
-  PixelPacman,
-  PixelSend,
-  PixelSparkles,
-} from "./PixelIcons";
+  ArrowUpRight,
+  Bot,
+  MessageSquare,
+  Sparkles,
+  X,
+  Send,
+} from "lucide-react";
 
 type Msg = { role: "user" | "assistant"; content: string };
 const suggestions = ["What does Mehedi build?", "Explore the 8-agent project", "Can Mehedi build my SaaS?"];
@@ -277,7 +276,7 @@ export function AIAssistant() {
           aria-label="Open AI assistant"
         >
           <div className="ai-launcher-character">
-            <PixelPacman size={18} />
+            <Bot size={18} />
           </div>
           <div className="ai-launcher-dots" aria-hidden="true">
             <i />
@@ -285,18 +284,18 @@ export function AIAssistant() {
             <i />
           </div>
           <span className="ai-launcher-text">Ask My AI</span>
-          <PixelArrowUpRight size={14} className="ai-launcher-arrow" />
+          <ArrowUpRight size={14} className="ai-launcher-arrow" />
         </PixelCard>
       ) : (
         <div className="ai-shell" role="dialog" aria-modal="true" aria-label="Mehedi portfolio assistant">
-          {/* Authentic Pixel Transition (Diagonal wipe from bottom-right on open, top-left on close) */}
+          {/* Authentic Transition */}
           {transitionMode && (
             <PixelTransitionOverlay mode={transitionMode} onComplete={handleTransitionComplete} />
           )}
 
           <header className="ai-header">
             <div className="ai-avatar">
-              <PixelBot size={20} />
+              <Bot size={20} />
             </div>
             <div>
               <small>PERSONAL AI / v1.0</small>
@@ -307,14 +306,14 @@ export function AIAssistant() {
               </span>
             </div>
             <button onClick={handleClose} aria-label="Close assistant" type="button">
-              <PixelClose size={18} />
+              <X size={18} />
             </button>
           </header>
 
           <div className="ai-messages scrollbar-hidden">
             {messages.map((message, index) => (
               <div className={`ai-message ${message.role}`} key={index}>
-                {message.role === "assistant" && <PixelSparkles size={14} />}
+                {message.role === "assistant" && <Sparkles size={14} />}
                 <p>{message.content}</p>
               </div>
             ))}
@@ -335,7 +334,7 @@ export function AIAssistant() {
                 {suggestions.map((suggestion) => (
                   <button onClick={() => send(suggestion)} key={suggestion} type="button">
                     <span>{suggestion}</span>
-                    <PixelArrowUpRight size={13} />
+                    <ArrowUpRight size={13} />
                   </button>
                 ))}
               </div>
@@ -351,7 +350,7 @@ export function AIAssistant() {
               aria-label="Ask about Mehedi’s work"
             />
             <button onClick={() => send()} disabled={loading || !input.trim()} aria-label="Send message" type="button">
-              <PixelSend size={17} />
+              <Send size={17} />
             </button>
           </div>
           <footer className="ai-footer">
