@@ -109,7 +109,7 @@ export async function POST(req: NextRequest) {
             to: submission.email,
             subject: `Discovery Call Confirmed · Mehedi & ${submission.name}`,
             bodyHtml: buildClientConfirmationHtml(emailData),
-            bodyText: `Hi ${submission.name},\n\nThank you for reaching out! Your discovery call has been placed on Google Calendar.\n\nMeeting Details:\n• Date: ${submission.meetingDate}\n• Time: ${submission.meetingTime || "03:00 PM"}\n• Project: ${submission.projectType}\n• Google Meet Link: ${meetUrl || "Will be provided in calendar invite"}\n\nI look forward to speaking with you.\n\nBest regards,\nMehedi\nAI & Automation Specialist\nhttps://mehedi.ai`,
+            bodyText: `Hi ${submission.name},\n\nThank you for reaching out! Your discovery call has been placed on Google Calendar.\n\nMeeting Details:\n• Date: ${submission.meetingDate}\n• Time: ${submission.meetingTime || "03:00 PM"}\n• Project: ${submission.projectType}\n• Google Meet Link: ${meetUrl || "Will be provided in calendar invite"}\n\nI look forward to speaking with you.\n\nBest regards,\nMehedi\nAI & Automation Specialist\nhttps://mhb-aa.vercel.app`,
           });
         }
 

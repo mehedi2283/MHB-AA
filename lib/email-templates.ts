@@ -11,12 +11,24 @@ export type EmailMeetingData = {
   meetUrl?: string;
 };
 
+function getProductionSiteUrl(portfolioUrl?: string): string {
+  if (portfolioUrl && !portfolioUrl.includes("localhost") && !portfolioUrl.includes("mehedi.ai")) {
+    return portfolioUrl.replace(/\/+$/, "");
+  }
+  const envUrl = (process.env.NEXT_PUBLIC_SITE_URL || "").trim().replace(/\/+$/, "");
+  if (envUrl && !envUrl.includes("localhost") && !envUrl.includes("mehedi.ai")) {
+    return envUrl;
+  }
+  return "https://mhb-aa.vercel.app";
+}
+
 /**
  * Builds a custom HTML & CSS branded email for the client.
  */
 export function buildClientConfirmationHtml(data: EmailMeetingData): string {
   const formattedDate = data.meetingDate || "Scheduled Date";
   const formattedTime = data.meetingTime || "11:00 AM";
+  const siteUrl = getProductionSiteUrl();
 
   return `
 <!DOCTYPE html>
@@ -135,7 +147,7 @@ export function buildClientConfirmationHtml(data: EmailMeetingData): string {
                 Mehedi Hasan
               </div>
               <div style="font-size: 11px; color: #717b6d; margin-top: 2px;">
-                AI & Automation Specialist · <a href="https://mehedi.ai" target="_blank" style="color: #c8ff3d; text-decoration: none;">mehedi.ai</a>
+                AI & Automation Specialist · <a href="${siteUrl}" target="_blank" style="color: #c8ff3d; text-decoration: none;">${siteUrl.replace(/^https?:\/\//, "")}</a>
               </div>
             </td>
           </tr>
@@ -153,6 +165,8 @@ export function buildClientConfirmationHtml(data: EmailMeetingData): string {
  * Builds custom HTML & CSS notification email for Mehedi (Admin).
  */
 export function buildAdminNotificationHtml(data: EmailMeetingData): string {
+  const siteUrl = getProductionSiteUrl();
+
   return `
 <!DOCTYPE html>
 <html lang="en">
@@ -259,7 +273,7 @@ export function buildAdminNotificationHtml(data: EmailMeetingData): string {
 
               <!-- Quick Actions -->
               <div style="text-align: center; margin-top: 24px;">
-                <a href="https://mehedi.ai/admin/inquiries" target="_blank" style="display: inline-block; background-color: #1a2517; border: 1px solid #c8ff3d; color: #c8ff3d; padding: 12px 24px; font-size: 12px; font-weight: 700; text-decoration: none; border-radius: 4px; font-family: monospace;">
+                <a href="${siteUrl}/admin/inquiries" target="_blank" style="display: inline-block; background-color: #1a2517; border: 1px solid #c8ff3d; color: #c8ff3d; padding: 12px 24px; font-size: 12px; font-weight: 700; text-decoration: none; border-radius: 4px; font-family: monospace;">
                   ⚡ OPEN CONTROL ROOM &rarr;
                 </a>
               </div>
@@ -291,7 +305,7 @@ export type ColdOutreachEmailData = {
  * Outer background is clean neutral, middle card is sleek dark luxury cyberpunk.
  */
 export function buildColdOutreachHtml(data: ColdOutreachEmailData): string {
-  const siteUrl = data.portfolioUrl || process.env.NEXT_PUBLIC_SITE_URL || "https://mehedi.ai";
+  const siteUrl = getProductionSiteUrl(data.portfolioUrl);
 
   return `
 <!DOCTYPE html>
@@ -362,7 +376,7 @@ export function buildColdOutreachHtml(data: ColdOutreachEmailData): string {
 
               <!-- Direct CTA Button -->
               <div style="text-align: center; margin: 30px 0 20px 0;">
-                <a href="${siteUrl}#contact" target="_blank" style="display: inline-block; background-color: #c8ff3d; color: #070907; padding: 13px 28px; font-size: 13px; font-weight: 800; text-decoration: none; border-radius: 4px; font-family: monospace; letter-spacing: 0.5px; box-shadow: 0 0 20px rgba(200, 255, 61, 0.4);">
+                <a href="${siteUrl}/#contact" target="_blank" style="display: inline-block; background-color: #c8ff3d; color: #070907; padding: 13px 28px; font-size: 13px; font-weight: 800; text-decoration: none; border-radius: 4px; font-family: monospace; letter-spacing: 0.5px; box-shadow: 0 0 20px rgba(200, 255, 61, 0.4);">
                   ⚡ SCHEDULE A 15-MIN DISCOVERY CALL &rarr;
                 </a>
               </div>
