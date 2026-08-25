@@ -26,6 +26,13 @@ import {
   Layers,
   ChevronRight,
   RefreshCw,
+  Target,
+  Calendar,
+  FileCheck,
+  Zap,
+  LayoutGrid,
+  List,
+  ArrowUpDown,
 } from "lucide-react";
 import { PixelLoader } from "./PixelLoader";
 
@@ -49,12 +56,12 @@ export type ClientRecord = {
 };
 
 const STAGES = [
-  { key: "lead", label: "Lead", color: "#939b8d", bg: "#151a15", border: "#2f382e" },
-  { key: "contacted", label: "Contacted", color: "#72a4ff", bg: "#0e1826", border: "#1f3350" },
-  { key: "audit_scheduled", label: "Audit Scheduled", color: "#facc15", bg: "#231f0a", border: "#493e11" },
-  { key: "proposal_sent", label: "Proposal Sent", color: "#c084fc", bg: "#1f1228", border: "#442359" },
-  { key: "active_client", label: "Active Client", color: "#c8ff3d", bg: "#141c10", border: "#2a3d21" },
-  { key: "completed", label: "Completed", color: "#34d399", bg: "#0c1f16", border: "#16452f" },
+  { key: "lead", label: "Lead", icon: Target, color: "#939b8d", bg: "#151a15", border: "#2f382e" },
+  { key: "contacted", label: "Contacted", icon: Mail, color: "#72a4ff", bg: "#0e1826", border: "#1f3350" },
+  { key: "audit_scheduled", label: "Audit Scheduled", icon: Calendar, color: "#facc15", bg: "#231f0a", border: "#493e11" },
+  { key: "proposal_sent", label: "Proposal Sent", icon: FileCheck, color: "#c084fc", bg: "#1f1228", border: "#442359" },
+  { key: "active_client", label: "Active Client", icon: Zap, color: "#c8ff3d", bg: "#141c10", border: "#2a3d21" },
+  { key: "completed", label: "Completed", icon: CheckCircle2, color: "#34d399", bg: "#0c1f16", border: "#16452f" },
 ] as const;
 
 const POPULAR_STACKS = [
@@ -131,6 +138,8 @@ export function ClientHubManager() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStage, setSelectedStage] = useState<string>("all");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [sortBy, setSortBy] = useState<"newest" | "oldest" | "name_asc" | "deal_high">("newest");
   const [editingClient, setEditingClient] = useState<Partial<ClientRecord> | null>(null);
   const [outreachTarget, setOutreachTarget] = useState<ClientRecord | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -173,23 +182,39 @@ export function ClientHubManager() {
   const activeClientsCount = clients.filter(c => c.stage === "active_client").length;
   const leadsCount = clients.filter(c => c.stage === "lead" || c.stage === "contacted").length;
 
-  // Filter clients
-  const filteredClients = clients.filter(client => {
-    const matchesStage = selectedStage === "all" || client.stage === selectedStage;
-    const q = searchQuery.toLowerCase().trim();
-    if (!q) return matchesStage;
+  // Filter and sort clients
+  const filteredClients = [...clients]
+    .filter(client => {
+      const matchesStage = selectedStage === "all" || client.stage === selectedStage;
+      const q = searchQuery.toLowerCase().trim();
+      if (!q) return matchesStage;
 
-    const matchesSearch =
-      client.name?.toLowerCase().includes(q) ||
-      client.company?.toLowerCase().includes(q) ||
-      client.email?.toLowerCase().includes(q) ||
-      client.phone?.toLowerCase().includes(q) ||
-      client.projectName?.toLowerCase().includes(q) ||
-      client.projectDescription?.toLowerCase().includes(q) ||
-      client.techStack?.some(t => t.toLowerCase().includes(q));
+      const matchesSearch =
+        client.name?.toLowerCase().includes(q) ||
+        client.company?.toLowerCase().includes(q) ||
+        client.email?.toLowerCase().includes(q) ||
+        client.phone?.toLowerCase().includes(q) ||
+        client.projectName?.toLowerCase().includes(q) ||
+        client.projectDescription?.toLowerCase().includes(q) ||
+        client.techStack?.some(t => t.toLowerCase().includes(q));
 
-    return matchesStage && matchesSearch;
-  });
+      return matchesStage && matchesSearch;
+    })
+    .sort((a, b) => {
+      if (sortBy === "name_asc") {
+        return (a.name || "").localeCompare(b.name || "");
+      }
+      if (sortBy === "oldest") {
+        return new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime();
+      }
+      if (sortBy === "deal_high") {
+        const valA = parseFloat((a.dealValue || "").replace(/[^0-9.]/g, "")) || 0;
+        const valB = parseFloat((b.dealValue || "").replace(/[^0-9.]/g, "")) || 0;
+        return valB - valA;
+      }
+      // default: newest
+      return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+    });
 
   // Open outreach modal pre-filled
   function handleOpenOutreach(client: ClientRecord) {
@@ -456,54 +481,137 @@ export function ClientHubManager() {
         </div>
       </div>
 
-      {/* Search & Stage Filters */}
-      <div className="bg-[#0b100b] border border-white/[0.08] p-3 rounded-xl flex flex-col md:flex-row items-center justify-between gap-3">
-        {/* Search */}
-        <div className="relative w-full md:w-80">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#838e7f]" />
-          <input
-            type="text"
-            placeholder="Search name, company, stack, project..."
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            className="w-full bg-[#121712] border border-white/[0.12] rounded-lg pl-9 pr-3 py-1.5 text-xs text-white placeholder:text-[#5f685c] focus:border-[#c8ff3d] focus:outline-none font-mono"
-          />
-        </div>
-
-        {/* Stage Filter Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto pb-1 md:pb-0">
+      {/* 1. Interactive Pipeline Stage Navigation Tabs */}
+      <div className="bg-[#0b100b] border border-white/[0.08] p-2 rounded-2xl">
+        <div className="flex items-center gap-2 overflow-x-auto scrollbar-none pb-1 sm:pb-0">
           <button
             onClick={() => setSelectedStage("all")}
-            className={`text-[11px] font-mono px-2.5 py-1 rounded-md transition whitespace-nowrap ${
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-mono font-bold transition-all whitespace-nowrap ${
               selectedStage === "all"
-                ? "bg-[#c8ff3d] text-black font-bold"
-                : "bg-[#141b14] text-[#a4ada0] hover:text-white border border-white/[0.06]"
+                ? "bg-[#c8ff3d] text-black shadow-[0_0_20px_rgba(200,255,61,0.25)] scale-[1.02]"
+                : "bg-[#141b14] text-[#a4ada0] hover:text-white hover:bg-[#1a241a] border border-white/[0.06]"
             }`}
           >
-            ALL ({clients.length})
+            <Layers size={14} />
+            <span>ALL CLIENTS</span>
+            <span
+              className={`px-1.5 py-0.5 rounded text-[10px] ${
+                selectedStage === "all" ? "bg-black/20 text-black font-bold" : "bg-white/[0.08] text-white/80"
+              }`}
+            >
+              {clients.length}
+            </span>
           </button>
+
           {STAGES.map(st => {
             const count = clients.filter(c => c.stage === st.key).length;
             const isSelected = selectedStage === st.key;
+            const Icon = st.icon;
+
             return (
               <button
                 key={st.key}
                 onClick={() => setSelectedStage(st.key)}
-                className={`text-[11px] font-mono px-2.5 py-1 rounded-md transition whitespace-nowrap flex items-center gap-1.5 ${
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-mono transition-all whitespace-nowrap ${
                   isSelected
-                    ? "bg-[#253322] text-[#c8ff3d] border border-[#c8ff3d]"
-                    : "bg-[#141b14] text-[#a4ada0] hover:text-white border border-white/[0.06]"
+                    ? "bg-[#192418] text-[#c8ff3d] border border-[#c8ff3d] shadow-[0_0_15px_rgba(200,255,61,0.2)] font-bold scale-[1.02]"
+                    : "bg-[#141b14] text-[#a4ada0] hover:text-white hover:bg-[#1a241a] border border-white/[0.06]"
                 }`}
               >
+                <Icon size={14} style={{ color: isSelected ? "#c8ff3d" : st.color }} />
                 <span>{st.label}</span>
-                <span className="opacity-60 text-[10px]">({count})</span>
+                <span
+                  className={`px-1.5 py-0.5 rounded text-[10px] ${
+                    isSelected ? "bg-[#c8ff3d]/20 text-[#c8ff3d] font-bold" : "bg-white/[0.08] text-white/70"
+                  }`}
+                >
+                  {count}
+                </span>
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* Main Client Grid / List */}
+      {/* 2. Unified Search, Sort & View Control Toolbar */}
+      <div className="bg-[#0b100b] border border-white/[0.08] p-3.5 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-3">
+        {/* Search with Clear Button */}
+        <div className="relative w-full md:max-w-md flex-1">
+          <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#838e7f]" />
+          <input
+            type="text"
+            placeholder="Search by client, company, tech stack (e.g. n8n), email..."
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            className="w-full bg-[#121812] border border-white/[0.12] focus:border-[#c8ff3d] rounded-xl pl-10 pr-9 py-2 text-xs text-white placeholder:text-[#5f685c] focus:outline-none font-mono transition"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#838e7f] hover:text-white p-1"
+              title="Clear search"
+            >
+              <X size={13} />
+            </button>
+          )}
+        </div>
+
+        {/* Right Action Tools: Filter Reset, Sort & View Mode Switcher */}
+        <div className="flex items-center gap-2.5 w-full md:w-auto justify-between md:justify-end">
+          {/* Active Filter Counter / Reset */}
+          {(searchQuery || selectedStage !== "all") && (
+            <button
+              onClick={() => {
+                setSearchQuery("");
+                setSelectedStage("all");
+              }}
+              className="text-[11px] font-mono text-[#ff8888] hover:text-[#ffaaaa] flex items-center gap-1 bg-[#281313] px-2.5 py-1.5 rounded-lg border border-[#ff555544] transition"
+            >
+              <X size={12} />
+              <span>Reset Filters</span>
+            </button>
+          )}
+
+          {/* Sort Selector */}
+          <div className="flex items-center gap-1.5 bg-[#121812] border border-white/[0.1] rounded-xl px-3 py-1.5">
+            <ArrowUpDown size={13} className="text-[#838e7f]" />
+            <select
+              value={sortBy}
+              onChange={e => setSortBy(e.target.value as any)}
+              className="bg-transparent text-xs font-mono text-[#a4ada0] focus:text-white outline-none cursor-pointer"
+            >
+              <option value="newest" className="bg-[#0b100b]">Newest Added</option>
+              <option value="oldest" className="bg-[#0b100b]">Oldest Added</option>
+              <option value="deal_high" className="bg-[#0b100b]">Highest Value</option>
+              <option value="name_asc" className="bg-[#0b100b]">Name (A-Z)</option>
+            </select>
+          </div>
+
+          {/* View Mode Toggle: Grid vs List */}
+          <div className="flex items-center bg-[#121812] border border-white/[0.1] rounded-xl p-1">
+            <button
+              onClick={() => setViewMode("grid")}
+              className={`p-1.5 rounded-lg transition ${
+                viewMode === "grid" ? "bg-[#c8ff3d] text-black font-bold" : "text-[#838e7f] hover:text-white"
+              }`}
+              title="Grid Card View"
+            >
+              <LayoutGrid size={14} />
+            </button>
+            <button
+              onClick={() => setViewMode("list")}
+              className={`p-1.5 rounded-lg transition ${
+                viewMode === "list" ? "bg-[#c8ff3d] text-black font-bold" : "text-[#838e7f] hover:text-white"
+              }`}
+              title="Compact Table View"
+            >
+              <List size={14} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Main Client Data View (Grid or List Table) */}
       {loading ? (
         <PixelLoader variant="skeleton-cards" label="QUERYING CLIENT HUB IN SUPABASE..." />
       ) : filteredClients.length === 0 ? (
@@ -540,7 +648,133 @@ export function ClientHubManager() {
             <span>Create First Client</span>
           </button>
         </div>
+      ) : viewMode === "list" ? (
+        /* COMPACT CRM TABLE VIEW */
+        <div className="bg-[#0b100b] border border-white/[0.08] rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left font-mono text-xs">
+              <thead>
+                <tr className="border-b border-white/[0.08] bg-[#0e140e] text-[#838e7f] text-[10px] uppercase tracking-wider">
+                  <th className="py-3.5 px-4">Client & Company</th>
+                  <th className="py-3.5 px-4">Stage</th>
+                  <th className="py-3.5 px-4">Deal Value</th>
+                  <th className="py-3.5 px-4">Project & Tech Stack</th>
+                  <th className="py-3.5 px-4">Outreach</th>
+                  <th className="py-3.5 px-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/[0.06]">
+                {filteredClients.map(client => {
+                  const stageConfig = STAGES.find(s => s.key === client.stage) || STAGES[0];
+                  const hasOutreach = client.outreachHistory && client.outreachHistory.length > 0;
+
+                  return (
+                    <tr key={client._id} className="hover:bg-[#121912] transition-colors">
+                      {/* Client Info */}
+                      <td className="py-3.5 px-4">
+                        <div className="font-bold text-white text-sm">{client.name}</div>
+                        <div className="text-xs text-[#a4ada0] flex items-center gap-2 mt-0.5">
+                          {client.company && <span>{client.company}</span>}
+                          {client.email && (
+                            <a href={`mailto:${client.email}`} className="text-[#72a4ff] hover:underline">
+                              {client.email}
+                            </a>
+                          )}
+                        </div>
+                      </td>
+
+                      {/* Stage Dropdown */}
+                      <td className="py-3.5 px-4">
+                        <select
+                          value={client.stage}
+                          onChange={e => handleQuickStageChange(client, e.target.value as ClientRecord["stage"])}
+                          style={{
+                            color: stageConfig.color,
+                            backgroundColor: stageConfig.bg,
+                            borderColor: stageConfig.border,
+                          }}
+                          className="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-1 rounded-md border appearance-none cursor-pointer focus:outline-none"
+                        >
+                          {STAGES.map(s => (
+                            <option key={s.key} value={s.key} className="bg-[#0f140f] text-white">
+                              {s.label}
+                            </option>
+                          ))}
+                        </select>
+                      </td>
+
+                      {/* Deal Value */}
+                      <td className="py-3.5 px-4 text-[#facc15] font-bold">
+                        {client.dealValue || "—"}
+                      </td>
+
+                      {/* Project & Tech Stack */}
+                      <td className="py-3.5 px-4 max-w-xs">
+                        <div className="text-white font-medium truncate">
+                          {client.projectName || "Custom Automation"}
+                        </div>
+                        {client.techStack && client.techStack.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {client.techStack.slice(0, 3).map((tech, i) => (
+                              <span key={i} className="text-[9px] px-1.5 py-0.5 bg-[#172216] text-[#c8ff3d] rounded">
+                                {tech}
+                              </span>
+                            ))}
+                            {client.techStack.length > 3 && (
+                              <span className="text-[9px] px-1.5 py-0.5 bg-white/10 text-white/70 rounded">
+                                +{client.techStack.length - 3}
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </td>
+
+                      {/* Outreach Status */}
+                      <td className="py-3.5 px-4">
+                        {hasOutreach ? (
+                          <span className="text-[#c8ff3d] text-[11px] flex items-center gap-1 font-bold">
+                            <Send size={11} />
+                            <span>{client.outreachHistory?.length} sent</span>
+                          </span>
+                        ) : (
+                          <span className="text-[#5f685c] text-[11px]">None</span>
+                        )}
+                      </td>
+
+                      {/* Action Buttons */}
+                      <td className="py-3.5 px-4 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => handleOpenOutreach(client)}
+                            className="text-[11px] font-mono font-bold bg-[#1a2517] hover:bg-[#c8ff3d] text-[#c8ff3d] hover:text-black border border-[#c8ff3d] px-2.5 py-1 rounded-lg transition flex items-center gap-1"
+                          >
+                            <Send size={11} />
+                            <span>Cold Email</span>
+                          </button>
+                          <button
+                            onClick={() => setEditingClient(client)}
+                            className="admin-button admin-button-quiet text-[11px] py-1 px-2"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDeleteClient(client._id, client.name)}
+                            className="admin-icon-button is-danger p-1"
+                            title="Delete client"
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
       ) : (
+        /* GRID CARDS VIEW */
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {filteredClients.map(client => {
             const stageConfig = STAGES.find(s => s.key === client.stage) || STAGES[0];
@@ -549,7 +783,7 @@ export function ClientHubManager() {
             return (
               <div
                 key={client._id}
-                className="bg-[#0b100b] border border-white/[0.08] hover:border-[#c8ff3d44] transition-all rounded-xl p-5 flex flex-col justify-between space-y-4 relative group shadow-[0_4px_20px_rgba(0,0,0,0.5)]"
+                className="bg-[#0b100b] border border-white/[0.08] hover:border-[#c8ff3d44] transition-all rounded-2xl p-5 flex flex-col justify-between space-y-4 relative group shadow-[0_4px_20px_rgba(0,0,0,0.5)]"
               >
                 {/* Card Top: Client Info & Stage Dropdown */}
                 <div>
@@ -617,7 +851,7 @@ export function ClientHubManager() {
                   </div>
 
                   {/* Project Details Box */}
-                  <div className="bg-[#101610] border border-white/[0.06] rounded-lg p-3.5 mt-3.5 space-y-2">
+                  <div className="bg-[#101610] border border-white/[0.06] rounded-xl p-3.5 mt-3.5 space-y-2">
                     <div className="flex items-center justify-between">
                       <div className="text-xs font-bold font-mono text-white flex items-center gap-1.5">
                         <Wrench size={13} className="text-[#c8ff3d]" />
