@@ -505,7 +505,7 @@ export function ClientHubManager() {
 
       {/* Main Client Grid / List */}
       {loading ? (
-        <PixelLoader label="QUERYING CLIENT HUB IN SUPABASE..." />
+        <PixelLoader variant="skeleton-cards" label="QUERYING CLIENT HUB IN SUPABASE..." />
       ) : filteredClients.length === 0 ? (
         <div className="p-12 text-center border-2 border-dashed border-white/[0.08] rounded-xl bg-[#090d09]">
           <div className="size-14 rounded-xl bg-[#141b14] border border-[#c8ff3d33] grid place-items-center mx-auto text-[#c8ff3d]">

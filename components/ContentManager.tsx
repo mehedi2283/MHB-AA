@@ -175,7 +175,7 @@ export function ContentManager({ collection }: { collection: string }) {
 
     <section className="admin-panel admin-collection">
       {loading ? (
-        <PixelLoader label={`LOADING ${collection.toUpperCase()} RECORDS...`} />
+        <PixelLoader variant="skeleton-table" label={`LOADING ${collection.toUpperCase()} RECORDS...`} />
       ) : items.length ? (
         items.map((item, index) => (
           <div className="admin-collection-row" key={item._id}>
