@@ -35,6 +35,8 @@ import {
   ArrowUpDown,
   ChevronDown,
   Check,
+  Save,
+  Globe,
 } from "lucide-react";
 import { PixelLoader } from "./PixelLoader";
 
@@ -298,6 +300,7 @@ export function ClientHubManager() {
   const [outreachTarget, setOutreachTarget] = useState<ClientRecord | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [notice, setNotice] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const [isSavingClient, setIsSavingClient] = useState(false);
 
   // Outreach state
   const [selectedTemplate, setSelectedTemplate] = useState(OUTREACH_TEMPLATES[0].id);
@@ -441,6 +444,7 @@ export function ClientHubManager() {
     e.preventDefault();
     if (!editingClient) return;
 
+    setIsSavingClient(true);
     try {
       const isNew = !editingClient._id;
       const url = isNew ? "/api/admin/clients" : `/api/admin/clients/${editingClient._id}`;
@@ -452,12 +456,17 @@ export function ClientHubManager() {
         body: JSON.stringify(editingClient),
       });
 
-      if (!res.ok) throw new Error("Failed to save client.");
-      setNotice({ type: "success", message: isNew ? "New client created successfully!" : "Client updated successfully!" });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to save client.");
+      }
+      setNotice({ type: "success", message: isNew ? "✓ New client created successfully!" : "✓ Client record updated successfully!" });
       setEditingClient(null);
       await loadClients();
     } catch (err: any) {
       setNotice({ type: "error", message: err.message || "Failed to save client." });
+    } finally {
+      setIsSavingClient(false);
     }
   }
 
@@ -1077,239 +1086,375 @@ export function ClientHubManager() {
 
       {/* 4. MODALS & POPUPS */}
 
-      {/* ADD / EDIT CLIENT MODAL */}
+      {/* ADD / EDIT CLIENT & PROJECT BLUEPRINT MODAL */}
       {editingClient && (
-        <div className="admin-modal-backdrop animate-in fade-in duration-150">
-          <div className="admin-modal max-w-2xl max-h-[90vh] overflow-y-auto rounded shadow-2xl">
-            <div className="admin-modal-head sticky top-0 bg-[#0c120c] z-20 pb-3 border-b border-white/[0.08] flex items-center justify-between">
-              <div>
-                <span className="font-mono text-[10px] text-[#c8ff3d] uppercase tracking-widest">
-                  SUPABASE DATABASE CRM
-                </span>
-                <h2 className="text-lg font-bold font-mono text-white">
-                  {editingClient._id ? "Edit Client & Project" : "Add New Client / Lead"}
-                </h2>
+        <div className="fixed inset-0 z-[999999] flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md animate-in fade-in duration-150">
+          <div className="w-full max-w-4xl max-h-[92vh] bg-[#0a0e0a] border border-[#c8ff3d]/30 rounded shadow-[0_25px_80px_rgba(0,0,0,0.9),0_0_40px_rgba(200,255,61,0.06)] flex flex-col overflow-hidden animate-in zoom-in-95 duration-150">
+            {/* Modal Header */}
+            <div className="px-6 py-4 bg-[#0d130d] border-b border-white/[0.08] flex items-center justify-between flex-shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="size-9 rounded bg-[#c8ff3d18] border border-[#c8ff3d44] text-[#c8ff3d] grid place-items-center flex-shrink-0">
+                  <Building2 size={18} />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-mono font-bold tracking-widest text-[#c8ff3d] uppercase">
+                      SUPABASE CRM SPECIFICATION
+                    </span>
+                    <span className="size-1.5 rounded-full bg-[#c8ff3d] animate-pulse" />
+                  </div>
+                  <h2 className="text-base font-bold text-white tracking-tight mt-0.5">
+                    {editingClient._id ? `Edit Client: ${editingClient.name}` : "Create New Client Profile"}
+                  </h2>
+                </div>
               </div>
               <button
-                className="admin-button admin-button-quiet text-xs"
+                type="button"
                 onClick={() => setEditingClient(null)}
+                className="size-8 rounded bg-white/[0.04] hover:bg-white/[0.1] border border-white/[0.08] text-[#838e7f] hover:text-white grid place-items-center transition cursor-pointer"
+                title="Close"
               >
-                Close
+                <X size={16} />
               </button>
             </div>
 
-            <form onSubmit={handleSaveClient} className="space-y-4 pt-3 font-mono text-xs">
-              {/* Basic Details */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="admin-label">Client Name *</label>
-                  <input
-                    type="text"
-                    required
-                    value={editingClient.name || ""}
-                    onChange={e => setEditingClient({ ...editingClient, name: e.target.value })}
-                    placeholder="e.g. Alexander Vance"
-                    className="admin-input"
-                  />
-                </div>
-                <div>
-                  <label className="admin-label">Email Address *</label>
-                  <input
-                    type="email"
-                    required
-                    value={editingClient.email || ""}
-                    onChange={e => setEditingClient({ ...editingClient, email: e.target.value })}
-                    placeholder="e.g. alex@vancecorp.com"
-                    className="admin-input"
-                  />
-                </div>
-                <div>
-                  <label className="admin-label">Phone / WhatsApp</label>
-                  <input
-                    type="text"
-                    value={editingClient.phone || ""}
-                    onChange={e => setEditingClient({ ...editingClient, phone: e.target.value })}
-                    placeholder="+1 (555) 234-5678"
-                    className="admin-input"
-                  />
-                </div>
-                <div>
-                  <label className="admin-label">Company / Brand</label>
-                  <input
-                    type="text"
-                    value={editingClient.company || ""}
-                    onChange={e => setEditingClient({ ...editingClient, company: e.target.value })}
-                    placeholder="e.g. Vance Logistics LLC"
-                    className="admin-input"
-                  />
-                </div>
-                <div>
-                  <label className="admin-label">Pipeline Stage</label>
-                  <div className="pt-1">
-                    <CustomStageDropdown
-                      currentStage={editingClient.stage || "lead"}
-                      onChange={newStage => setEditingClient({ ...editingClient, stage: newStage })}
-                    />
+            {/* Modal Scrollable Form Body */}
+            <form onSubmit={handleSaveClient} className="flex flex-col flex-1 overflow-hidden min-h-0">
+              <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-5 scrollbar-none">
+                {/* 01: Client & Contact Identifiers */}
+                <div className="bg-[#0f150f] border border-white/[0.06] rounded p-4 sm:p-5 space-y-4">
+                  <div className="flex items-center justify-between border-b border-white/[0.06] pb-2.5">
+                    <div className="flex items-center gap-2">
+                      <User size={14} className="text-[#c8ff3d]" />
+                      <span className="text-xs font-mono font-bold text-white uppercase tracking-wider">
+                        01 · Client & Contact Information
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-mono text-[#838e7f]">* Required fields</span>
                   </div>
-                </div>
-                <div>
-                  <label className="admin-label">Deal Value / Budget</label>
-                  <input
-                    type="text"
-                    value={editingClient.dealValue || ""}
-                    onChange={e => setEditingClient({ ...editingClient, dealValue: e.target.value })}
-                    placeholder="e.g. $4,500 / $1,500/mo"
-                    className="admin-input"
-                  />
-                </div>
-              </div>
 
-              {/* Project Scope */}
-              <div className="border-t border-white/[0.08] pt-3 space-y-3">
-                <div className="text-[11px] font-bold text-[#c8ff3d] uppercase tracking-wider">
-                  Project Scope & Architecture
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="admin-label">Project Name</label>
-                    <input
-                      type="text"
-                      value={editingClient.projectName || ""}
-                      onChange={e => setEditingClient({ ...editingClient, projectName: e.target.value })}
-                      placeholder="e.g. Full Member Lifecycle Automation"
-                      className="admin-input"
-                    />
-                  </div>
-                  <div>
-                    <label className="admin-label">Website / Prototype URL</label>
-                    <input
-                      type="url"
-                      value={editingClient.websiteUrl || ""}
-                      onChange={e => setEditingClient({ ...editingClient, websiteUrl: e.target.value })}
-                      placeholder="https://example.com"
-                      className="admin-input"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="admin-label">Project Description & Client Brief</label>
-                  <textarea
-                    rows={3}
-                    value={editingClient.projectDescription || ""}
-                    onChange={e => setEditingClient({ ...editingClient, projectDescription: e.target.value })}
-                    placeholder="Details about client bottlenecks, custom integrations, API keys, and workflow blueprint..."
-                    className="admin-input"
-                  />
-                </div>
-              </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[11px] font-mono font-semibold text-[#a4ada0] mb-1.5">
+                        Client Full Name <span className="text-[#c8ff3d]">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={editingClient.name || ""}
+                        onChange={e => setEditingClient({ ...editingClient, name: e.target.value })}
+                        placeholder="e.g. Vance Miller"
+                        className="w-full bg-[#080c08] border border-white/[0.12] focus:border-[#c8ff3d] rounded px-3.5 py-2.5 text-xs text-white placeholder:text-[#505a4e] outline-none transition font-sans"
+                      />
+                    </div>
 
-              {/* Tech Stack Selector */}
-              <div className="border-t border-white/[0.08] pt-3 space-y-2">
-                <label className="admin-label">Tech Stack & Tools</label>
-                <div className="flex flex-wrap gap-1.5">
-                  {POPULAR_STACKS.map(tech => {
-                    const active = (editingClient.techStack || []).includes(tech);
-                    return (
+                    <div>
+                      <label className="block text-[11px] font-mono font-semibold text-[#a4ada0] mb-1.5">
+                        Email Address <span className="text-[#c8ff3d]">*</span>
+                      </label>
+                      <input
+                        type="email"
+                        required
+                        value={editingClient.email || ""}
+                        onChange={e => setEditingClient({ ...editingClient, email: e.target.value })}
+                        placeholder="e.g. vance@vancecold.com"
+                        className="w-full bg-[#080c08] border border-white/[0.12] focus:border-[#c8ff3d] rounded px-3.5 py-2.5 text-xs text-white placeholder:text-[#505a4e] outline-none transition font-sans"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-mono font-semibold text-[#a4ada0] mb-1.5">
+                        Phone / WhatsApp
+                      </label>
+                      <input
+                        type="text"
+                        value={editingClient.phone || ""}
+                        onChange={e => setEditingClient({ ...editingClient, phone: e.target.value })}
+                        placeholder="e.g. +1 (415) 890-1234"
+                        className="w-full bg-[#080c08] border border-white/[0.12] focus:border-[#c8ff3d] rounded px-3.5 py-2.5 text-xs text-white placeholder:text-[#505a4e] outline-none transition font-sans"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-mono font-semibold text-[#a4ada0] mb-1.5">
+                        Company / Brand Name
+                      </label>
+                      <input
+                        type="text"
+                        value={editingClient.company || ""}
+                        onChange={e => setEditingClient({ ...editingClient, company: e.target.value })}
+                        placeholder="e.g. Vance Logistics LLC"
+                        className="w-full bg-[#080c08] border border-white/[0.12] focus:border-[#c8ff3d] rounded px-3.5 py-2.5 text-xs text-white placeholder:text-[#505a4e] outline-none transition font-sans"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 02: Commercials & Pipeline Stage */}
+                <div className="bg-[#0f150f] border border-white/[0.06] rounded p-4 sm:p-5 space-y-4">
+                  <div className="flex items-center justify-between border-b border-white/[0.06] pb-2.5">
+                    <div className="flex items-center gap-2">
+                      <DollarSign size={14} className="text-[#facc15]" />
+                      <span className="text-xs font-mono font-bold text-white uppercase tracking-wider">
+                        02 · Commercials & Pipeline Status
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[11px] font-mono font-semibold text-[#a4ada0] mb-1.5">
+                        Pipeline Stage
+                      </label>
+                      <div className="pt-0.5">
+                        <CustomStageDropdown
+                          currentStage={editingClient.stage || "lead"}
+                          onChange={newStage => setEditingClient({ ...editingClient, stage: newStage })}
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-mono font-semibold text-[#a4ada0] mb-1.5">
+                        Deal Value / Retainer Budget
+                      </label>
+                      <input
+                        type="text"
+                        value={editingClient.dealValue || ""}
+                        onChange={e => setEditingClient({ ...editingClient, dealValue: e.target.value })}
+                        placeholder="e.g. $4,500 / $1,500/mo"
+                        className="w-full bg-[#080c08] border border-white/[0.12] focus:border-[#c8ff3d] rounded px-3.5 py-2.5 text-xs text-white placeholder:text-[#505a4e] outline-none transition font-sans"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 03: Project Scope & Architecture */}
+                <div className="bg-[#0f150f] border border-white/[0.06] rounded p-4 sm:p-5 space-y-4">
+                  <div className="flex items-center justify-between border-b border-white/[0.06] pb-2.5">
+                    <div className="flex items-center gap-2">
+                      <Wrench size={14} className="text-[#c8ff3d]" />
+                      <span className="text-xs font-mono font-bold text-white uppercase tracking-wider">
+                        03 · Project Scope & Technical Blueprint
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[11px] font-mono font-semibold text-[#a4ada0] mb-1.5">
+                        Project Name / Automation Title
+                      </label>
+                      <input
+                        type="text"
+                        value={editingClient.projectName || ""}
+                        onChange={e => setEditingClient({ ...editingClient, projectName: e.target.value })}
+                        placeholder="e.g. Cold Email AI Engine & CRM Sync"
+                        className="w-full bg-[#080c08] border border-white/[0.12] focus:border-[#c8ff3d] rounded px-3.5 py-2.5 text-xs text-white placeholder:text-[#505a4e] outline-none transition font-sans"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-mono font-semibold text-[#a4ada0] mb-1.5">
+                        Website / Prototype / Portal URL
+                      </label>
+                      <input
+                        type="url"
+                        value={editingClient.websiteUrl || ""}
+                        onChange={e => setEditingClient({ ...editingClient, websiteUrl: e.target.value })}
+                        placeholder="https://clientbrand.com"
+                        className="w-full bg-[#080c08] border border-white/[0.12] focus:border-[#c8ff3d] rounded px-3.5 py-2.5 text-xs text-white placeholder:text-[#505a4e] outline-none transition font-sans"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-mono font-semibold text-[#a4ada0] mb-1.5">
+                      Project Description & Client Brief
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={editingClient.projectDescription || ""}
+                      onChange={e => setEditingClient({ ...editingClient, projectDescription: e.target.value })}
+                      placeholder="Describe workflow architecture, automated triggers, endpoints, integrations, deliverables..."
+                      className="w-full bg-[#080c08] border border-white/[0.12] focus:border-[#c8ff3d] rounded px-3.5 py-2.5 text-xs text-white placeholder:text-[#505a4e] outline-none transition font-sans leading-relaxed resize-y"
+                    />
+                  </div>
+
+                  {/* Tech Stack Chips Selector */}
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="text-[11px] font-mono font-semibold text-[#a4ada0]">
+                        Tech Stack & Tool Ecosystem
+                      </label>
+                      <span className="text-[10px] font-mono text-[#838e7f]">
+                        {(editingClient.techStack || []).length} selected
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {POPULAR_STACKS.map(tech => {
+                        const active = (editingClient.techStack || []).includes(tech);
+                        return (
+                          <button
+                            type="button"
+                            key={tech}
+                            onClick={() => toggleTechStack(tech)}
+                            className={`text-[11px] font-mono px-2.5 py-1 rounded transition border cursor-pointer flex items-center gap-1.5 ${
+                              active
+                                ? "bg-[#c8ff3d1c] border-[#c8ff3d] text-[#c8ff3d] font-bold shadow-[0_0_12px_rgba(200,255,61,0.15)]"
+                                : "bg-[#0b0f0b] text-[#838e7f] border-white/[0.08] hover:border-white/25 hover:text-white"
+                            }`}
+                          >
+                            <span className={`text-[10px] ${active ? "text-[#c8ff3d]" : "text-[#556052]"}`}>
+                              {active ? "✓" : "+"}
+                            </span>
+                            <span>{tech}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                {/* 04: Deliverable Screenshots & Media */}
+                <div className="bg-[#0f150f] border border-white/[0.06] rounded p-4 sm:p-5 space-y-4">
+                  <div className="flex items-center justify-between border-b border-white/[0.06] pb-2.5">
+                    <div className="flex items-center gap-2">
+                      <FileImage size={14} className="text-[#c8ff3d]" />
+                      <span className="text-xs font-mono font-bold text-white uppercase tracking-wider">
+                        04 · Deliverable Screenshots & Media Assets
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-mono text-[#838e7f]">
+                      {(editingClient.screenshots || []).length} attached
+                    </span>
+                  </div>
+
+                  {/* Uploaders */}
+                  <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                    {/* File Upload Button */}
+                    <div className="sm:col-span-4">
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        accept="image/*"
+                        onChange={handleFileUpload}
+                        className="hidden"
+                      />
                       <button
                         type="button"
-                        key={tech}
-                        onClick={() => toggleTechStack(tech)}
-                        className={`text-[10px] font-mono px-2 py-1 rounded transition border cursor-pointer ${
-                          active
-                            ? "bg-[#c8ff3d] text-black font-bold border-[#c8ff3d]"
-                            : "bg-[#141b14] text-[#a4ada0] border-white/[0.08] hover:border-white/30"
-                        }`}
+                        disabled={uploadingImage}
+                        onClick={() => fileInputRef.current?.click()}
+                        className="w-full h-full min-h-[42px] px-4 py-2.5 bg-[#141e14] hover:bg-[#1a281a] border border-[#c8ff3d44] hover:border-[#c8ff3d] text-[#c8ff3d] rounded text-xs font-mono font-bold transition flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_15px_rgba(200,255,61,0.08)]"
                       >
-                        {active ? "✓ " : "+ "}
-                        {tech}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Screenshots Uploader & Supabase Bucket */}
-              <div className="border-t border-white/[0.08] pt-3 space-y-3">
-                <div className="flex items-center justify-between">
-                  <label className="admin-label">Project Screenshots & Deliverables (Supabase Storage)</label>
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    accept="image/*"
-                    onChange={handleFileUpload}
-                    className="hidden"
-                  />
-                  <button
-                    type="button"
-                    disabled={uploadingImage}
-                    onClick={() => fileInputRef.current?.click()}
-                    className="text-xs bg-[#1a2517] border border-[#c8ff3d] text-[#c8ff3d] px-3 py-1 rounded hover:bg-[#c8ff3d] hover:text-black transition flex items-center gap-1.5 cursor-pointer"
-                  >
-                    {uploadingImage ? <PixelLoader label="UPLOADING..." /> : <Upload size={12} />}
-                    <span>Upload Image</span>
-                  </button>
-                </div>
-
-                {/* Uploaded Thumbnails */}
-                {editingClient.screenshots && editingClient.screenshots.length > 0 && (
-                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                    {editingClient.screenshots.map((s, idx) => (
-                      <div key={idx} className="relative group rounded overflow-hidden border border-white/[0.12] bg-black">
-                        <img src={s.url} alt={s.caption || ""} className="w-full h-20 object-cover" />
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveScreenshot(idx)}
-                          className="absolute top-1 right-1 bg-red-600/90 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition cursor-pointer"
-                          title="Remove"
-                        >
-                          <X size={12} />
-                        </button>
-                        {s.caption && (
-                          <div className="p-1 text-[9px] truncate bg-[#0f140f] text-[#838e7f]">{s.caption}</div>
+                        {uploadingImage ? (
+                          <PixelLoader label="UPLOADING..." />
+                        ) : (
+                          <>
+                            <Upload size={14} />
+                            <span>Upload to Storage</span>
+                          </>
                         )}
-                      </div>
-                    ))}
-                  </div>
-                )}
+                      </button>
+                    </div>
 
-                {/* Add by Image URL */}
-                <div className="flex gap-2">
-                  <input
-                    type="url"
-                    value={newScreenshotUrl}
-                    onChange={e => setNewScreenshotUrl(e.target.value)}
-                    placeholder="Or paste direct image URL (https://...)"
-                    className="admin-input flex-1"
-                  />
-                  <input
-                    type="text"
-                    value={newScreenshotCaption}
-                    onChange={e => setNewScreenshotCaption(e.target.value)}
-                    placeholder="Caption (optional)"
-                    className="admin-input w-36"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleAddManualScreenshot}
-                    className="admin-button admin-button-quiet text-xs whitespace-nowrap"
-                  >
-                    Add URL
-                  </button>
+                    {/* Direct URL Input */}
+                    <div className="sm:col-span-8 flex gap-2">
+                      <input
+                        type="url"
+                        value={newScreenshotUrl}
+                        onChange={e => setNewScreenshotUrl(e.target.value)}
+                        placeholder="Or paste direct image URL (https://...)"
+                        className="flex-1 bg-[#080c08] border border-white/[0.12] focus:border-[#c8ff3d] rounded px-3 py-2 text-xs text-white placeholder:text-[#505a4e] outline-none transition font-sans"
+                      />
+                      <input
+                        type="text"
+                        value={newScreenshotCaption}
+                        onChange={e => setNewScreenshotCaption(e.target.value)}
+                        placeholder="Caption"
+                        className="w-28 bg-[#080c08] border border-white/[0.12] focus:border-[#c8ff3d] rounded px-3 py-2 text-xs text-white placeholder:text-[#505a4e] outline-none transition font-sans"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleAddManualScreenshot}
+                        className="px-3.5 py-2 bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.1] text-white rounded text-xs font-mono font-bold transition cursor-pointer whitespace-nowrap"
+                      >
+                        Add
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Uploaded Thumbnails Grid */}
+                  {editingClient.screenshots && editingClient.screenshots.length > 0 && (
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+                      {editingClient.screenshots.map((s, idx) => (
+                        <div
+                          key={idx}
+                          className="relative group rounded overflow-hidden border border-white/[0.12] hover:border-[#c8ff3d] transition bg-[#080c08] flex flex-col"
+                        >
+                          <div className="relative w-full h-24 bg-black/50">
+                            <img src={s.url} alt={s.caption || ""} className="w-full h-full object-cover" />
+                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-2 transition">
+                              <button
+                                type="button"
+                                onClick={() => setPreviewImage(s.url)}
+                                className="size-7 rounded bg-[#c8ff3d] text-black grid place-items-center hover:scale-110 transition cursor-pointer"
+                                title="View Full Size"
+                              >
+                                <Eye size={13} />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveScreenshot(idx)}
+                                className="size-7 rounded bg-red-600 text-white grid place-items-center hover:scale-110 transition cursor-pointer"
+                                title="Delete Image"
+                              >
+                                <Trash2 size={13} />
+                              </button>
+                            </div>
+                          </div>
+                          {s.caption && (
+                            <div className="p-1.5 text-[10px] font-mono text-[#838e7f] truncate bg-[#0d120d] border-t border-white/[0.06]">
+                              {s.caption}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
               {/* Modal Footer */}
-              <div className="border-t border-white/[0.08] pt-4 flex items-center justify-end gap-2">
-                <button
-                  type="button"
-                  className="admin-button admin-button-quiet text-xs py-2 px-4"
-                  onClick={() => setEditingClient(null)}
-                >
-                  Cancel
-                </button>
-                <button type="submit" className="admin-button admin-button-primary text-xs py-2 px-5">
-                  Save to Supabase
-                </button>
+              <div className="px-6 py-4 bg-[#0d130d] border-t border-white/[0.08] flex items-center justify-between flex-shrink-0">
+                <div className="text-[11px] font-mono text-[#838e7f] flex items-center gap-2">
+                  <span className="size-2 rounded-full bg-[#c8ff3d] animate-ping" />
+                  <span>Realtime database sync on save</span>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setEditingClient(null)}
+                    className="px-4 py-2 rounded text-xs font-mono text-[#838e7f] hover:text-white hover:bg-white/[0.06] transition cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSavingClient}
+                    className="px-5 py-2 rounded text-xs font-mono font-bold bg-[#c8ff3d] hover:bg-[#d8ff60] text-black transition flex items-center gap-2 shadow-[0_0_20px_rgba(200,255,61,0.25)] cursor-pointer disabled:opacity-50"
+                  >
+                    {isSavingClient ? (
+                      <PixelLoader label="SAVING..." />
+                    ) : (
+                      <>
+                        <CheckCircle2 size={14} />
+                        <span>Save to Database</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             </form>
           </div>
@@ -1318,43 +1463,60 @@ export function ClientHubManager() {
 
       {/* COLD OUTREACH EMAIL COMPOSER MODAL */}
       {outreachTarget && (
-        <div className="admin-modal-backdrop animate-in fade-in duration-150">
-          <div className="admin-modal max-w-3xl max-h-[90vh] overflow-y-auto">
-            <div className="admin-modal-head sticky top-0 bg-[#0c120c] z-20 pb-3 border-b border-white/[0.08]">
-              <div>
-                <span className="font-mono text-[10px] text-[#c8ff3d] uppercase tracking-widest flex items-center gap-1.5">
-                  <Send size={12} />
-                  <span>CONNECTED GMAIL OUTREACH ENGINE</span>
-                </span>
-                <h2 className="text-lg font-bold font-mono text-white">
-                  Cold Email to {outreachTarget.name} ({outreachTarget.email})
-                </h2>
+        <div className="fixed inset-0 z-[999999] flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md animate-in fade-in duration-150">
+          <div className="w-full max-w-3xl max-h-[92vh] bg-[#0a0e0a] border border-[#c8ff3d]/30 rounded shadow-[0_25px_80px_rgba(0,0,0,0.9),0_0_40px_rgba(200,255,61,0.06)] flex flex-col overflow-hidden animate-in zoom-in-95 duration-150">
+            {/* Modal Header */}
+            <div className="px-6 py-4 bg-[#0d130d] border-b border-white/[0.08] flex items-center justify-between flex-shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="size-9 rounded bg-[#c8ff3d18] border border-[#c8ff3d44] text-[#c8ff3d] grid place-items-center flex-shrink-0">
+                  <Send size={16} />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-mono font-bold tracking-widest text-[#c8ff3d] uppercase">
+                      GMAIL OUTREACH ENGINE
+                    </span>
+                    <span className="size-1.5 rounded-full bg-[#c8ff3d] animate-pulse" />
+                  </div>
+                  <h2 className="text-base font-bold text-white tracking-tight mt-0.5">
+                    Cold Pitch to: <span className="text-[#c8ff3d]">{outreachTarget.name}</span>
+                    {outreachTarget.company && <span className="text-[#838e7f] font-normal"> ({outreachTarget.company})</span>}
+                  </h2>
+                </div>
               </div>
               <button
-                className="admin-button admin-button-quiet text-xs"
+                type="button"
                 onClick={() => setOutreachTarget(null)}
+                className="size-8 rounded bg-white/[0.04] hover:bg-white/[0.1] border border-white/[0.08] text-[#838e7f] hover:text-white grid place-items-center transition cursor-pointer"
+                title="Close"
               >
-                Close
+                <X size={16} />
               </button>
             </div>
 
-            <div className="space-y-4 pt-3 font-mono text-xs">
+            {/* Modal Body */}
+            <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-5 scrollbar-none">
               {/* Template Picker */}
               <div>
-                <label className="admin-label">Select Proven Cold Pitch Template</label>
+                <label className="block text-[11px] font-mono font-semibold text-[#a4ada0] mb-2">
+                  Select Proven Cold Pitch Template
+                </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {OUTREACH_TEMPLATES.map(tmpl => (
                     <button
                       type="button"
                       key={tmpl.id}
                       onClick={() => applyTemplate(tmpl.id, outreachTarget)}
-                      className={`p-2.5 rounded-lg border text-left transition font-mono ${
+                      className={`p-3 rounded border text-left transition font-mono cursor-pointer ${
                         selectedTemplate === tmpl.id
                           ? "bg-[#1b2618] border-[#c8ff3d] text-white shadow-[0_0_15px_rgba(200,255,61,0.2)]"
-                          : "bg-[#111711] border-white/[0.08] text-[#a4ada0] hover:text-white"
+                          : "bg-[#0f140f] border-white/[0.08] text-[#838e7f] hover:text-white hover:border-white/20"
                       }`}
                     >
-                      <div className="text-[11px] font-bold">{tmpl.name}</div>
+                      <div className="text-xs font-bold text-white flex items-center justify-between">
+                        <span>{tmpl.name}</span>
+                        {selectedTemplate === tmpl.id && <Check size={13} className="text-[#c8ff3d]" />}
+                      </div>
                     </button>
                   ))}
                 </div>
@@ -1363,8 +1525,9 @@ export function ClientHubManager() {
               {/* Tabs: Edit vs Live Email Preview */}
               <div className="flex border-b border-white/[0.08] gap-4">
                 <button
+                  type="button"
                   onClick={() => setActiveOutreachTab("edit")}
-                  className={`pb-2 text-xs font-bold font-mono transition border-b-2 ${
+                  className={`pb-2.5 text-xs font-bold font-mono transition border-b-2 cursor-pointer ${
                     activeOutreachTab === "edit"
                       ? "border-[#c8ff3d] text-[#c8ff3d]"
                       : "border-transparent text-[#838e7f] hover:text-white"
@@ -1373,8 +1536,9 @@ export function ClientHubManager() {
                   1. Compose & Edit
                 </button>
                 <button
+                  type="button"
                   onClick={() => setActiveOutreachTab("preview")}
-                  className={`pb-2 text-xs font-bold font-mono transition border-b-2 flex items-center gap-1.5 ${
+                  className={`pb-2.5 text-xs font-bold font-mono transition border-b-2 flex items-center gap-1.5 cursor-pointer ${
                     activeOutreachTab === "preview"
                       ? "border-[#c8ff3d] text-[#c8ff3d]"
                       : "border-transparent text-[#838e7f] hover:text-white"
@@ -1386,32 +1550,36 @@ export function ClientHubManager() {
               </div>
 
               {activeOutreachTab === "edit" ? (
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <div>
-                    <label className="admin-label">Subject Line</label>
+                    <label className="block text-[11px] font-mono font-semibold text-[#a4ada0] mb-1.5">
+                      Subject Line
+                    </label>
                     <input
                       type="text"
                       required
                       value={outreachSubject}
                       onChange={e => setOutreachSubject(e.target.value)}
-                      className="admin-input"
+                      className="w-full bg-[#080c08] border border-white/[0.12] focus:border-[#c8ff3d] rounded px-3.5 py-2.5 text-xs text-white placeholder:text-[#505a4e] outline-none transition font-sans"
                     />
                   </div>
 
                   <div>
-                    <label className="admin-label">Email Message Body (HTML supported)</label>
+                    <label className="block text-[11px] font-mono font-semibold text-[#a4ada0] mb-1.5">
+                      Email Message Body (HTML supported)
+                    </label>
                     <textarea
                       rows={10}
                       value={outreachBody}
                       onChange={e => setOutreachBody(e.target.value)}
-                      className="admin-input font-mono text-xs leading-relaxed"
+                      className="w-full bg-[#080c08] border border-white/[0.12] focus:border-[#c8ff3d] rounded px-3.5 py-2.5 text-xs text-white placeholder:text-[#505a4e] outline-none transition font-mono leading-relaxed resize-y"
                     />
                   </div>
                 </div>
               ) : (
                 /* Live Preview Container */
-                <div className="bg-[#070907] border border-[#233020] rounded p-5 text-white max-h-96 overflow-y-auto">
-                  <div className="border-b border-[#1a2419] pb-3 mb-4 text-xs font-mono text-[#838e7f]">
+                <div className="bg-[#070907] border border-[#233020] rounded p-5 text-white max-h-96 overflow-y-auto scrollbar-none">
+                  <div className="border-b border-[#1a2419] pb-3 mb-4 text-xs font-mono text-[#838e7f] space-y-1">
                     <div>To: <span className="text-[#c8ff3d]">{outreachTarget.email}</span></div>
                     <div>Subject: <span className="text-white font-bold">{outreachSubject}</span></div>
                   </div>
@@ -1438,36 +1606,36 @@ export function ClientHubManager() {
                   </div>
                 </div>
               )}
+            </div>
 
-              {/* Outreach Modal Footer */}
-              <div className="border-t border-white/[0.08] pt-4 flex items-center justify-between">
-                <div className="text-[10px] font-mono text-[#838e7f]">
-                  Sends directly from your connected Gmail address via Google OAuth.
-                </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    className="admin-button admin-button-quiet text-xs py-2 px-4"
-                    onClick={() => setOutreachTarget(null)}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    disabled={isSendingOutreach}
-                    onClick={handleSendOutreach}
-                    className="admin-button admin-button-primary text-xs py-2 px-5 flex items-center gap-2"
-                  >
-                    {isSendingOutreach ? (
-                      <PixelLoader label="DISPATCHING EMAIL..." />
-                    ) : (
-                      <>
-                        <Send size={13} />
-                        <span>Send Cold Outreach</span>
-                      </>
-                    )}
-                  </button>
-                </div>
+            {/* Outreach Modal Footer */}
+            <div className="px-6 py-4 bg-[#0d130d] border-t border-white/[0.08] flex items-center justify-between flex-shrink-0">
+              <div className="text-[11px] font-mono text-[#838e7f]">
+                Sends directly from your connected Gmail address via Google OAuth.
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  className="px-4 py-2 rounded text-xs font-mono text-[#838e7f] hover:text-white hover:bg-white/[0.06] transition cursor-pointer"
+                  onClick={() => setOutreachTarget(null)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  disabled={isSendingOutreach}
+                  onClick={handleSendOutreach}
+                  className="px-5 py-2 rounded text-xs font-mono font-bold bg-[#c8ff3d] hover:bg-[#d8ff60] text-black transition flex items-center gap-2 shadow-[0_0_20px_rgba(200,255,61,0.25)] cursor-pointer disabled:opacity-50"
+                >
+                  {isSendingOutreach ? (
+                    <PixelLoader label="DISPATCHING EMAIL..." />
+                  ) : (
+                    <>
+                      <Send size={13} />
+                      <span>Send Cold Outreach</span>
+                    </>
+                  )}
+                </button>
               </div>
             </div>
           </div>
