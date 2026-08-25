@@ -2180,10 +2180,14 @@ select {
     transform: none !important;
 }
 
-.back-to-top-btn svg,
+.back-to-top-btn svg {
+    color: var(--acid);
+    transition: transform .2s ease;
+}
+
 .back-to-top-btn:hover svg {
     color: var(--acid);
-    transform: none !important;
+    transform: translateY(-3px) !important;
 }
 
 .ai-shell {
