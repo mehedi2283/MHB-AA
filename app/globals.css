@@ -2180,12 +2180,18 @@ select {
     transform: none !important;
 }
 
-.back-to-top-btn svg {
+.back-to-top-progress-ring,
+.back-to-top-btn:hover .back-to-top-progress-ring {
+    transform: none !important;
+    inset: 0 !important;
+}
+
+.back-to-top-arrow-icon {
     color: var(--acid);
     transition: transform .2s ease;
 }
 
-.back-to-top-btn:hover svg {
+.back-to-top-btn:hover .back-to-top-arrow-icon {
     color: var(--acid);
     transform: translateY(-3px) !important;
 }

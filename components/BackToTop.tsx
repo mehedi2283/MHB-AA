@@ -214,8 +214,8 @@ export function BackToTop() {
         >
           {/* 8-Bit Pixel Perimeter Progress Ring */}
           <svg
-            className="pointer-events-none absolute inset-0 h-full w-full"
-            style={{ shapeRendering: "crispEdges" }}
+            className="pointer-events-none absolute inset-0 h-full w-full back-to-top-progress-ring"
+            style={{ shapeRendering: "crispEdges", transform: "none" }}
           >
             <rect
               x="1"
@@ -251,7 +251,7 @@ export function BackToTop() {
           <span className="w-[30px] text-right font-mono text-[9px] font-bold text-[#c8ff3d] tabular-nums tracking-tighter inline-block flex-shrink-0">
             {scrollProgress}%
           </span>
-          <PixelArrowUp size={13} className="flex-shrink-0 text-[#c8ff3d]" />
+          <PixelArrowUp size={13} className="back-to-top-arrow-icon flex-shrink-0 text-[#c8ff3d]" />
         </PixelCard>
       </div>
     </div>
