@@ -367,28 +367,80 @@ export function ContactForm() {
       </div>
 
       {/* Online Meeting / Interactive Calendar & Time Slot Picker */}
-      <div className="contact-form-wide border border-[#ffffff15] hover:border-[#c8ff3d44] bg-[#0c120c] p-4 rounded space-y-4 transition">
-        <label className="flex items-center justify-between cursor-pointer select-none">
-          <div className="flex items-center gap-3">
-            <input
-              type="checkbox"
-              checked={wantMeeting}
-              onChange={(e) => setWantMeeting(e.target.checked)}
-              className="size-4 accent-[#c8ff3d] rounded cursor-pointer"
-            />
-            <span className="flex items-center gap-2 text-xs font-bold text-[#ffffff]">
-              <PixelCalendar size={16} className="text-[#c8ff3d]" />
-              Schedule an online discovery meeting (Google Meet)
-            </span>
+      <div
+        className={`contact-form-wide rounded border transition-all duration-300 p-4 sm:p-5 space-y-4 ${
+          wantMeeting
+            ? "bg-[#0c140c] border-[#c8ff3d]/60 shadow-[0_0_30px_rgba(200,255,61,0.1)] ring-1 ring-[#c8ff3d]/30"
+            : "bg-[#090d09] border-white/[0.12] hover:border-[#c8ff3d]/40 hover:bg-[#0c110c]"
+        }`}
+      >
+        <label className="flex items-center justify-between gap-4 cursor-pointer select-none group">
+          <div className="flex items-center gap-3.5 min-w-0">
+            {/* Custom Cyberpunk Checkbox Box */}
+            <div className="relative shrink-0">
+              <input
+                type="checkbox"
+                checked={wantMeeting}
+                onChange={(e) => setWantMeeting(e.target.checked)}
+                className="sr-only"
+              />
+              <div
+                className={`size-5 rounded border flex items-center justify-center transition-all duration-200 ${
+                  wantMeeting
+                    ? "bg-[#c8ff3d] border-[#c8ff3d] text-black shadow-[0_0_12px_rgba(200,255,61,0.6)] scale-105"
+                    : "bg-[#101710] border-white/25 group-hover:border-[#c8ff3d]/60 group-hover:bg-[#151f15]"
+                }`}
+              >
+                {wantMeeting && <PixelCheck size={12} className="stroke-[3]" />}
+              </div>
+            </div>
+
+            {/* Glowing Icon Badge & Title */}
+            <div className="flex items-center gap-3 min-w-0">
+              <div
+                className={`size-8 rounded grid place-items-center shrink-0 transition-all duration-200 ${
+                  wantMeeting
+                    ? "bg-[#162616] border border-[#c8ff3d]/60 text-[#c8ff3d] shadow-[0_0_12px_rgba(200,255,61,0.2)]"
+                    : "bg-white/[0.04] border border-white/[0.08] text-[#838e7f] group-hover:text-[#c8ff3d] group-hover:border-[#c8ff3d]/30"
+                }`}
+              >
+                <PixelCalendar size={17} />
+              </div>
+              <div className="min-w-0 space-y-0.5">
+                <span
+                  className={`text-xs font-mono font-bold block transition-colors ${
+                    wantMeeting ? "text-white" : "text-[#d1d8cc] group-hover:text-white"
+                  }`}
+                >
+                  Schedule an online discovery meeting (Google Meet)
+                </span>
+                <span className="text-[10.5px] font-mono text-[#737e6f] block truncate">
+                  Direct 1-on-1 video call slot reservation
+                </span>
+              </div>
+            </div>
           </div>
-          <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 bg-[#c8ff3d15] border border-[#c8ff3d33] rounded text-[10px] font-mono text-[#c8ff3d]">
-            <Video size={11} /> Google Meet
-          </span>
+
+          {/* Right Status Badge */}
+          <div className="shrink-0 hidden sm:flex items-center">
+            {wantMeeting ? (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#152615] border border-[#c8ff3d]/70 rounded text-[10.5px] font-mono font-bold text-[#c8ff3d] shadow-[0_0_15px_rgba(200,255,61,0.2)]">
+                <span className="size-1.5 rounded-full bg-[#c8ff3d] animate-ping" />
+                <Video size={12} />
+                <span>Google Meet Enabled</span>
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white/[0.03] border border-white/10 rounded text-[10.5px] font-mono text-[#838e7f] group-hover:text-white group-hover:border-white/20 transition">
+                <Video size={12} />
+                <span>Google Meet</span>
+              </span>
+            )}
+          </div>
         </label>
 
         {/* Visual 8-Bit Interactive Calendar & Date-based Time Slot Selector */}
         {wantMeeting && (
-          <div className="pt-2 animate-in fade-in duration-200">
+          <div className="pt-3 border-t border-white/[0.08] animate-in fade-in zoom-in-95 duration-200">
             <InteractiveMeetingPicker
               onSelect={(date, time) => {
                 setMeetingDate(date);
