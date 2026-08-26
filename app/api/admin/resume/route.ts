@@ -2,45 +2,32 @@ import { NextRequest, NextResponse } from "next/server";
 import { isUnauthorizedError, requireAdmin } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase";
 import { logActivity } from "@/lib/supabase-data";
-import fs from "fs";
-import path from "path";
 
 export async function GET() {
   try {
     await requireAdmin();
-    const resumePath = path.join(process.cwd(), "public", "resume.pdf");
-    const exists = fs.existsSync(resumePath);
+    const supabase = supabaseAdmin();
 
-    let stats = null;
-    if (exists) {
-      const fileStat = fs.statSync(resumePath);
-      stats = {
-        size: fileStat.size,
-        updatedAt: fileStat.mtime.toISOString(),
-      };
-    }
+    const res = await supabase
+      .from("app_settings")
+      .select("data")
+      .eq("key", "site:resume")
+      .maybeSingle();
 
-    // Also check Supabase metadata
-    let metadata: Record<string, unknown> = {};
-    try {
-      const res = await supabaseAdmin()
-        .from("app_settings")
-        .select("data")
-        .eq("key", "site:resume")
-        .maybeSingle();
-      metadata = res.data?.data || {};
-    } catch {}
+    const meta = res.data?.data;
+    const exists = Boolean(meta && (meta.base64Data || meta.publicUrl));
 
     return NextResponse.json({
       exists,
-      filename: (metadata.filename as string) || (exists ? "Mehedi_Hasan_Resume.pdf" : null),
-      size: stats?.size || (metadata.size as number) || 0,
-      updatedAt: stats?.updatedAt || (metadata.updatedAt as string) || null,
-      url: exists ? "/resume.pdf" : null,
+      filename: meta?.filename || (exists ? "Mehedi_Hasan_Resume.pdf" : null),
+      size: meta?.size || 0,
+      updatedAt: meta?.uploadedAt || null,
+      url: exists ? "/api/resume/download" : null,
       downloadUrl: exists ? "/api/resume/download" : null,
     });
   } catch (error) {
     if (isUnauthorizedError(error)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    console.error("Resume status fetch error:", error);
     return NextResponse.json({ error: "Failed to fetch resume status." }, { status: 500 });
   }
 }
@@ -56,75 +43,101 @@ export async function POST(req: NextRequest) {
     }
 
     // Validate PDF
-    const fileName = file.name || "resume.pdf";
+    const fileName = file.name || "Mehedi_Hasan_Resume.pdf";
     if (!fileName.toLowerCase().endsWith(".pdf") && file.type !== "application/pdf") {
       return NextResponse.json({ error: "Only PDF files are supported for resume/CV." }, { status: 400 });
     }
 
-    // Maximum 15MB size limit
+    // Maximum 15MB limit
     if (file.size > 15 * 1024 * 1024) {
       return NextResponse.json({ error: "File size exceeds 15MB limit." }, { status: 400 });
     }
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    const supabase = supabaseAdmin();
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const base64Data = buffer.toString("base64");
 
-    const publicDir = path.join(process.cwd(), "public");
-    if (!fs.existsSync(publicDir)) {
-      fs.mkdirSync(publicDir, { recursive: true });
+    // Try uploading to Supabase Storage if available
+    let publicUrl = "";
+    try {
+      const { data: buckets } = await supabase.storage.listBuckets();
+      const targetBucket = buckets?.find((b) => b.name === "portfolio-assets" || b.name === "client-screenshots")?.name;
+
+      if (targetBucket) {
+        const filePath = `resumes/${Date.now()}_Mehedi_Hasan_Resume.pdf`;
+        const { error: uploadErr } = await supabase.storage
+          .from(targetBucket)
+          .upload(filePath, buffer, {
+            contentType: "application/pdf",
+            upsert: true,
+          });
+
+        if (!uploadErr) {
+          const { data: urlData } = supabase.storage.from(targetBucket).getPublicUrl(filePath);
+          publicUrl = urlData.publicUrl;
+        }
+      }
+    } catch (storageErr) {
+      console.warn("Supabase storage upload fallback to db:", storageErr);
     }
 
-    const filePath = path.join(publicDir, "resume.pdf");
-    fs.writeFileSync(filePath, buffer);
-
-    // Save metadata in Supabase app_settings
+    // Resiliently store in Supabase app_settings table
     const meta = {
       filename: fileName,
       size: file.size,
       mimeType: file.type || "application/pdf",
       uploadedAt: new Date().toISOString(),
       uploadedBy: session.sub,
-      url: "/resume.pdf",
+      publicUrl: publicUrl || null,
+      base64Data, // Guarantees 100% download reliability in Vercel Serverless
     };
 
-    try {
-      await supabaseAdmin()
-        .from("app_settings")
-        .upsert({
-          key: "site:resume",
-          data: meta,
-          updated_at: new Date().toISOString(),
-        });
-      await logActivity(session.sub!, "upload", "resume", "site:resume");
-    } catch {}
+    const { error: dbError } = await supabase
+      .from("app_settings")
+      .upsert({
+        key: "site:resume",
+        data: meta,
+        updated_at: new Date().toISOString(),
+      });
+
+    if (dbError) {
+      console.error("Supabase app_settings upsert error:", dbError);
+      throw new Error(dbError.message || "Failed to save resume in Supabase database.");
+    }
+
+    await logActivity(session.sub!, "upload", "resume", "site:resume");
 
     return NextResponse.json({
       ok: true,
-      message: "Resume uploaded successfully!",
-      resume: meta,
+      message: "Resume uploaded successfully to Supabase!",
+      resume: {
+        filename: meta.filename,
+        size: meta.size,
+        uploadedAt: meta.uploadedAt,
+      },
     });
   } catch (error) {
     if (isUnauthorizedError(error)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     console.error("Resume upload error:", error);
-    return NextResponse.json({ error: "Failed to upload resume." }, { status: 500 });
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Failed to upload resume to Supabase." },
+      { status: 500 }
+    );
   }
 }
 
 export async function DELETE() {
   try {
     const session = await requireAdmin();
-    const resumePath = path.join(process.cwd(), "public", "resume.pdf");
-    if (fs.existsSync(resumePath)) {
-      fs.unlinkSync(resumePath);
-    }
+    const supabase = supabaseAdmin();
 
-    try {
-      await supabaseAdmin()
-        .from("app_settings")
-        .delete()
-        .eq("key", "site:resume");
-      await logActivity(session.sub!, "delete", "resume", "site:resume");
-    } catch {}
+    await supabase
+      .from("app_settings")
+      .delete()
+      .eq("key", "site:resume");
+
+    await logActivity(session.sub!, "delete", "resume", "site:resume");
 
     return NextResponse.json({ ok: true, message: "Resume removed." });
   } catch (error) {
