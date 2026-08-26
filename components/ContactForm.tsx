@@ -55,11 +55,11 @@ function PortfolioSelect({
 
   return (
     <div
-      className={`portfolio-select ${open ? "is-open" : ""} ${invalid ? "is-invalid" : ""}`}
+      className={`relative w-full select-none ${open ? "z-40" : "z-10"}`}
       ref={root}
     >
       <select
-        className="portfolio-select-native"
+        className="sr-only opacity-0 pointer-events-none absolute"
         name={name}
         value={value}
         onChange={(event) => {
@@ -82,10 +82,17 @@ function PortfolioSelect({
           </option>
         ))}
       </select>
+
       <button
         ref={trigger}
         type="button"
-        className="portfolio-select-trigger"
+        className={`w-full min-h-[46px] h-[46px] px-3.5 py-2.5 rounded bg-[#0b100b] hover:bg-[#111711] border ${
+          open
+            ? "border-[#c8ff3d] shadow-[0_0_15px_rgba(200,255,61,0.18)] ring-1 ring-[#c8ff3d]/40"
+            : invalid
+            ? "border-rose-500/60 shadow-[0_0_10px_rgba(244,63,94,0.15)]"
+            : "border-white/[0.14] hover:border-[#c8ff3d]/40"
+        } flex items-center justify-between text-left transition-all duration-150 cursor-pointer group`}
         aria-haspopup="listbox"
         aria-expanded={open}
         onClick={() => setOpen((current) => !current)}
@@ -97,24 +104,81 @@ function PortfolioSelect({
           if (event.key === "Escape") setOpen(false);
         }}
       >
-        <span className={value ? "has-value" : ""}>{value || placeholder}</span>
-        <ChevronDown size={15} />
+        <div className="flex items-center gap-2.5 truncate">
+          <span
+            className={`size-2 rounded-full transition-all duration-200 ${
+              value
+                ? "bg-[#c8ff3d] shadow-[0_0_8px_#c8ff3d]"
+                : "bg-white/20 group-hover:bg-[#c8ff3d]/60"
+            }`}
+          />
+          <span
+            className={`text-xs font-mono font-medium truncate ${
+              value ? "text-white font-bold" : "text-[#798575]"
+            }`}
+          >
+            {value || placeholder}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-2 pl-2 shrink-0">
+          {value && (
+            <span className="text-[9.5px] font-mono font-bold uppercase tracking-widest text-[#c8ff3d] bg-[#142214] px-1.5 py-0.5 rounded border border-[#c8ff3d]/30 hidden sm:inline-block">
+              SET
+            </span>
+          )}
+          <ChevronDown
+            size={14}
+            className={`text-[#838e7f] group-hover:text-white transition-transform duration-200 ${
+              open ? "rotate-180 text-[#c8ff3d] group-hover:text-[#c8ff3d]" : ""
+            }`}
+          />
+        </div>
       </button>
+
       {open && (
-        <div className="portfolio-select-menu" role="listbox" aria-label={placeholder}>
-          {options.map((option, index) => (
-            <button
-              type="button"
-              role="option"
-              aria-selected={value === option}
-              onClick={() => choose(option)}
-              key={option}
-            >
-              <span>{String(index + 1).padStart(2, "0")}</span>
-              <strong>{option}</strong>
-              {value === option && <PixelCheck size={14} />}
-            </button>
-          ))}
+        <div
+          className="absolute left-0 right-0 top-full mt-1.5 bg-[#090e09]/95 backdrop-blur-2xl border border-[#c8ff3d]/40 rounded shadow-[0_16px_48px_rgba(0,0,0,0.85)] p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150 space-y-1"
+          role="listbox"
+          aria-label={placeholder}
+        >
+          <div className="px-2.5 py-1 text-[9px] font-mono font-bold uppercase tracking-widest text-[#838e7f] border-b border-white/[0.06] mb-1 flex items-center justify-between">
+            <span>{placeholder}</span>
+            <span className="text-[#c8ff3d]">{options.length} OPTIONS</span>
+          </div>
+
+          <div className="max-h-60 overflow-y-auto scrollbar-none space-y-1">
+            {options.map((option, index) => (
+              <button
+                type="button"
+                role="option"
+                aria-selected={value === option}
+                onClick={() => choose(option)}
+                key={option}
+                className={`w-full flex items-center justify-between px-3 py-2 rounded text-xs font-mono transition-all text-left cursor-pointer group ${
+                  value === option
+                    ? "bg-[#142414] text-[#c8ff3d] font-bold border border-[#c8ff3d]/40 shadow-[0_0_12px_rgba(200,255,61,0.12)]"
+                    : "text-[#a4ada0] hover:text-white hover:bg-white/[0.06] hover:translate-x-0.5"
+                }`}
+              >
+                <div className="flex items-center gap-2.5 truncate">
+                  <span
+                    className={`text-[10px] font-bold font-mono transition-colors ${
+                      value === option
+                        ? "text-[#c8ff3d]"
+                        : "text-[#5f685c] group-hover:text-[#c8ff3d]"
+                    }`}
+                  >
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <span className="truncate">{option}</span>
+                </div>
+                {value === option && (
+                  <PixelCheck size={14} className="text-[#c8ff3d] shrink-0 ml-2" />
+                )}
+              </button>
+            ))}
+          </div>
         </div>
       )}
     </div>
@@ -254,17 +318,36 @@ export function ContactForm() {
     <form onSubmit={submit} className="glass card contact-form-grid">
       <label className="label">
         <span>Name</span>
-        <input className="input" name="name" minLength={2} maxLength={100} required />
+        <input
+          className="input min-h-[46px] h-[46px] px-3.5 py-2.5 rounded bg-[#0b100b] border border-white/[0.14] hover:border-white/25 focus:border-[#c8ff3d] focus:ring-1 focus:ring-[#c8ff3d]/30 text-white text-xs font-mono transition"
+          name="name"
+          minLength={2}
+          maxLength={100}
+          required
+          placeholder="e.g. Alex Vance"
+        />
       </label>
       <label className="label">
         <span>Work email</span>
-        <input className="input" type="email" name="email" maxLength={200} required />
+        <input
+          className="input min-h-[46px] h-[46px] px-3.5 py-2.5 rounded bg-[#0b100b] border border-white/[0.14] hover:border-white/25 focus:border-[#c8ff3d] focus:ring-1 focus:ring-[#c8ff3d]/30 text-white text-xs font-mono transition"
+          type="email"
+          name="email"
+          maxLength={200}
+          required
+          placeholder="alex@company.com"
+        />
       </label>
       <label className="label">
         <span>
           Company <i>(optional)</i>
         </span>
-        <input className="input" name="company" maxLength={150} />
+        <input
+          className="input min-h-[46px] h-[46px] px-3.5 py-2.5 rounded bg-[#0b100b] border border-white/[0.14] hover:border-white/25 focus:border-[#c8ff3d] focus:ring-1 focus:ring-[#c8ff3d]/30 text-white text-xs font-mono transition"
+          name="company"
+          maxLength={150}
+          placeholder="Acme Corp"
+        />
       </label>
       <div className="label">
         <span>Project type</span>
@@ -321,11 +404,12 @@ export function ContactForm() {
       <label className="label contact-form-wide">
         <span>What should the system solve?</span>
         <textarea
-          className="input min-h-32 resize-y"
+          className="input min-h-32 resize-y p-3.5 rounded bg-[#0b100b] border border-white/[0.14] hover:border-white/25 focus:border-[#c8ff3d] focus:ring-1 focus:ring-[#c8ff3d]/30 text-white text-xs font-mono transition leading-relaxed"
           name="message"
           minLength={20}
           maxLength={5000}
           required
+          placeholder="Describe your current bottleneck, tools to connect, or project goals..."
         />
       </label>
       <input className="hidden" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" />
