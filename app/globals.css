@@ -4744,10 +4744,12 @@ select {
     text-align: center
 }
 
-.admin-input {
+.admin-input,
+.admin-select {
     width: 100%;
     min-height: 43px;
-    padding: 11px 12px;
+    height: 43px;
+    padding: 10px 12px;
     border: 1px solid #34362f;
     border-radius: var(--ui-radius);
     outline: 0;
@@ -4755,14 +4757,17 @@ select {
     color: var(--admin-text);
     font-size: 11px;
     line-height: 1.5;
-    transition: border-color .16s, background .16s
+    transition: border-color .16s, background .16s;
+    box-sizing: border-box;
 }
 
-.admin-input:hover {
+.admin-input:hover,
+.admin-select:hover {
     border-color: #494c42
 }
 
-.admin-input:focus {
+.admin-input:focus,
+.admin-select:focus {
     border-color: var(--admin-accent);
     background: #0e0f0c;
     box-shadow: 0 0 0 1px var(--admin-accent)

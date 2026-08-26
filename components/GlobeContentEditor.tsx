@@ -140,12 +140,12 @@ function CustomCitySelect({
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between bg-[#0e140e] hover:bg-[#131a13] border border-white/[0.12] hover:border-[#c8ff3d44] focus:border-[#c8ff3d] rounded px-3 py-2 text-left text-xs font-mono transition cursor-pointer"
+        className="w-full min-h-[43px] h-[43px] flex items-center justify-between bg-[#0b0c0a] hover:bg-[#0e0f0c] border border-[#34362f] hover:border-[#494c42] focus:border-[#c8ff3d] focus:ring-1 focus:ring-[#c8ff3d]/30 rounded px-3 py-2.5 text-left text-xs font-mono transition cursor-pointer"
       >
-        <span className={selectedCity ? "text-white font-bold truncate" : "text-[#5f685c] truncate"}>
+        <span className={selectedCity ? "text-white font-medium truncate" : "text-[#5f685c] truncate"}>
           {selectedCity ? `${selectedCity.name}, ${selectedCity.country} (${selectedCity.code})` : placeholder}
         </span>
-        <ChevronDown size={13} className={`text-[#838e7f] flex-shrink-0 ml-1.5 transition-transform ${open ? "rotate-180 text-[#c8ff3d]" : ""}`} />
+        <ChevronDown size={14} className={`text-[#838e7f] flex-shrink-0 ml-1.5 transition-transform ${open ? "rotate-180 text-[#c8ff3d]" : ""}`} />
       </button>
 
       {open && (
@@ -411,7 +411,7 @@ export function GlobeContentEditor() {
                       </button>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 items-end">
                       {/* City Dropdown - Automatically sets Lat/Lon */}
                       <div className="admin-field text-xs">
                         <span>Select City (Autosets Coordinates)</span>
@@ -427,7 +427,7 @@ export function GlobeContentEditor() {
                         <span>Subtitle / Project Name</span>
                         <input
                           type="text"
-                          className="admin-input text-xs py-2"
+                          className="admin-input text-xs font-mono h-[43px] min-h-[43px]"
                           value={marker.sub || ""}
                           placeholder="e.g. Gazi AI Engine, Lead Pipeline"
                           onChange={(e) => updateMarker(index, { sub: e.target.value })}
@@ -439,7 +439,7 @@ export function GlobeContentEditor() {
                         <span>Custom Badge Label (Optional Override)</span>
                         <input
                           type="text"
-                          className="admin-input text-xs py-1.5 font-mono"
+                          className="admin-input text-xs font-mono h-[43px] min-h-[43px]"
                           value={marker.name}
                           placeholder="e.g. DUBAI, NYC"
                           onChange={(e) => updateMarker(index, { name: e.target.value.toUpperCase() })}
@@ -499,7 +499,7 @@ export function GlobeContentEditor() {
                     </div>
 
                     <div className="space-y-3">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 items-end">
                         {/* From City Dropdown */}
                         <div className="admin-field text-xs">
                           <span>From Origin City</span>
@@ -526,7 +526,7 @@ export function GlobeContentEditor() {
                         <span>Route Tag Label</span>
                         <input
                           type="text"
-                          className="admin-input text-xs py-1.5 font-mono"
+                          className="admin-input text-xs font-mono h-[43px] min-h-[43px]"
                           value={arc.label}
                           placeholder="e.g. NYC → LONDON"
                           onChange={(e) => updateArc(index, { label: e.target.value })}
