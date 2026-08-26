@@ -15,6 +15,8 @@ interface PixelCardProps {
   type?: "button" | "submit" | "reset";
   target?: string;
   rel?: string;
+  download?: string;
+  "aria-label"?: string;
   onClick?: () => void;
   style?: React.CSSProperties;
 }
@@ -76,6 +78,8 @@ export function PixelCard({
   type,
   target,
   rel,
+  download,
+  "aria-label": ariaLabel,
   onClick,
   style,
 }: PixelCardProps) {
@@ -369,7 +373,7 @@ export function PixelCard({
 
   if (as === "a") {
     return (
-      <a {...commonProps} href={href} target={target} rel={rel}>
+      <a {...commonProps} href={href} target={target} rel={rel} download={download} aria-label={ariaLabel}>
         {children}
         {canvasOverlay}
       </a>

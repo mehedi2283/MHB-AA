@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { ArrowUpRight, Globe as GlobeIcon, LoaderCircle, Save } from "lucide-react";
 import Link from "next/link";
 import { SkeletonSiteEditor } from "./SkeletonLoader";
+import { ResumeUploader } from "./ResumeUploader";
 import type { SiteContent } from "@/lib/site-content";
 
 type SectionKey = Exclude<keyof SiteContent, "metrics" | "workflowNodes" | "globeMarkers" | "globeArcs">;
@@ -109,6 +110,9 @@ export function SiteContentEditor() {
             Open 3D Globe Editor <ArrowUpRight size={13} />
           </Link>
         </section>
+
+        {/* Dedicated Resume & CV Manager */}
+        <ResumeUploader />
 
         {(Object.keys(labels) as SectionKey[]).map((section, index) => (
           <section className="admin-panel admin-editor-section" key={section}>

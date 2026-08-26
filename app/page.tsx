@@ -6,7 +6,7 @@ import {
   PixelShield,
   PixelSparkles,
 } from "@/components/PixelIcons";
-import { CircleDot, Play, ArrowUp } from "lucide-react";
+import { CircleDot, Play, ArrowUp, ArrowDownToLine } from "lucide-react";
 import { Navigation } from "@/components/Navigation";
 import { AutomationCore } from "@/components/AutomationCore";
 import { AutomationCommand } from "@/components/AutomationCommand";
@@ -57,6 +57,18 @@ export default async function Home() {
               <PixelCard as="a" href="#playground" variant="glass" gridSize={6} className="os-action-ghost inline-flex items-center gap-2">
                 <Play size={13} className="fill-current text-[#c8ff3d]" /> {content.hero.secondaryCta}
               </PixelCard>
+              <PixelCard
+                as="a"
+                href="/api/resume/download"
+                download="Mehedi_Hasan_Resume.pdf"
+                variant="glass"
+                gridSize={6}
+                className="os-action-ghost inline-flex items-center gap-2 border border-[#c8ff3d]/30 hover:border-[#c8ff3d] hover:text-white transition"
+                aria-label="Download Resume / CV"
+              >
+                <ArrowDownToLine size={13} className="text-[#c8ff3d]" />
+                <span>Resume / CV</span>
+              </PixelCard>
             </div>
             <AutomationCommand />
           </div>
@@ -86,7 +98,18 @@ export default async function Home() {
               <div className="os-card-label">PROFILE.LOG</div>
               <h3>{lines(content.about.profileHeading)}</h3>
               <p>{content.about.profileBody}</p>
-              <div className="os-signature">{content.about.signature}</div>
+              <div className="mt-4 pt-4 border-t border-white/[0.08] flex flex-wrap items-center justify-between gap-3">
+                <div className="os-signature">{content.about.signature}</div>
+                <a
+                  href="/api/resume/download"
+                  download="Mehedi_Hasan_Resume.pdf"
+                  className="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-[#c8ff3d] hover:text-[#d8ff60] transition px-2.5 py-1 rounded bg-[#141f12] border border-[#c8ff3d]/30 hover:border-[#c8ff3d]"
+                  aria-label="Download Full CV (PDF)"
+                >
+                  <ArrowDownToLine size={13} />
+                  <span>Download Full CV (PDF)</span>
+                </a>
+              </div>
             </PixelCard>
             <PixelCard as="article" variant="glass" gridSize={9} className="os-profile-card">
               <div className="os-card-label">I THINK IN</div>
