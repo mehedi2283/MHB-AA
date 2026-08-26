@@ -21,7 +21,7 @@ import {
   Webhook,
 } from "lucide-react";
 import { PixelCalendar, PixelCheck } from "./PixelIcons";
-import { PixelLoader } from "./PixelLoader";
+import { SkeletonSettingsForm } from "./SkeletonLoader";
 
 type GoogleStatus = {
   connected: boolean;
@@ -130,7 +130,7 @@ export function IntegrationsSettingsForm() {
   }
 
   if (loading) {
-    return <PixelLoader label="VERIFYING GOOGLE ACCOUNT INTEGRATION STATUS..." />;
+    return <SkeletonSettingsForm />;
   }
 
   return (

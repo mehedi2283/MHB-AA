@@ -37,6 +37,7 @@ import {
   Check,
   Save,
   Globe,
+  LoaderCircle,
 } from "lucide-react";
 import { PixelLoader } from "./PixelLoader";
 
@@ -1348,7 +1349,10 @@ export function ClientHubManager() {
                         className="w-full h-full min-h-[42px] px-4 py-2.5 bg-[#141e14] hover:bg-[#1a281a] border border-[#c8ff3d44] hover:border-[#c8ff3d] text-[#c8ff3d] rounded text-xs font-mono font-bold transition flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_15px_rgba(200,255,61,0.08)]"
                       >
                         {uploadingImage ? (
-                          <PixelLoader label="UPLOADING..." />
+                          <>
+                            <LoaderCircle size={14} className="animate-spin" />
+                            <span>Uploading...</span>
+                          </>
                         ) : (
                           <>
                             <Upload size={14} />
@@ -1446,7 +1450,10 @@ export function ClientHubManager() {
                     className="px-5 py-2 rounded text-xs font-mono font-bold bg-[#c8ff3d] hover:bg-[#d8ff60] text-black transition flex items-center gap-2 shadow-[0_0_20px_rgba(200,255,61,0.25)] cursor-pointer disabled:opacity-50"
                   >
                     {isSavingClient ? (
-                      <PixelLoader label="SAVING..." />
+                      <>
+                        <LoaderCircle size={14} className="animate-spin" />
+                        <span>Saving to Database...</span>
+                      </>
                     ) : (
                       <>
                         <CheckCircle2 size={14} />
@@ -1633,7 +1640,10 @@ export function ClientHubManager() {
                   className="px-5 py-2 rounded text-xs font-mono font-bold bg-[#c8ff3d] hover:bg-[#d8ff60] text-black transition flex items-center gap-2 shadow-[0_0_20px_rgba(200,255,61,0.25)] cursor-pointer disabled:opacity-50"
                 >
                   {isSendingOutreach ? (
-                    <PixelLoader label="DISPATCHING EMAIL..." />
+                    <>
+                      <LoaderCircle size={14} className="animate-spin" />
+                      <span>Dispatching Email...</span>
+                    </>
                   ) : (
                     <>
                       <Send size={13} />

@@ -4,7 +4,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { Globe as GlobeIcon, LoaderCircle, Plus, Save, Trash2, MapPin, Navigation, ChevronDown, Search } from "lucide-react";
 import type { GlobeMarker, GlobeArc, SiteContent } from "@/lib/site-content";
 import { Globe } from "@/components/magicui/globe";
-import { PixelLoader } from "./PixelLoader";
+import { SkeletonGlobeEditor } from "./SkeletonLoader";
 
 export interface CityPreset {
   name: string;
@@ -341,11 +341,7 @@ export function GlobeContentEditor() {
   }
 
   if (!content || (busy && !content)) {
-    return (
-      <div className="admin-page admin-page-wide py-20 flex justify-center items-center">
-        <PixelLoader label="INITIALIZING 3D GLOBE & CLIENT TELEMETRY..." />
-      </div>
-    );
+    return <SkeletonGlobeEditor />;
   }
 
   return (

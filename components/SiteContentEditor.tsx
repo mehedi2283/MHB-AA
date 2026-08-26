@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { ArrowUpRight, Globe as GlobeIcon, LoaderCircle, Save } from "lucide-react";
 import Link from "next/link";
-import { PixelLoader } from "./PixelLoader";
+import { SkeletonSiteEditor } from "./SkeletonLoader";
 import type { SiteContent } from "@/lib/site-content";
 
 type SectionKey = Exclude<keyof SiteContent, "metrics" | "workflowNodes" | "globeMarkers" | "globeArcs">;
@@ -71,11 +71,7 @@ export function SiteContentEditor() {
   }
 
   if (!content || (busy && !content)) {
-    return (
-      <div className="admin-page admin-page-wide py-20 flex justify-center items-center">
-        <PixelLoader label="RETRIEVING WEBSITE SECTIONS & CONTENT..." />
-      </div>
-    );
+    return <SkeletonSiteEditor />;
   }
 
   return (

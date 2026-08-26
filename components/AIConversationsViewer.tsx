@@ -16,7 +16,7 @@ import {
   X,
 } from "lucide-react";
 import { PixelBot, PixelChat, PixelCheck } from "./PixelIcons";
-import { PixelLoader } from "./PixelLoader";
+import { SkeletonTable } from "./SkeletonLoader";
 
 type ChatMessage = {
   role: "user" | "assistant";
@@ -157,7 +157,9 @@ export function AIConversationsViewer() {
       {/* Main Table */}
       <div className="border border-[#ffffff18] bg-[#0d110d] rounded overflow-hidden">
         {loading ? (
-          <PixelLoader label="RETRIEVING AI CONVERSATIONS FROM SUPABASE..." />
+          <div className="p-4">
+            <SkeletonTable rows={6} />
+          </div>
         ) : error ? (
           <div className="p-8 text-center text-rose-400 text-xs font-mono">{error}</div>
         ) : filtered.length === 0 ? (
