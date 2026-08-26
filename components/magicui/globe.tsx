@@ -98,20 +98,20 @@ export function Globe({
   const activeMarkers = markers && markers.length > 0 ? markers : DEFAULT_GLOBE_MARKERS;
   const activeArcs = arcs && arcs.length > 0 ? arcs : DEFAULT_GLOBE_ARCS;
 
-  // Framer Motion Spring Physics Engine for buttery-smooth horizontal & vertical damping
+  // Ultra smooth spring physics engine
   const phiTarget = useMotionValue(0);
   const springPhi = useSpring(phiTarget, {
     mass: 0.8,
-    stiffness: 140,
-    damping: 24,
+    stiffness: 130,
+    damping: 25,
     restDelta: 0.0001,
   });
 
   const thetaTarget = useMotionValue(0.24);
   const springTheta = useSpring(thetaTarget, {
     mass: 0.8,
-    stiffness: 140,
-    damping: 24,
+    stiffness: 130,
+    damping: 25,
     restDelta: 0.0001,
   });
 
@@ -125,15 +125,22 @@ export function Globe({
 
     function handleResize() {
       if (!canvas) return;
-      widthRef.current = canvas.offsetWidth;
+      const width = canvas.offsetWidth;
+      if (width && width !== widthRef.current) {
+        widthRef.current = width;
+        globe?.update({
+          width: width * 2,
+          height: width * 2,
+        });
+      }
     }
 
-    handleResize();
+    widthRef.current = canvas.offsetWidth || 460;
+    const initialWidth = widthRef.current * 2;
+
     window.addEventListener("resize", handleResize);
 
-    const initialWidth = (widthRef.current || 460) * 2;
-
-    // Single unified acid-green palette matching reference
+    // Acid green palette
     const ACID_COLOR: [number, number, number] = [0.78, 1.0, 0.24];
 
     globe = createGlobe(canvas, {
@@ -144,9 +151,8 @@ export function Globe({
       theta: 0.24,
       dark: 1,
       diffuse: 1.3,
-      mapSamples: 16000,
+      mapSamples: 14000,
       mapBrightness: 6,
-      // Unified sleek dark matrix
       baseColor: [0.15, 0.24, 0.13],
       markerColor: ACID_COLOR,
       glowColor: [0.18, 0.32, 0.1],
@@ -171,26 +177,24 @@ export function Globe({
     });
     observer.observe(canvas);
 
-    // High-performance 60 FPS animation loop driven by 2-axis Spring Physics
+    // High-performance 60 FPS animation loop
     function animate() {
       if (isVisibleOnScreen) {
         if (pointerInteracting.current === null) {
-          // Continuous silky-smooth auto rotation
-          phiTarget.set(phiTarget.get() + 0.0035);
+          // Continuous smooth auto-rotation
+          phiTarget.set(phiTarget.get() + 0.0032);
         }
 
         const currentPhi = springPhi.get();
         const currentTheta = springTheta.get();
-        const currentWidth = (widthRef.current || 460) * 2;
 
+        // Pass only orientation updates during 60fps loop (avoids texture re-allocations)
         globe?.update({
           phi: currentPhi,
           theta: currentTheta,
-          width: currentWidth,
-          height: currentWidth,
         });
 
-        // 60 FPS Direct DOM transforms for Markers (tracking both phi and theta)
+        // 60 FPS Direct GPU DOM transforms for Markers
         for (const marker of activeMarkers) {
           const el = markerDomMap.current.get(marker.id);
           if (el) {
@@ -203,7 +207,7 @@ export function Globe({
           }
         }
 
-        // 60 FPS Direct DOM transforms for Arcs (tracking both phi and theta)
+        // 60 FPS Direct GPU DOM transforms for Arcs
         for (const arc of activeArcs) {
           const el = arcDomMap.current.get(arc.id);
           if (el) {
@@ -236,7 +240,8 @@ export function Globe({
   return (
     <div
       ref={containerRef}
-      className={`relative aspect-square w-full max-w-[560px] mx-auto select-none flex items-center justify-center ${className}`}
+      className={`relative aspect-square w-full max-w-[520px] mx-auto select-none flex items-center justify-center transform-gpu will-change-transform ${className}`}
+      style={{ contain: "layout paint" }}
     >
       {/* Precision ambient background glow */}
       <div
@@ -254,7 +259,8 @@ export function Globe({
       {/* WebGL Canvas with 2-axis (X and Y) spring drag controls */}
       <canvas
         ref={canvasRef}
-        className="w-full h-full cursor-grab active:cursor-grabbing opacity-95 transition-opacity duration-300 z-10 touch-none"
+        className="w-full h-full cursor-grab active:cursor-grabbing opacity-95 transition-opacity duration-300 z-10 touch-none transform-gpu will-change-transform"
+        style={{ backfaceVisibility: "hidden", transform: "translateZ(0)" }}
         onPointerDown={(e) => {
           pointerInteracting.current = { x: e.clientX, y: e.clientY };
           (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
@@ -294,8 +300,8 @@ export function Globe({
               if (el) arcDomMap.current.set(route.id, el);
               else arcDomMap.current.delete(route.id);
             }}
-            className="absolute will-change-transform opacity-0 pointer-events-none"
-            style={{ left: "50%", top: "50%" }}
+            className="absolute will-change-transform opacity-0 pointer-events-none transform-gpu"
+            style={{ left: "50%", top: "50%", transform: "translateZ(0)" }}
           >
             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#0d120d]/90 border border-[#c8ff3d]/60 shadow-[0_0_15px_rgba(200,255,61,0.25)] text-[10px] font-mono font-bold text-[#c8ff3d] tracking-wider whitespace-nowrap backdrop-blur-md">
               <span className="size-1.5 rounded-full bg-[#c8ff3d] animate-ping" />
@@ -314,8 +320,8 @@ export function Globe({
               if (el) markerDomMap.current.set(city.id, el);
               else markerDomMap.current.delete(city.id);
             }}
-            className="absolute will-change-transform opacity-0 pointer-events-auto group cursor-pointer"
-            style={{ left: "50%", top: "50%" }}
+            className="absolute will-change-transform opacity-0 pointer-events-auto group cursor-pointer transform-gpu"
+            style={{ left: "50%", top: "50%", transform: "translateZ(0)" }}
           >
             {/* Badge container with pinpoint needle */}
             <div className="flex flex-col items-center">

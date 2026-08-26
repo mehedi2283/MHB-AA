@@ -11,9 +11,9 @@ export function AutomationCore({
   arcs?: GlobeArc[];
 }) {
   return (
-    <div className="automation-core-stage flex items-center justify-center relative min-h-[460px] lg:min-h-[540px]">
-      <div className="relative w-full max-w-[540px] aspect-square flex items-center justify-center">
-        <Globe className="scale-110" markers={markers} arcs={arcs} />
+    <div className="automation-core-stage flex items-center justify-center relative min-h-[440px] lg:min-h-[500px]">
+      <div className="relative w-full max-w-[460px] lg:max-w-[500px] aspect-square flex items-center justify-center transform-gpu will-change-transform">
+        <Globe markers={markers} arcs={arcs} />
       </div>
     </div>
   );
