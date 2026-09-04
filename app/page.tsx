@@ -19,6 +19,12 @@ import { MarqueeStrip } from "@/components/MarqueeStrip";
 import { AIAssistant } from "@/components/AIAssistant";
 import { BackToTop } from "@/components/BackToTop";
 import { PixelCard } from "@/components/PixelCard";
+import { TelemetryHUD } from "@/components/TelemetryHUD";
+import { CommandPalette } from "@/components/CommandPalette";
+import { AgentSandbox } from "@/components/AgentSandbox";
+import { BeforeAfterComparison } from "@/components/BeforeAfterComparison";
+import { RoiCalculator } from "@/components/RoiCalculator";
+import { BlueprintGenerator } from "@/components/BlueprintGenerator";
 import { getPublicCollections, getSiteContent } from "@/lib/site-content";
 
 const lines = (value: string) =>
@@ -74,14 +80,7 @@ export default async function Home() {
           </div>
           <AutomationCore markers={content.globeMarkers} arcs={content.globeArcs} />
         </div>
-        <div className="shell os-status-strip">
-          <span>{content.hero.location}</span>
-          <span>{content.hero.specialties}</span>
-          <span className="os-status-right">
-            <PixelRadio size={13} />
-            SYSTEMS ONLINE
-          </span>
-        </div>
+        <TelemetryHUD location={content.hero.location} specialties={content.hero.specialties} />
       </section>
 
       <MarqueeStrip />
@@ -157,6 +156,7 @@ export default async function Home() {
             <p>{content.playground.description}</p>
           </div>
           <WorkflowVisualizer workflowNodes={content.workflowNodes} />
+          <AgentSandbox />
         </div>
       </section>
 
@@ -189,6 +189,9 @@ export default async function Home() {
         <p className="shell os-estimate-note">Portfolio indicators · editable estimates where noted in the case studies</p>
       </section>
 
+      <BeforeAfterComparison />
+      <RoiCalculator />
+
       <section id="technology" className="section os-technology">
         <div className="shell">
           <div className="os-section-head os-section-head-row">
@@ -201,6 +204,8 @@ export default async function Home() {
           <TechSignal technologies={technologies} />
         </div>
       </section>
+
+      <BlueprintGenerator />
 
       <section id="process" className="section os-process">
         <div className="shell os-process-layout">
@@ -256,6 +261,7 @@ export default async function Home() {
       </footer>
       <BackToTop />
       <AIAssistant />
+      <CommandPalette />
     </main>
   );
 }

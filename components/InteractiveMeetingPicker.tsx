@@ -218,7 +218,7 @@ export function InteractiveMeetingPicker({
   return (
     <div className="space-y-4">
       {/* Dual Timezone Status Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 bg-[#080c08] border border-[#ffffff15] rounded-md text-[11px] font-mono">
+      <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 bg-[#080c08] border border-[#ffffff15] rounded text-[11px] font-mono">
         <div className="flex items-center gap-1.5 text-[#c8ff3d]">
           <Globe size={13} className="animate-spin-slow" />
           <span className="text-[#a4ada0]">Your Timezone:</span>

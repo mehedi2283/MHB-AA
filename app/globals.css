@@ -225,8 +225,22 @@ select {
     height: 58px;
     overflow: visible;
     background: transparent;
-    border-bottom: 1px solid #ffffff12;
-    backdrop-filter: none
+    border-bottom: 1px solid transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    transition: border-color 0.3s ease, background-color 0.3s ease, backdrop-filter 0.3s ease;
+}
+
+.os-nav.is-scrolled {
+    border-bottom-color: #ffffff12;
+    background: rgba(16, 19, 15, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.os-nav.is-open {
+    border-bottom-color: #ffffff12;
+    background: #10130ff7;
 }
 
 .os-nav-texture {
@@ -239,7 +253,15 @@ select {
     background-position: 0 1px;
     background-repeat: repeat;
     background-size: 2px 2px;
-    image-rendering: pixelated
+    image-rendering: pixelated;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.os-nav.is-scrolled .os-nav-texture,
+.os-nav.is-open .os-nav-texture,
+.case-nav .os-nav-texture {
+    opacity: 1;
 }
 
 .os-nav-texture:after {
@@ -254,11 +276,17 @@ select {
 
 @media(max-width:760px) {
     .os-nav {
-        background: #10130ff7
+        background: transparent;
+    }
+
+    .os-nav.is-scrolled,
+    .os-nav.is-open {
+        background: #10130ff7;
+        border-bottom-color: #ffffff12;
     }
 
     .os-nav-texture {
-        background-color: transparent
+        background-color: transparent;
     }
 }
 
@@ -2307,21 +2335,13 @@ select {
 .ai-message-content {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 10px;
     min-width: 0;
-}
-
-.ai-message p {
-    margin: 0;
     padding: 10px 13px;
     border-radius: var(--ui-radius);
-    font-size: 12px;
-    line-height: 1.55;
-    white-space: pre-line;
-    word-break: break-word;
 }
 
-.ai-message.assistant p {
+.ai-message.assistant .ai-message-content {
     background: #131913;
     color: #d2dbd0;
     border-left: 2px solid #c8ff3d77;
@@ -2332,10 +2352,33 @@ select {
     justify-content: flex-end;
 }
 
-.ai-message.user p {
+.ai-message.user .ai-message-content {
     background: var(--acid);
     color: #0a0d08;
     font-weight: 600;
+}
+
+.ai-message p {
+    margin: 0;
+    padding: 0;
+    font-size: 12px;
+    line-height: 1.55;
+    white-space: pre-line;
+    word-break: break-word;
+    background: transparent !important;
+    border: none !important;
+}
+
+.ai-message.assistant p {
+    background: transparent !important;
+    border: none !important;
+    color: inherit;
+}
+
+.ai-message.user p {
+    background: transparent !important;
+    border: none !important;
+    color: inherit;
 }
 
 .ai-thinking {
@@ -4800,13 +4843,18 @@ select {
 }
 
 .admin-collection-row {
-    min-height: 76px;
-    padding: 0 18px;
+    min-height: 68px;
+    padding: 12px 18px;
     border-bottom: 1px solid var(--admin-line-soft);
     display: grid;
-    grid-template-columns: 40px minmax(0, 1fr) auto;
+    grid-template-columns: auto minmax(0, 1fr) auto;
     align-items: center;
-    gap: 14px
+    gap: 16px;
+    transition: background 0.15s ease;
+}
+
+.admin-collection-row:hover {
+    background: #111711;
 }
 
 .admin-collection-row:last-child {
@@ -4814,33 +4862,33 @@ select {
 }
 
 .admin-row-index {
-    color: var(--admin-faint);
+    color: #5f685c;
     font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
-    font-size: 8px
+    font-size: 11px;
+    font-weight: 700;
 }
 
 .admin-row-main {
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 7px
+    gap: 4px;
 }
 
 .admin-row-main strong {
     overflow: hidden;
-    color: #dcddd6;
-    font-size: 12px;
-    font-weight: 500;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
     text-overflow: ellipsis;
-    white-space: nowrap
+    white-space: nowrap;
+    letter-spacing: -0.01em;
 }
 
 .admin-row-main>span {
-    color: var(--admin-faint);
-    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
-    font-size: 7px;
-    letter-spacing: .08em;
-    text-transform: uppercase
+    color: #a4ada0;
+    font-size: 12px;
+    line-height: 1.5;
 }
 
 .admin-row-main i {
@@ -4858,7 +4906,8 @@ select {
 .admin-row-actions {
     display: flex;
     align-items: center;
-    gap: 5px
+    gap: 8px;
+    justify-content: flex-end;
 }
 
 .admin-empty {
@@ -5371,13 +5420,14 @@ select {
 
     .admin-collection-row {
         padding: 13px;
-        grid-template-columns: 28px minmax(0, 1fr);
-        gap: 8px
+        grid-template-columns: auto minmax(0, 1fr);
+        gap: 12px;
     }
 
     .admin-row-actions {
-        grid-column: 2;
-        justify-content: flex-start
+        grid-column: 1 / -1;
+        justify-content: flex-end;
+        margin-top: 6px;
     }
 
     .admin-action-bar {

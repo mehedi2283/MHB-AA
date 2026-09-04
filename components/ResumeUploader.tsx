@@ -1,5 +1,6 @@
 "use client";
 
+/* eslint-disable react-hooks/set-state-in-effect */
 import React, { useEffect, useState, useRef } from "react";
 import {
   FileText,
@@ -14,6 +15,7 @@ import {
   ArrowDownToLine,
   FileCode,
 } from "lucide-react";
+import { DeleteConfirmModal } from "./DeleteConfirmModal";
 
 interface ResumeStatus {
   exists: boolean;
@@ -29,6 +31,7 @@ export function ResumeUploader() {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const [msg, setMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -52,13 +55,13 @@ export function ResumeUploader() {
   }, []);
 
   async function uploadFile(file: File) {
-    if (!file.name.toLowerCase().endsWith(".pdf") && file.type !== "application/pdf") {
-      setMsg({ type: "error", text: "Please select a valid PDF file (.pdf)." });
+    if (!file.name.toLowerCase().endsWith(".pdf")) {
+      setMsg({ type: "error", text: "Please select a valid PDF document." });
       return;
     }
 
     if (file.size > 15 * 1024 * 1024) {
-      setMsg({ type: "error", text: "File size exceeds 15MB limit." });
+      setMsg({ type: "error", text: "File exceeds 15MB limit." });
       return;
     }
 
@@ -73,10 +76,11 @@ export function ResumeUploader() {
         method: "POST",
         body: formData,
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to upload resume to Supabase.");
 
-      setMsg({ type: "success", text: "Resume uploaded successfully to Supabase! Live auto-download buttons are now active." });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Upload failed.");
+
+      setMsg({ type: "success", text: "Resume uploaded and synchronized to Supabase Storage." });
       await loadStatus();
     } catch (err) {
       setMsg({ type: "error", text: err instanceof Error ? err.message : "Upload failed." });
@@ -99,8 +103,6 @@ export function ResumeUploader() {
   }
 
   async function handleDelete() {
-    if (!confirm("Are you sure you want to remove the current resume file?")) return;
-
     setDeleting(true);
     setMsg(null);
 
@@ -110,6 +112,7 @@ export function ResumeUploader() {
       if (!res.ok) throw new Error(data.error || "Failed to delete resume.");
 
       setMsg({ type: "success", text: "Resume removed from Supabase." });
+      setShowDeleteModal(false);
       await loadStatus();
     } catch (err) {
       setMsg({ type: "error", text: err instanceof Error ? err.message : "Delete failed." });
@@ -227,7 +230,7 @@ export function ResumeUploader() {
 
               <button
                 type="button"
-                onClick={handleDelete}
+                onClick={() => setShowDeleteModal(true)}
                 disabled={deleting}
                 className="px-3 py-1.5 rounded bg-rose-950/20 hover:bg-rose-950/40 text-rose-300 hover:text-rose-200 border border-rose-500/20 hover:border-rose-500/40 text-xs font-mono font-bold transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
               >
@@ -292,6 +295,17 @@ export function ResumeUploader() {
           </button>
         </div>
       </div>
+
+      <DeleteConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => !deleting && setShowDeleteModal(false)}
+        onConfirm={handleDelete}
+        isLoading={deleting}
+        title="Remove Current Resume"
+        itemName={status?.filename || "Current Resume PDF"}
+        description="Are you sure you want to remove the currently active resume file from Supabase Storage? Visitors will no longer be able to download it until you upload a new PDF."
+        confirmText="Remove Resume"
+      />
     </section>
   );
 }

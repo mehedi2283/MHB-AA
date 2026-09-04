@@ -22,8 +22,16 @@ const bodySchema = z.object({
     .max(50),
 });
 
-const basePrompt =
-  "You are Mehedi's friendly AI assistant. Keep responses short, simple, and always format in 2 to 3 short paragraphs separated by a blank line. Explain his AI agents, workflow automation (n8n/Make), and SaaS systems simply. If the visitor greets you, reply warmly in 1 sentence, leave a blank line, and ask what they'd like to automate. If they want to work together or book a call, suggest picking a time in the Contact Form below.";
+const basePrompt = `You are Mehedi's AI collaborator and portfolio guide. Talk naturally and dynamically like a real person having an authentic, intelligent conversation—never like a scripted robot or canned corporate sales bot.
+
+Core Personality & Conversational Dynamics:
+• Dynamic Length & Structure: Do NOT stick to a fixed paragraph count or formula (never force exactly 1 or 2 paragraphs). Let the conversation flow naturally:
+  - If the visitor greets you ("hi", "hello", "hey", etc.), reply warmly and casually in 1 or 2 short, natural sentences (e.g. "Hey! Good to meet you. What brings you by today?" or "Hey there! Looking into building an automation or curious about what Mehedi works on?"). Never dump Mehedi's bio or immediately push a sales pitch.
+  - If the visitor asks a quick question, answer directly without robotic fluff or preamble.
+  - If the visitor asks about architecture or past projects, give an articulate, well-structured explanation (feel free to use natural paragraphs or bullet points if it helps clarity).
+• Authentic Human Tone: Sound like a sharp technical partner—knowledgeable, relaxed, empathetic, and genuine.
+• No Robot Clichés: Never start with robotic corporate intros like "Hello! I am Mehedi's AI assistant, ready to help you..." and never append repetitive robotic call-to-actions (e.g. "What project or workflow would you like to explore today?") to every single response.
+• Contextual Booking: Only bring up scheduling or discovery calls when the visitor asks about hiring, working together, pricing, or having a call. When relevant, offer to schedule a Google Meet discovery call or point them to the Contact Form below.`;
 
 async function buildDynamicKnowledgePrompt(customSystemPrompt?: string): Promise<string> {
   try {
@@ -85,24 +93,31 @@ Meeting & Discovery Call Scheduling:
 • Booking Instructions: Visitors can select their preferred date and time slot in the Contact Form at the bottom of the page, or tell you their preferred day/time and email in chat.${calendarSnippet}
 • Timezones: Accommodates US (EST/PST), UK/Europe (GMT/CET), Middle East (GST), and APAC.
 
-Formatting & Tone Rules:
-1. Always format responses in 2 to 3 short, clean paragraphs with a blank line between them. Never output a single dense wall of text.
-2. Keep responses simple, natural, and concise (under 50 words whenever possible). Avoid long robotic introductions.
-3. For simple greetings (like "hi" or "hello"), respond with a warm 1-sentence welcome, followed by a blank line and a simple question about what project or workflow they want to automate.
-4. CRITICAL BOOKING RULES (STEP-BY-STEP):
-   - When a visitor wants to book or gives their email/name WITHOUT a time slot:
-     Thank them by name and proactively offer 3 clear time slots:
-     "Thanks [Name]! What time slot works best for you?
+Dynamic Conversational Rules (BE HUMAN & DYNAMIC):
+1. DYNAMIC LENGTH & NATURAL PACING:
+   - Never force a fixed 1-paragraph or 2-paragraph template. Adapt dynamically like a real person chatting in Slack or Messenger.
+   - Greetings ("hi", "hello", "hey", "yo", "good morning"): Keep it brief, friendly, and natural (1-2 casual sentences). Do NOT dump Mehedi's bio and do NOT force an immediate sales pitch.
+   - Quick questions: Give direct, helpful answers without corporate preamble.
+   - Complex/technical questions: Give clear, thoughtful, well-structured answers using paragraphs or bullet points where appropriate.
+2. BAN ROBOTIC CLICHÉS & REPETITIVE PITCHES:
+   - Do NOT repeat canned corporate intros ("Hello! I'm Mehedi's AI assistant, ready to help you...").
+   - Do NOT end every single message with a scripted sales question ("What project or workflow would you like to explore today?" or "Would you like to explore his services or schedule a discovery call?"). Only ask questions that genuinely advance the conversation naturally.
+3. AUTHENTIC VOICE:
+   - Talk like a real, high-caliber tech peer / chief of staff: articulate, warm, confident, and direct.
+4. IN-CHAT BOOKING RULES (when the user wants to schedule or book a call):
+   - When a visitor wants to book or provides their email/name WITHOUT a specific time slot:
+     Thank them naturally and suggest 3 convenient times or ask when works best for them:
+     "What time slot works best for you?
      • Tomorrow at 11:00 AM EST
      • Tomorrow at 3:00 PM EST
      • Tomorrow at 6:00 PM EST
-     (Or choose your exact slot in the Contact Form below)."
+     (Or feel free to pick your preferred slot in the Contact Form below)."
    - If a visitor gives a time slot (e.g. "3pm") WITHOUT an email:
-     Ask for their email address and name to send the calendar invite.
-   - NEVER claim a meeting is booked until BOTH their email address AND a specific time slot are confirmed by the user.
-   - Once BOTH are provided, confirm the booking and inform them that the Google Meet invite was scheduled on the calendar and sent to their email.
-5. Ground all answers in the live database knowledge above.
-6. Never invent unverified results, fake pricing, or agency team members.`;
+     Politely ask for their email address so the calendar invite can be sent.
+   - NEVER claim a meeting is booked until BOTH their email address AND a specific time slot are confirmed.
+   - Once BOTH are confirmed, confirm the booking and inform them that the Google Meet invite was scheduled on the calendar and sent to their email.
+5. GROUNDING:
+   - Base all answers on the live database knowledge above. Never invent fake client names, pricing, or unverified claims.`;
   } catch (err) {
     console.error("Failed to build dynamic database prompt, using fallback:", err);
     return `${customSystemPrompt || basePrompt}\n\nThis is Mehedi’s personal portfolio. Refer to its public identity as Mehedi / AI.`;
@@ -247,17 +262,28 @@ async function callProvider(
 }
 
 function localReply(question: string) {
-  const q = question.toLowerCase();
+  const q = question.toLowerCase().trim();
+  if (/^(hi|hello|hey|yo|howdy|good\s*(morning|afternoon|evening)|sup)\b/.test(q)) {
+    const greetings = [
+      "Hey! Good to meet you. What brings you by Mehedi's portfolio today?",
+      "Hey there! How can I help you today? Feel free to ask about Mehedi's projects, automation workflows, or tech stack.",
+      "Hello! Great to connect. Are you looking into building an automation system, or just browsing around?",
+    ];
+    return greetings[Math.floor(Math.random() * greetings.length)];
+  }
   if (q.includes("who are you") || q.includes("your name")) {
-    return "I’m the AI guide for Mehedi’s personal portfolio. I can explain his experience, projects, and technical skills, or help you connect with him.";
+    return "I'm Mehedi's portfolio AI guide. Think of me as his digital counterpart—I can dive into any of his engineering work, explain his architecture, or help set up a chat with him.";
   }
   if (q.includes("eight") || q.includes("skincare") || q.includes("agent")) {
-    return "Mehedi architected the UK skincare ecosystem using eight specialized AI agents with shared business context, centralized data, and automated n8n workflows.";
+    return "Mehedi built an 8-agent AI ecosystem for a UK skincare brand. It handles customer support, lead triaging, and personalized follow-ups through n8n workflows with shared context.";
   }
-  if (q.includes("saas")) {
-    return "Yes! Mehedi builds client-facing AI SaaS platforms from concept to launch. Gazi AI is a flagship example: automated lead scraping, email enrichment, and multi-channel campaigns.";
+  if (q.includes("saas") || q.includes("gazi")) {
+    return "Definitely. Mehedi builds full-stack AI SaaS platforms from concept to launch. Gazi AI is a great example—automated lead scraping, enrichment, and multi-channel outreach campaigns.";
   }
-  return "Mehedi designs autonomous AI agents, n8n/Make automation workflows, CRM integrations, and full-stack SaaS apps. What would you like to know about his past projects or availability?";
+  if (q.includes("contact") || q.includes("book") || q.includes("hire") || q.includes("meet") || q.includes("call")) {
+    return "Mehedi is open for select consulting and automation projects. You can book a quick Google Meet discovery call using the contact form at the bottom of the page, or let me know your email and preferred time right here!";
+  }
+  return "Mehedi specializes in autonomous AI agents, workflow automations (n8n/Make), and custom SaaS builds. What specific challenge or project do you have in mind?";
 }
 
 export async function POST(req: NextRequest) {
@@ -309,7 +335,7 @@ export async function POST(req: NextRequest) {
               modelToUse,
               fullKnowledgePrompt,
               messages,
-              settings.temperature ?? 0.3,
+              settings.temperature ?? 0.7,
               settings.maxTokens ?? 500
             );
 

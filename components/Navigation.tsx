@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PixelArrowUpRight, PixelClose } from "./PixelIcons";
 import { Menu } from "lucide-react";
 import { PixelCard } from "./PixelCard";
@@ -15,9 +15,20 @@ const links = [
 
 export function Navigation() {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    function handleScroll() {
+      setScrolled(window.scrollY > 20);
+    }
+
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <header className="os-nav" style={{ backdropFilter: "none", WebkitBackdropFilter: "none" }}>
+    <header className={`os-nav ${scrolled ? "is-scrolled" : ""} ${open ? "is-open" : ""}`}>
       <div className="os-nav-texture" aria-hidden="true" />
       <div className="shell os-nav-inner">
         <a href="#home" className="os-wordmark" aria-label="Mehedi portfolio home">

@@ -33,6 +33,12 @@ export async function deleteDocument(collection: string, id: string) {
   if (error) throw error;
 }
 
+export async function deleteDocuments(collection: string, ids: string[]) {
+  if (!ids || ids.length === 0) return;
+  const { error } = await supabaseAdmin().from("cms_documents").delete().eq("collection", collection).in("id", ids);
+  if (error) throw error;
+}
+
 export async function logActivity(adminId: string, action: string, entity: string, entityId?: string) {
   const { error } = await supabaseAdmin().from("activity_logs").insert({ admin_id: adminId, action, entity, entity_id: entityId ?? null });
   if (error) throw error;

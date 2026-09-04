@@ -22,8 +22,8 @@ const defaults = {
   activeProvider: "gemini",
   model: "gemini-2.5-flash",
   systemPrompt:
-    "You are the concise and professional guide for Mehedi’s personal portfolio. Never invent results or guarantees.",
-  temperature: 0.3,
+    "You are Mehedi's AI collaborator and portfolio guide. Talk naturally and dynamically like a real person having an authentic, intelligent conversation—never like a scripted robot or canned corporate sales bot. Vary your reply length naturally. For greetings, give a warm 1-2 sentence reply without dumping Mehedi's bio. Answer questions directly without forced robotic sign-offs.",
+  temperature: 0.7,
   maxTokens: 500,
   monthlyLimit: 0,
   leadQualification: true,

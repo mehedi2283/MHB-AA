@@ -39,6 +39,7 @@ import {
   Globe,
   LoaderCircle,
 } from "lucide-react";
+import { DeleteConfirmModal } from "./DeleteConfirmModal";
 import { PixelLoader } from "./PixelLoader";
 
 export type ClientRecord = {
@@ -302,6 +303,8 @@ export function ClientHubManager() {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [notice, setNotice] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [isSavingClient, setIsSavingClient] = useState(false);
+  const [deleteConfirmTarget, setDeleteConfirmTarget] = useState<{ id: string; name: string } | null>(null);
+  const [isDeletingClient, setIsDeletingClient] = useState(false);
 
   // Outreach state
   const [selectedTemplate, setSelectedTemplate] = useState(OUTREACH_TEMPLATES[0].id);
@@ -471,17 +474,24 @@ export function ClientHubManager() {
     }
   }
 
-  async function handleDeleteClient(id: string, name: string) {
-    if (!window.confirm(`Are you sure you want to delete client record "${name}"?`)) return;
-
+  async function confirmDeleteClient() {
+    if (!deleteConfirmTarget) return;
+    setIsDeletingClient(true);
     try {
-      const res = await fetch(`/api/admin/clients/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/admin/clients/${deleteConfirmTarget.id}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Failed to delete client.");
-      setNotice({ type: "success", message: `Client "${name}" removed.` });
+      setNotice({ type: "success", message: `Client "${deleteConfirmTarget.name}" removed.` });
+      setDeleteConfirmTarget(null);
       await loadClients();
     } catch (err: any) {
       setNotice({ type: "error", message: err.message || "Failed to delete client." });
+    } finally {
+      setIsDeletingClient(false);
     }
+  }
+
+  function handleDeleteClient(id: string, name: string) {
+    setDeleteConfirmTarget({ id, name });
   }
 
   async function handleQuickStageChange(client: ClientRecord, newStage: ClientRecord["stage"]) {
@@ -1674,6 +1684,18 @@ export function ClientHubManager() {
           </div>
         </div>
       )}
+
+      {/* DEDICATED DELETE CONFIRMATION MODAL */}
+      <DeleteConfirmModal
+        isOpen={deleteConfirmTarget !== null}
+        onClose={() => !isDeletingClient && setDeleteConfirmTarget(null)}
+        onConfirm={confirmDeleteClient}
+        isLoading={isDeletingClient}
+        title="Delete Client Record"
+        itemName={deleteConfirmTarget?.name}
+        description="Are you sure you want to delete this client record? All associated contact details, project blueprints, and outreach records will be permanently removed."
+        confirmText="Delete Client"
+      />
     </div>
   );
 }

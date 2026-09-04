@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { PixelCalendar, PixelCheck } from "./PixelIcons";
 import { SkeletonSettingsForm } from "./SkeletonLoader";
+import { DeleteConfirmModal } from "./DeleteConfirmModal";
 
 type GoogleStatus = {
   connected: boolean;
@@ -41,6 +42,7 @@ export function IntegrationsSettingsForm() {
   const [googleStatus, setGoogleStatus] = useState<GoogleStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
+  const [showDisconnectModal, setShowDisconnectModal] = useState(false);
   const [showCredsForm, setShowCredsForm] = useState(false);
   const [clientIdInput, setClientIdInput] = useState("");
   const [clientSecretInput, setClientSecretInput] = useState("");
@@ -82,7 +84,6 @@ export function IntegrationsSettingsForm() {
   }, []);
 
   async function handleDisconnect() {
-    if (!confirm("Disconnect your Google account? Automatic Calendar and Gmail sync will be paused.")) return;
     setActionLoading(true);
     try {
       const res = await fetch("/api/auth/google/status", {
@@ -92,6 +93,7 @@ export function IntegrationsSettingsForm() {
       });
       if (res.ok) {
         setMsg({ type: "success", text: "Google account disconnected." });
+        setShowDisconnectModal(false);
         await loadStatus();
       }
     } catch {
@@ -204,7 +206,7 @@ export function IntegrationsSettingsForm() {
           <div className="flex items-center gap-2.5">
             {googleStatus?.connected ? (
               <button
-                onClick={handleDisconnect}
+                onClick={() => setShowDisconnectModal(true)}
                 disabled={actionLoading}
                 className="px-3.5 py-2 rounded text-xs font-mono font-bold bg-rose-950/40 border border-rose-800 text-rose-300 hover:bg-rose-900/60 transition flex items-center gap-1.5 cursor-pointer"
               >
@@ -400,6 +402,17 @@ export function IntegrationsSettingsForm() {
           )}
         </div>
       </div>
+
+      <DeleteConfirmModal
+        isOpen={showDisconnectModal}
+        onClose={() => !actionLoading && setShowDisconnectModal(false)}
+        onConfirm={handleDisconnect}
+        isLoading={actionLoading}
+        title="Disconnect Google Account"
+        itemName={googleStatus?.account?.email || "Google Workspace Account"}
+        description="Are you sure you want to disconnect your Google account? Automatic Google Calendar scheduling, Google Meet room generation, and Gmail sync will be paused until you reconnect."
+        confirmText="Disconnect Account"
+      />
     </div>
   );
 }

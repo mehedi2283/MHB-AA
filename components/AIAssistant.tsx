@@ -171,7 +171,7 @@ export function AIAssistant() {
     {
       role: "assistant",
       content:
-        "Hey there! I'm Mehedi's portfolio AI.\n\nAsk me about his custom AI agents, automated workflows (n8n/Make), or booking a discovery call.",
+        "Hey! Welcome to Mehedi's portfolio. Feel free to ask about his AI agents, automation workflows, or whatever you're curious about!",
     },
   ]);
   const messageEnd = useRef<HTMLDivElement>(null);
@@ -315,9 +315,13 @@ export function AIAssistant() {
               <div className={`ai-message ${message.role}`} key={index}>
                 {message.role === "assistant" && <Sparkles size={14} />}
                 <div className="ai-message-content">
-                  {message.content.split(/\n\n+/).map((paragraph, pIdx) => (
-                    <p key={pIdx}>{paragraph.trim()}</p>
-                  ))}
+                  {message.content
+                    .split(/\n\n+/)
+                    .map((p) => p.trim())
+                    .filter(Boolean)
+                    .map((paragraph, pIdx) => (
+                      <p key={pIdx}>{paragraph}</p>
+                    ))}
                 </div>
               </div>
             ))}
