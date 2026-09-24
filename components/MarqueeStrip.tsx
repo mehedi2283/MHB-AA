@@ -23,7 +23,7 @@ export function MarqueeStrip() {
         <div className="os-marquee-group" aria-hidden="false">
           {CAPABILITIES.map((item, index) => (
             <span key={`a-${index}`} className="os-marquee-item">
-              <span className="os-marquee-dot">✦</span>
+              <span className="os-marquee-dot" aria-hidden="true" />
               <span className="os-marquee-text">{item}</span>
             </span>
           ))}
@@ -33,7 +33,7 @@ export function MarqueeStrip() {
         <div className="os-marquee-group" aria-hidden="true">
           {CAPABILITIES.map((item, index) => (
             <span key={`b-${index}`} className="os-marquee-item">
-              <span className="os-marquee-dot">✦</span>
+              <span className="os-marquee-dot" aria-hidden="true" />
               <span className="os-marquee-text">{item}</span>
             </span>
           ))}

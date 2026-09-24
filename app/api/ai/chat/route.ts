@@ -438,7 +438,7 @@ export async function POST(req: NextRequest) {
               if (googleAcc?.email) {
                 await sendGmailMessage({
                   to: googleAcc.email,
-                  subject: `🚨 In-Chat Discovery Meeting Booked: ${clientName} (${attendeeEmail})`,
+                  subject: `In-Chat Discovery Meeting Booked: ${clientName} (${attendeeEmail})`,
                   bodyHtml: buildAdminNotificationHtml(emailPayload),
                   bodyText: `New discovery call scheduled via AI Chat!\nClient: ${clientName} (${attendeeEmail})\nDate: ${datePart} at ${timeHour}:${timeMin}\nGoogle Meet Link: ${meetUrl || "N/A"}\nhttps://mhb-aa.vercel.app/admin/inquiries`,
                 });
@@ -464,7 +464,7 @@ export async function POST(req: NextRequest) {
               });
 
               if (meetUrl && !message.includes(meetUrl)) {
-                message += `\n\n✓ Discovery call confirmed on Google Calendar for ${datePart} at ${timeHour}:${timeMin}.\n\nGoogle Meet: ${meetUrl}\n\nA confirmation email has also been sent to ${attendeeEmail}!`;
+                message += `\n\nDiscovery call confirmed on Google Calendar for ${datePart} at ${timeHour}:${timeMin}.\n\nGoogle Meet: ${meetUrl}\n\nA confirmation email has also been sent to ${attendeeEmail}.`;
               }
             } else if (!timeMatch && !alreadyBooked) {
               // User shared email but no time slot yet - log lead to CRM

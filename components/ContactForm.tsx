@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, ExternalLink, LoaderCircle, Video } from "lucide-react";
+import { Check, ChevronDown, ExternalLink, LoaderCircle, Video } from "lucide-react";
 import { PixelCalendar, PixelCheck, PixelSend } from "./PixelIcons";
 import { PixelCard } from "./PixelCard";
 import { InteractiveMeetingPicker } from "./InteractiveMeetingPicker";
@@ -262,7 +262,7 @@ export function ContactForm() {
       <div className="glass card min-h-[420px] grid place-items-center text-center p-8">
         <div className="space-y-4 max-w-md">
           <div className="size-14 rounded bg-[#c8ff3d18] border border-[#c8ff3d44] text-[#c8ff3d] grid place-items-center mx-auto text-2xl font-bold">
-            ✓
+            <Check size={22} />
           </div>
           <h3 className="text-2xl font-bold text-white">Your brief is in.</h3>
           <p className="text-sm text-[#a4ada0] leading-relaxed">

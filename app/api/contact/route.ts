@@ -135,7 +135,7 @@ export async function POST(req: NextRequest) {
 
         await sendGmailMessage({
           to: adminDestEmail,
-          subject: `🚨 New Lead & ${submission.meetingRequested ? "Meeting Booked" : "Inquiry"}: ${submission.name} (${submission.budget})`,
+          subject: `New Lead & ${submission.meetingRequested ? "Meeting Booked" : "Inquiry"}: ${submission.name} (${submission.budget})`,
           bodyHtml: buildAdminNotificationHtml(adminEmailData),
           bodyText: `New project inquiry received on your portfolio!\n\nClient Details:\n• Name: ${submission.name}\n• Email: ${submission.email}\n• Company: ${submission.company || "N/A"}\n• Project Type: ${submission.projectType}\n• Budget Range: ${submission.budget}\n• Timeline: ${submission.timeline}\n• Meeting Requested: ${submission.meetingRequested ? "YES" : "No"}\n${submission.meetingDate ? `• Meeting Date: ${submission.meetingDate} at ${submission.meetingTime || "Flexible"}\n` : ""}${meetUrl ? `• Google Meet Link: ${meetUrl}\n` : ""}\nProject Problem / Solution Brief:\n${submission.message}\n\nView and manage in Admin Control Room: /admin/inquiries`,
         });

@@ -40,6 +40,8 @@ import {
   Globe,
   LoaderCircle,
   Pencil,
+  Rocket,
+  ArrowRight,
 } from "lucide-react";
 import { DeleteConfirmModal } from "./DeleteConfirmModal";
 import { PixelLoader } from "./PixelLoader";
@@ -95,7 +97,8 @@ const POPULAR_STACKS = [
 const OUTREACH_TEMPLATES = [
   {
     id: "automation_pitch",
-    name: "⚡ AI Agents & Workflow Automation Pitch",
+    icon: Zap,
+    name: "AI Agents & Workflow Automation Pitch",
     subject: "Automating {{company}}'s workflows & operational bottlenecks",
     body: `<p>Hi {{name}},</p>
 <p>I came across <strong>{{company}}</strong> and wanted to reach out regarding your systems architecture. I specialize in engineering end-to-end automation pipelines and custom AI agents (using <strong>{{techStack}}</strong>) that eliminate repetitive manual operations and scale client workflows seamlessly.</p>
@@ -105,7 +108,8 @@ const OUTREACH_TEMPLATES = [
   },
   {
     id: "ghl_pipeline",
-    name: "🔄 GoHighLevel & CRM Automated Pipeline",
+    icon: RefreshCw,
+    name: "GoHighLevel & CRM Automated Pipeline",
     subject: "Custom GHL + AI Automation Architecture for {{company}}",
     body: `<p>Hi {{name}},</p>
 <p>Hope you're having a productive week.</p>
@@ -115,7 +119,8 @@ const OUTREACH_TEMPLATES = [
   },
   {
     id: "complimentary_audit",
-    name: "🔍 Complimentary Systems & Workflow Audit",
+    icon: Search,
+    name: "Complimentary Systems & Workflow Audit",
     subject: "Complimentary Automation Audit for {{projectName}}",
     body: `<p>Hi {{name}},</p>
 <p>I'm reaching out because I saw what you're building with <strong>{{projectName}}</strong> at <strong>{{company}}</strong>.</p>
@@ -125,7 +130,8 @@ const OUTREACH_TEMPLATES = [
   },
   {
     id: "saas_mvp",
-    name: "🚀 Custom Full-Stack SaaS / AI MVP Build",
+    icon: Rocket,
+    name: "Custom Full-Stack SaaS / AI MVP Build",
     subject: "Accelerating {{projectName}} MVP Architecture",
     body: `<p>Hi {{name}},</p>
 <p>I build production-grade AI applications and SaaS platforms powered by <strong>{{techStack}}</strong>.</p>
@@ -134,7 +140,8 @@ const OUTREACH_TEMPLATES = [
   },
   {
     id: "custom",
-    name: "✍️ Blank / Custom Pitch",
+    icon: Pencil,
+    name: "Blank / Custom Pitch",
     subject: "Regarding {{projectName}} & AI Automation",
     body: `<p>Hi {{name}},</p>
 <p>I'd love to connect regarding <strong>{{company}}</strong> and discuss potential collaboration on <strong>{{projectName}}</strong>.</p>
@@ -486,7 +493,7 @@ export function ClientHubManager() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to send email.");
 
-      setNotice({ type: "success", message: `⚡ Cold outreach successfully sent to ${selectedRecipients.join(", ")}!` });
+      setNotice({ type: "success", message: `Cold outreach successfully sent to ${selectedRecipients.join(", ")}.` });
       setOutreachTarget(null);
       await loadClients();
     } catch (err: any) {
@@ -517,7 +524,7 @@ export function ClientHubManager() {
         const data = await res.json().catch(() => ({}));
         throw new Error(data.error || "Failed to save client.");
       }
-      setNotice({ type: "success", message: isNew ? "✓ New client created successfully!" : "✓ Client record updated successfully!" });
+      setNotice({ type: "success", message: isNew ? "New client created successfully." : "Client record updated successfully." });
       setEditingClient(null);
       await loadClients();
     } catch (err: any) {
@@ -1404,7 +1411,7 @@ export function ClientHubManager() {
                             }`}
                           >
                             <span className={`text-[10px] ${active ? "text-[#c8ff3d]" : "text-[#556052]"}`}>
-                              {active ? "✓" : "+"}
+                              {active ? <Check size={10} /> : <Plus size={10} />}
                             </span>
                             <span>{tech}</span>
                           </button>
@@ -1606,7 +1613,9 @@ export function ClientHubManager() {
                   Select Proven Cold Pitch Template
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {OUTREACH_TEMPLATES.map(tmpl => (
+                  {OUTREACH_TEMPLATES.map(tmpl => {
+                    const TemplateIcon = tmpl.icon;
+                    return (
                     <button
                       type="button"
                       key={tmpl.id}
@@ -1617,12 +1626,16 @@ export function ClientHubManager() {
                           : "bg-[#0f140f] border-white/[0.08] text-[#838e7f] hover:text-white hover:border-white/20"
                       }`}
                     >
-                      <div className="text-xs font-bold text-white flex items-center justify-between">
-                        <span>{tmpl.name}</span>
+                      <div className="text-xs font-bold text-white flex items-center justify-between gap-2">
+                        <span className="flex items-center gap-2">
+                          <TemplateIcon size={13} className="text-[#c8ff3d] shrink-0" />
+                          <span>{tmpl.name}</span>
+                        </span>
                         {selectedTemplate === tmpl.id && <Check size={13} className="text-[#c8ff3d]" />}
                       </div>
                     </button>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 
@@ -1730,7 +1743,7 @@ export function ClientHubManager() {
                       )}
                       <div className="pt-2 text-center">
                         <span className="inline-block bg-[#c8ff3d] text-black font-bold font-mono px-4 py-2 rounded text-xs shadow-[0_0_15px_rgba(200,255,61,0.35)]">
-                          ⚡ SCHEDULE A 15-MIN DISCOVERY CALL →
+                          <Calendar size={13} /> SCHEDULE A 15-MIN DISCOVERY CALL <ArrowRight size={13} />
                         </span>
                       </div>
                     </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight, Clock, Globe, ShieldAlert, Sparkles, Video } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, Clock, Globe, ShieldAlert, Sparkles, Video, Zap } from "lucide-react";
 import { PixelCalendar, PixelCheck } from "./PixelIcons";
 
 const MONTH_NAMES = [
@@ -378,7 +378,7 @@ export function InteractiveMeetingPicker({
                       isSelected ? "text-[#203310] font-semibold" : "text-[#717b6d]"
                     }`}
                   >
-                    ⚡ {hostEquiv} BST
+                    <span className="inline-flex items-center gap-1"><Zap size={10} /> {hostEquiv} BST</span>
                   </div>
                 </button>
               );
@@ -402,7 +402,7 @@ export function InteractiveMeetingPicker({
       <div className="p-3 bg-[#111910] border border-[#c8ff3d44] rounded flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono shadow-[0_0_15px_rgba(200,255,61,0.08)]">
         <div className="flex items-center gap-2">
           <div className="size-5 rounded bg-[#c8ff3d] text-[#070a07] grid place-items-center font-bold text-[10px]">
-            ✓
+            <Check size={14} />
           </div>
           <div>
             <span className="text-[#a4ada0]">Selected Discovery Call:</span>{" "}

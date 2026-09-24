@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import { Cpu, Check, Copy, ArrowRight, Sparkles, Layers, RefreshCw } from "lucide-react";
+import { Cpu, Check, Copy, ArrowRight, Sparkles, Layers, RefreshCw, Plus } from "lucide-react";
 import { playTacticalClick, playSuccessSound } from "@/lib/tactical-audio";
+import { PixelButton } from "./PixelButton";
 
 type BlueprintGoal = {
   id: string;
@@ -225,7 +226,10 @@ export function BlueprintGenerator() {
                           : "bg-white/[0.03] border-white/[0.08] text-[#838e7f] hover:text-white"
                       }`}
                     >
-                      {active ? `✓ ${tool}` : `+ ${tool}`}
+                      <span className="inline-flex items-center gap-1.5">
+                        {active ? <Check size={11} /> : <Plus size={11} />}
+                        {tool}
+                      </span>
                     </button>
                   );
                 })}
@@ -253,14 +257,14 @@ export function BlueprintGenerator() {
                   <span className="text-[10px] font-mono text-[#c8ff3d] bg-[#c8ff3d]/10 px-2 py-0.5 rounded-[2px] border border-[#c8ff3d]/30">
                     EST. {selectedGoal.timeline}
                   </span>
-                  <button
-                    type="button"
+                  <PixelButton
+                    variant="secondary"
                     onClick={handleCopy}
-                    className="flex items-center gap-1 text-[11px] font-mono text-[#a4ada0] hover:text-white bg-white/[0.04] px-2 py-1 rounded-[2px] border border-white/10 transition cursor-pointer"
+                    className="px-2.5 py-1 text-[11px] normal-case"
                   >
                     {copied ? <Check size={12} className="text-[#c8ff3d]" /> : <Copy size={12} />}
                     <span>{copied ? "Copied!" : "Copy"}</span>
-                  </button>
+                  </PixelButton>
                 </div>
               </div>
 
@@ -299,14 +303,14 @@ export function BlueprintGenerator() {
 
             {/* Request Blueprint CTA */}
             <div className="pt-6 mt-4 border-t border-white/[0.08]">
-              <button
-                type="button"
+              <PixelButton
+                variant="primary"
                 onClick={handleRequest}
-                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded font-mono font-bold text-xs uppercase tracking-wider text-black bg-[#c8ff3d] hover:bg-[#d5ff63] active:bg-[#b0e82c] transition shadow-[0_0_20px_rgba(200,255,61,0.25)] cursor-pointer"
+                className="w-full py-3 text-xs"
               >
                 <span>Request Custom Build of This Architecture</span>
                 <ArrowRight size={14} />
-              </button>
+              </PixelButton>
             </div>
           </div>
         </div>

@@ -295,7 +295,9 @@ export function IntegrationsSettingsForm() {
               <span>
                 Google Cloud OAuth App:{" "}
                 <strong className="text-white">
-                  {googleStatus?.hasClientId ? "Configured ✓" : "Needs Credentials"}
+                  {googleStatus?.hasClientId ? (
+                    <span className="inline-flex items-center gap-1"><CheckCircle2 size={12} /> Configured</span>
+                  ) : "Needs Credentials"}
                 </strong>
               </span>
             </div>

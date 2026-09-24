@@ -3,7 +3,7 @@
 /* eslint-disable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { CheckSquare, LoaderCircle, Plus, Save, Trash2 } from "lucide-react";
+import { CalendarDays, CheckSquare, LoaderCircle, Plus, Save, Trash2, Video } from "lucide-react";
 import { DeleteConfirmModal } from "./DeleteConfirmModal";
 import { PixelLoader } from "./PixelLoader";
 
@@ -386,7 +386,7 @@ export function ContentManager({ collection }: { collection: string }) {
                     {Boolean(item.budget) && <span className="text-[#838e7f]">· {String(item.budget)}</span>}
                     {Boolean(item.meetingDate) && (
                       <span className="text-white font-mono bg-[#162215] px-2 py-0.5 rounded-[2px] border border-[#c8ff3d33] text-[11px] inline-flex items-center gap-1">
-                        📅 {String(item.meetingDate)} at{" "}
+                        <CalendarDays size={12} /> {String(item.meetingDate)} at{" "}
                         {String(item.meetingTime || "11:00 AM")}
                       </span>
                     )}
@@ -397,7 +397,7 @@ export function ContentManager({ collection }: { collection: string }) {
                         rel="noreferrer"
                         className="text-[#c8ff3d] hover:underline text-[11px] font-mono inline-flex items-center gap-1 px-2 py-0.5 rounded-[2px] bg-[#c8ff3d10] border border-[#c8ff3d33]"
                       >
-                        📹 Google Meet
+                        <Video size={12} /> Google Meet
                       </a>
                     )}
                   </div>

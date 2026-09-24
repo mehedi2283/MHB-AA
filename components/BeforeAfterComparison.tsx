@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { AlertTriangle, CheckCircle2, Zap, Clock, ShieldAlert, Cpu, ArrowRight } from "lucide-react";
 import { PixelCard } from "./PixelCard";
+import { PixelButton } from "./PixelButton";
 import { playTacticalClick } from "@/lib/tactical-audio";
 
 export function BeforeAfterComparison() {
@@ -87,66 +88,50 @@ export function BeforeAfterComparison() {
         {/* View Switcher (Desktop & Mobile) */}
         <div className="flex items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-2 p-1 rounded bg-[#0d120d] border border-white/[0.08]">
-            <button
-              type="button"
+            <PixelButton
+              variant={viewMode === "comparison" ? "acid" : "secondary"}
               onClick={() => {
                 playTacticalClick();
                 setViewMode("comparison");
               }}
-              className={`px-3 py-1.5 text-xs font-mono font-bold rounded transition cursor-pointer ${
-                viewMode === "comparison"
-                  ? "bg-[#1f2b1c] text-[#c8ff3d] border border-[#c8ff3d]/40 shadow-sm"
-                  : "text-[#838e7f] hover:text-white"
-              }`}
+              className="px-3 py-1.5 text-xs font-bold"
             >
               Side-by-Side Matrix
-            </button>
-            <button
-              type="button"
+            </PixelButton>
+            <PixelButton
+              variant={viewMode === "interactive" ? "acid" : "secondary"}
               onClick={() => {
                 playTacticalClick();
                 setViewMode("interactive");
               }}
-              className={`px-3 py-1.5 text-xs font-mono font-bold rounded transition cursor-pointer ${
-                viewMode === "interactive"
-                  ? "bg-[#1f2b1c] text-[#c8ff3d] border border-[#c8ff3d]/40 shadow-sm"
-                  : "text-[#838e7f] hover:text-white"
-              }`}
+              className="px-3 py-1.5 text-xs font-bold"
             >
               Interactive Focus Toggle
-            </button>
+            </PixelButton>
           </div>
 
           {viewMode === "interactive" && (
             <div className="flex items-center gap-2">
-              <button
-                type="button"
+              <PixelButton
+                variant={activeTab === "before" ? "danger" : "secondary"}
                 onClick={() => {
                   playTacticalClick();
                   setActiveTab("before");
                 }}
-                className={`px-3 py-1 text-xs font-mono rounded font-bold transition cursor-pointer ${
-                  activeTab === "before"
-                    ? "bg-rose-950/60 text-rose-300 border border-rose-600"
-                    : "text-[#838e7f] hover:text-white"
-                }`}
+                className="px-3 py-1 text-xs font-bold"
               >
-                ⚠️ Legacy Manual
-              </button>
-              <button
-                type="button"
+                <AlertTriangle size={13} /> Legacy Manual
+              </PixelButton>
+              <PixelButton
+                variant={activeTab === "after" ? "acid" : "secondary"}
                 onClick={() => {
                   playTacticalClick();
                   setActiveTab("after");
                 }}
-                className={`px-3 py-1 text-xs font-mono rounded font-bold transition cursor-pointer ${
-                  activeTab === "after"
-                    ? "bg-[#182615] text-[#c8ff3d] border border-[#c8ff3d]"
-                    : "text-[#838e7f] hover:text-white"
-                }`}
+                className="px-3 py-1 text-xs font-bold"
               >
-                ⚡ Autonomous AI
-              </button>
+                <Zap size={13} /> Autonomous AI
+              </PixelButton>
             </div>
           )}
         </div>

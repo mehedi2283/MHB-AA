@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import { Globe as GlobeIcon, LoaderCircle, Plus, Save, Trash2, MapPin, Navigation, ChevronDown, Search } from "lucide-react";
+import { Globe as GlobeIcon, LoaderCircle, Plus, Save, Trash2, MapPin, Navigation, ChevronDown, Search, Zap } from "lucide-react";
 import type { GlobeMarker, GlobeArc, SiteContent } from "@/lib/site-content";
 import { Globe } from "@/components/magicui/globe";
 import { SkeletonGlobeEditor } from "./SkeletonLoader";
@@ -556,7 +556,7 @@ export function GlobeContentEditor() {
 
             <div className="w-full p-3 rounded bg-black/40 border border-white/[0.06] text-center mt-3">
               <p className="text-[11px] text-white/70 leading-relaxed">
-                ✨ <strong>Instant Live Sync:</strong> Selecting any city above automatically updates the 3D coordinates and renders the pin & arc in real-time.
+                <span className="inline-flex items-center gap-1.5"><Zap size={12} className="text-[#c8ff3d]" /><strong>Instant Live Sync:</strong></span> Selecting any city above automatically updates the 3D coordinates and renders the pin & arc in real-time.
               </p>
             </div>
           </section>
