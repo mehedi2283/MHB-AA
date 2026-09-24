@@ -2,6 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element */
 import React, { useEffect, useState, useRef } from "react";
+import { createPortal } from "react-dom";
 import {
   Building2,
   CheckCircle2,
@@ -46,6 +47,7 @@ export type ClientRecord = {
   _id: string;
   name: string;
   email: string;
+  emails?: string[];
   phone?: string;
   company?: string;
   stage: "lead" | "contacted" | "audit_scheduled" | "proposal_sent" | "active_client" | "completed";
@@ -222,6 +224,7 @@ function CustomStageDropdown({
   onChange: (newStage: ClientRecord["stage"]) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const [menuPosition, setMenuPosition] = useState<{ top: number; left: number } | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const currentConfig = STAGES.find(s => s.key === currentStage) || STAGES[0];
   const CurrentIcon = currentConfig.icon;
@@ -236,6 +239,25 @@ function CustomStageDropdown({
       document.addEventListener("mousedown", handleClickOutside);
     }
     return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    const updatePosition = () => {
+      const rect = dropdownRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      const menuHeight = Math.min(280, STAGES.length * 38 + 42);
+      const top = rect.bottom + 6 + menuHeight <= window.innerHeight ? rect.bottom + 6 : Math.max(8, rect.top - menuHeight - 6);
+      const left = Math.min(Math.max(8, rect.right - 192), window.innerWidth - 200);
+      setMenuPosition({ top, left });
+    };
+    updatePosition();
+    window.addEventListener("resize", updatePosition);
+    window.addEventListener("scroll", updatePosition, true);
+    return () => {
+      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition, true);
+    };
   }, [open]);
 
   return (
@@ -255,8 +277,8 @@ function CustomStageDropdown({
         <ChevronDown size={11} className={`opacity-60 transition-transform ${open ? "rotate-180 opacity-100" : ""}`} />
       </button>
 
-      {open && (
-        <div className="absolute right-0 mt-1.5 w-48 bg-[#0d140d] border border-white/[0.15] rounded shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-xl p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150">
+      {open && menuPosition && typeof document !== "undefined" && createPortal(
+        <div style={{ top: menuPosition.top, left: menuPosition.left }} className="fixed w-48 bg-[#0d140d] border border-white/[0.15] rounded shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-xl p-1.5 z-[1000000] animate-in fade-in zoom-in-95 duration-150">
           <div className="text-[9px] font-mono text-[#838e7f] uppercase tracking-wider px-2 py-1 border-b border-white/[0.06] mb-1">
             MOVE STAGE
           </div>
@@ -285,7 +307,8 @@ function CustomStageDropdown({
               </button>
             );
           })}
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
@@ -310,6 +333,7 @@ export function ClientHubManager() {
   const [selectedTemplate, setSelectedTemplate] = useState(OUTREACH_TEMPLATES[0].id);
   const [outreachSubject, setOutreachSubject] = useState("");
   const [outreachBody, setOutreachBody] = useState("");
+  const [selectedRecipients, setSelectedRecipients] = useState<string[]>([]);
   const [isSendingOutreach, setIsSendingOutreach] = useState(false);
   const [activeOutreachTab, setActiveOutreachTab] = useState<"edit" | "preview">("edit");
 
@@ -380,8 +404,35 @@ export function ClientHubManager() {
   // Open outreach modal pre-filled
   function handleOpenOutreach(client: ClientRecord) {
     setOutreachTarget(client);
+    setSelectedRecipients(getClientEmails(client));
     applyTemplate(OUTREACH_TEMPLATES[0].id, client);
     setActiveOutreachTab("edit");
+  }
+
+  function getClientEmails(client: Pick<ClientRecord, "email" | "emails">) {
+    return Array.from(new Set([client.email, ...(client.emails || [])]
+      .map(email => email.trim().toLowerCase())
+      .filter(email => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))));
+  }
+
+  function addClientEmail() {
+    if (!editingClient) return;
+    const emails = Array.from(new Set([...(editingClient.emails || []), editingClient.email || ""]
+      .map(email => email.trim().toLowerCase())
+      .filter(Boolean)));
+    setEditingClient({ ...editingClient, emails: [...emails, ""] });
+  }
+
+  function updateClientEmail(index: number, value: string) {
+    if (!editingClient) return;
+    const emails = [...(editingClient.emails || [])];
+    emails[index] = value;
+    setEditingClient({ ...editingClient, emails });
+  }
+
+  function removeClientEmail(index: number) {
+    if (!editingClient) return;
+    setEditingClient({ ...editingClient, emails: (editingClient.emails || []).filter((_, emailIndex) => emailIndex !== index) });
   }
 
   function applyTemplate(templateId: string, client: ClientRecord) {
@@ -406,7 +457,7 @@ export function ClientHubManager() {
   }
 
   async function handleSendOutreach() {
-    if (!outreachTarget || !outreachTarget.email) {
+    if (!outreachTarget || selectedRecipients.length === 0) {
       setNotice({ type: "error", message: "Client does not have a valid email address." });
       return;
     }
@@ -420,7 +471,8 @@ export function ClientHubManager() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           clientId: outreachTarget._id,
-          to: outreachTarget.email,
+          to: selectedRecipients[0],
+          recipients: selectedRecipients,
           clientName: outreachTarget.name,
           company: outreachTarget.company,
           projectName: outreachTarget.projectName,
@@ -433,7 +485,7 @@ export function ClientHubManager() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to send email.");
 
-      setNotice({ type: "success", message: `⚡ Cold outreach successfully sent to ${outreachTarget.email}!` });
+      setNotice({ type: "success", message: `⚡ Cold outreach successfully sent to ${selectedRecipients.join(", ")}!` });
       setOutreachTarget(null);
       await loadClients();
     } catch (err: any) {
@@ -1161,7 +1213,7 @@ export function ClientHubManager() {
 
                     <div>
                       <label className="block text-[11px] font-mono font-semibold text-[#a4ada0] mb-1.5">
-                        Email Address <span className="text-[#c8ff3d]">*</span>
+                        Primary Email Address <span className="text-[#c8ff3d]">*</span>
                       </label>
                       <input
                         type="email"
@@ -1171,6 +1223,32 @@ export function ClientHubManager() {
                         placeholder="e.g. vance@vancecold.com"
                         className="w-full bg-[#080c08] border border-white/[0.12] focus:border-[#c8ff3d] rounded px-3.5 py-2.5 text-xs text-white placeholder:text-[#505a4e] outline-none transition font-sans"
                       />
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="block text-[11px] font-mono font-semibold text-[#a4ada0]">
+                          Additional Email Addresses
+                        </label>
+                        <button type="button" onClick={addClientEmail} className="text-[10px] font-mono font-bold text-[#c8ff3d] hover:text-white flex items-center gap-1">
+                          <Plus size={12} /> Add Email
+                        </button>
+                      </div>
+                      {(editingClient.emails || []).map((email, index) => (
+                        <div key={index} className="flex items-center gap-2 mb-2">
+                          <input
+                            type="email"
+                            value={email}
+                            onChange={e => updateClientEmail(index, e.target.value)}
+                            placeholder="e.g. finance@client.com"
+                            className="flex-1 bg-[#080c08] border border-white/[0.12] focus:border-[#c8ff3d] rounded px-3.5 py-2.5 text-xs text-white placeholder:text-[#505a4e] outline-none transition font-sans"
+                          />
+                          <button type="button" onClick={() => removeClientEmail(index)} className="size-9 grid place-items-center rounded border border-white/[0.1] text-[#838e7f] hover:text-[#ff8888] hover:border-[#ff5555]">
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
+                      ))}
+                      <p className="text-[10px] font-mono text-[#5f685c]">The primary address remains the default recipient.</p>
                     </div>
 
                     <div>
@@ -1539,6 +1617,28 @@ export function ClientHubManager() {
                 </div>
               </div>
 
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-[11px] font-mono font-semibold text-[#a4ada0]">
+                    Select Recipients
+                  </label>
+                  <span className="text-[10px] font-mono text-[#838e7f]">{selectedRecipients.length} selected</span>
+                </div>
+                <div className="space-y-2">
+                  {getClientEmails(outreachTarget).map(email => (
+                    <label key={email} className="flex items-center gap-2 text-xs font-mono text-[#d0dad0] cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={selectedRecipients.includes(email)}
+                        onChange={e => setSelectedRecipients(current => e.target.checked ? [...current, email] : current.filter(item => item !== email))}
+                        className="accent-[#c8ff3d]"
+                      />
+                      <span>{email}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
               {/* Tabs: Edit vs Live Email Preview */}
               <div className="flex border-b border-white/[0.08] gap-4">
                 <button
@@ -1600,7 +1700,7 @@ export function ClientHubManager() {
                     <div className="h-1 bg-gradient-to-r from-[#c8ff3d] via-[#8aff00] to-[#c8ff3d]" />
                     <div className="p-5 sm:p-6 text-white space-y-4">
                       <div className="border-b border-[#1a2419] pb-3 text-xs font-mono text-[#838e7f] space-y-1">
-                        <div>To: <span className="text-[#c8ff3d]">{outreachTarget.email}</span></div>
+                        <div>To: <span className="text-[#c8ff3d]">{selectedRecipients.join(", ")}</span></div>
                         <div>Subject: <span className="text-white font-bold">{outreachSubject}</span></div>
                       </div>
                       <div

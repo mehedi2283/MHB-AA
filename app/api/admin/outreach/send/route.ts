@@ -12,6 +12,7 @@ export async function POST(req: NextRequest) {
     const {
       clientId,
       to,
+      recipients,
       clientName,
       company,
       projectName,
@@ -21,7 +22,12 @@ export async function POST(req: NextRequest) {
       customBodyText,
     } = body;
 
-    if (!to || !to.includes("@")) {
+    const recipientList = Array.from(new Set([
+      ...(Array.isArray(recipients) ? recipients : []),
+      ...(typeof to === "string" ? [to] : []),
+    ].map(email => email.trim().toLowerCase()).filter(email => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))));
+
+    if (recipientList.length === 0) {
       return NextResponse.json({ error: "Valid recipient email address is required." }, { status: 400 });
     }
 
@@ -56,14 +62,18 @@ export async function POST(req: NextRequest) {
       customBodyHtml.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 
     // Send via connected Gmail account
-    const sent = await sendGmailMessage({
-      to,
-      subject,
-      bodyHtml: fullHtml,
-      bodyText: plainText,
-    });
+    const failedRecipients: string[] = [];
+    for (const recipient of recipientList) {
+      const sent = await sendGmailMessage({
+        to: recipient,
+        subject,
+        bodyHtml: fullHtml,
+        bodyText: plainText,
+      });
+      if (!sent) failedRecipients.push(recipient);
+    }
 
-    if (!sent) {
+    if (failedRecipients.length === recipientList.length) {
       return NextResponse.json(
         { error: "Failed to send email via Google Gmail API. Please verify your Google OAuth tokens in Settings." },
         { status: 500 }
@@ -77,13 +87,11 @@ export async function POST(req: NextRequest) {
         const clientDoc = allClients.find(c => c._id === clientId);
         if (clientDoc) {
           const pastHistory = Array.isArray(clientDoc.outreachHistory) ? clientDoc.outreachHistory : [];
+          const sentAt = new Date().toISOString();
           const updatedHistory = [
-            {
-              sentAt: new Date().toISOString(),
-              subject,
-              to,
-              status: "sent",
-            },
+            ...recipientList
+              .filter(recipient => !failedRecipients.includes(recipient))
+              .map(recipient => ({ sentAt, subject, to: recipient, status: "sent" })),
             ...pastHistory,
           ];
 
@@ -99,7 +107,10 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    return NextResponse.json({ ok: true, message: `Email successfully sent to ${to}` });
+    if (failedRecipients.length > 0) {
+      return NextResponse.json({ ok: true, message: `Email sent to ${recipientList.length - failedRecipients.length} recipient(s).`, failedRecipients }, { status: 207 });
+    }
+    return NextResponse.json({ ok: true, message: `Email successfully sent to ${recipientList.join(", ")}` });
   } catch (error) {
     if (isUnauthorizedError(error)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     console.error("Cold outreach sending error:", error);
