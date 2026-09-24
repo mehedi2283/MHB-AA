@@ -662,7 +662,7 @@ export function ClientHubManager() {
         <div className="flex items-center gap-2">
           <button
             onClick={loadClients}
-            className="admin-button admin-button-quiet size-9 p-0 flex items-center justify-center"
+            className="admin-icon-button"
             title="Refresh database"
             aria-label="Refresh database"
           >
@@ -956,7 +956,7 @@ export function ClientHubManager() {
                         <div className="flex items-center justify-end gap-2">
                           <button
                             onClick={() => handleOpenOutreach(client)}
-                            className="size-8 p-0 rounded border border-[#c8ff3d] bg-[#1a2517] hover:bg-[#c8ff3d] text-[#c8ff3d] hover:text-black transition flex items-center justify-center"
+                            className="admin-icon-button border-[#c8ff3d] bg-[#1a2517] hover:bg-[#c8ff3d] text-[#c8ff3d] hover:text-black"
                             title="Send cold email"
                             aria-label="Send cold email"
                           >
@@ -964,7 +964,7 @@ export function ClientHubManager() {
                           </button>
                           <button
                             onClick={() => setEditingClient(client)}
-                            className="admin-button admin-button-quiet size-8 p-0 flex items-center justify-center"
+                            className="admin-icon-button"
                             title="Edit client"
                             aria-label="Edit client"
                           >
@@ -972,7 +972,7 @@ export function ClientHubManager() {
                           </button>
                           <button
                             onClick={() => handleDeleteClient(client._id, client.name)}
-                            className="admin-icon-button is-danger size-8 p-0 flex items-center justify-center"
+                            className="admin-icon-button is-danger"
                             title="Delete client"
                             aria-label="Delete client"
                           >
@@ -1131,7 +1131,7 @@ export function ClientHubManager() {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => handleOpenOutreach(client)}
-                      className="size-8 p-0 rounded border border-[#c8ff3d] bg-[#1a2517] hover:bg-[#c8ff3d] text-[#c8ff3d] hover:text-black transition flex items-center justify-center shadow-[0_0_15px_rgba(200,255,61,0.15)] cursor-pointer"
+                      className="admin-icon-button border-[#c8ff3d] bg-[#1a2517] hover:bg-[#c8ff3d] text-[#c8ff3d] hover:text-black shadow-[0_0_15px_rgba(200,255,61,0.15)] cursor-pointer"
                       title="Send cold email"
                       aria-label="Send cold email"
                     >
@@ -1140,7 +1140,7 @@ export function ClientHubManager() {
 
                     <button
                       onClick={() => setEditingClient(client)}
-                      className="admin-button admin-button-quiet size-8 p-0 flex items-center justify-center"
+                      className="admin-icon-button"
                       title="Edit client"
                       aria-label="Edit client"
                     >
@@ -1149,7 +1149,7 @@ export function ClientHubManager() {
 
                     <button
                       onClick={() => handleDeleteClient(client._id, client.name)}
-                      className="admin-icon-button is-danger size-8 p-0 flex items-center justify-center"
+                      className="admin-icon-button is-danger"
                       title="Delete client"
                       aria-label="Delete client"
                     >

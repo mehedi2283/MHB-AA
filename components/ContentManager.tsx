@@ -3,7 +3,7 @@
 /* eslint-disable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { CalendarDays, CheckSquare, LoaderCircle, Plus, Save, Trash2, Video } from "lucide-react";
+import { CalendarDays, CheckSquare, LoaderCircle, Pencil, Plus, Save, Trash2, Video } from "lucide-react";
 import { DeleteConfirmModal } from "./DeleteConfirmModal";
 import { PixelLoader } from "./PixelLoader";
 
@@ -405,10 +405,12 @@ export function ContentManager({ collection }: { collection: string }) {
                 <div className="admin-row-actions shrink-0 flex items-center gap-2">
                   {editable && (
                     <button
-                      className="admin-button admin-button-quiet"
+                      className="admin-icon-button"
                       onClick={() => setEditing(item)}
+                      aria-label={`Edit ${String(item.name || item.title || item.email || "record")}`}
+                      title="Edit record"
                     >
-                      Edit
+                      <Pencil size={14} />
                     </button>
                   )}
                   <button

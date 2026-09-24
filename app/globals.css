@@ -4373,7 +4373,7 @@ select {
 }
 
 .admin-button {
-    min-height: 39px;
+    min-height: 36px;
     padding: 0 14px;
     display: inline-flex;
     align-items: center;
@@ -4408,16 +4408,17 @@ select {
 }
 
 .admin-button-quiet {
-    min-height: 31px;
-    padding-inline: 11px;
+    min-height: 36px;
+    padding-inline: 14px;
     background: transparent
 }
 
 .admin-icon-button {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     display: grid;
-    place-items: center
+    place-items: center;
+    flex: 0 0 36px
 }
 
 .admin-icon-button.is-danger {
@@ -6283,4 +6284,126 @@ svg *,
   );
   animation: skeleton-wave 2.2s infinite cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+/* ========================================================================== */
+/* Universal Lift-Up & Scale Button Hover Animation System                     */
+/* Applied to all buttons, action CTAs, and interactive links across the site */
+/* ========================================================================== */
+
+/* Base transition for smooth lift-up & scale */
+button:not(:disabled):not(.no-lift),
+a.btn,
+a.os-nav-connect,
+a.os-action-primary,
+a.os-action-ghost,
+a.case-cta-primary,
+a.case-next,
+.admin-button:not(:disabled),
+.admin-icon-button:not(:disabled),
+.admin-auth-submit:not(:disabled),
+.pixel-btn:not([disabled]),
+.os-nav-connect {
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease, background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease !important;
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Hover: Smooth Lift Up & Scale */
+button:not(:disabled):not(.no-lift):hover,
+a.btn:hover,
+a.os-nav-connect:hover,
+a.os-action-primary:hover,
+a.os-action-ghost:hover,
+a.case-cta-primary:hover,
+a.case-next:hover,
+.admin-button:not(:disabled):hover,
+.admin-icon-button:not(:disabled):hover,
+.admin-auth-submit:not(:disabled):hover,
+.pixel-btn:not([disabled]):hover,
+.os-nav-connect:hover {
+  transform: translateY(-2.5px) scale(1.03) !important;
+}
+
+/* Primary / Acid Neon Buttons: Enhanced Glow & Pop */
+.os-nav-connect:hover,
+.btn-primary:hover,
+.os-action-primary:hover,
+.case-cta-primary:hover,
+.admin-button-primary:hover,
+.admin-auth-submit:hover,
+.pixel-btn.bg-\[\#c8ff3d\]:hover,
+button[class*="bg-[#c8ff3d]"]:not(:disabled):hover,
+a[class*="bg-[#c8ff3d]"]:hover {
+  background: #d4ff55 !important;
+  color: #080a07 !important;
+  box-shadow: 0 0 28px rgba(200, 255, 61, 0.55), 0 8px 24px rgba(200, 255, 61, 0.32) !important;
+}
+
+/* Secondary / Glass / Ghost Buttons: Crisp Ambient Lift */
+.os-action-ghost:hover,
+.btn:not(.btn-primary):hover,
+.admin-button:not(.admin-button-primary):not(:disabled):hover,
+.case-next:hover,
+button[class*="bg-white"]:not(:disabled):hover,
+a[class*="bg-white"]:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6), 0 0 16px rgba(200, 255, 61, 0.2) !important;
+  border-color: rgba(200, 255, 61, 0.45) !important;
+}
+
+/* Danger / Rose Red Buttons: Aggressive Warning Lift */
+button[class*="rose"]:not(:disabled):hover,
+button[class*="danger"]:not(:disabled):hover,
+.pixel-btn.bg-rose-600:hover {
+  box-shadow: 0 8px 25px rgba(244, 63, 94, 0.45) !important;
+  background: #f43f5e !important;
+}
+
+/* Active / Press Response (Satisfying tactile click on all buttons) */
+button:not(:disabled):not(.no-lift):active,
+a.btn:active,
+a.os-nav-connect:active,
+a.os-action-primary:active,
+a.os-action-ghost:active,
+a.case-cta-primary:active,
+a.case-next:active,
+.admin-button:not(:disabled):active,
+.admin-icon-button:not(:disabled):active,
+.admin-auth-submit:not(:disabled):active,
+.pixel-btn:not([disabled]):active,
+.os-nav-connect:active {
+  transform: translateY(0.5px) scale(0.97) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) !important;
+  transition: transform 0.08s ease !important;
+}
+
+/* Inner Icons & Arrow dynamic micro-translations on hover */
+.os-nav-connect svg,
+.os-action-primary svg,
+.btn svg,
+.admin-button svg,
+.pixel-btn svg,
+button:not(:disabled) svg {
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.os-nav-connect:hover svg,
+.pixel-btn:hover svg[class*="ArrowUpRight"],
+button:not(:disabled):hover svg[class*="ArrowUpRight"],
+a:hover svg[class*="ArrowUpRight"] {
+  transform: translate(2.5px, -2.5px) !important;
+}
+
+.pixel-btn:hover svg[class*="ArrowRight"],
+button:not(:disabled):hover svg[class*="ArrowRight"],
+a:hover svg[class*="ArrowRight"],
+.case-cta-primary:hover svg {
+  transform: translateX(3.5px) !important;
+}
+
+.pixel-btn:hover svg[class*="ArrowDown"],
+button:not(:disabled):hover svg[class*="ArrowDown"],
+a:hover svg[class*="ArrowDown"] {
+  transform: translateY(2.5px) !important;
+}
+
 
