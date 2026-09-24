@@ -39,6 +39,7 @@ import {
   Save,
   Globe,
   LoaderCircle,
+  Pencil,
 } from "lucide-react";
 import { DeleteConfirmModal } from "./DeleteConfirmModal";
 import { PixelLoader } from "./PixelLoader";
@@ -654,11 +655,11 @@ export function ClientHubManager() {
         <div className="flex items-center gap-2">
           <button
             onClick={loadClients}
-            className="admin-button admin-button-quiet text-xs py-2 px-3 flex items-center gap-1.5"
+            className="admin-button admin-button-quiet size-9 p-0 flex items-center justify-center"
             title="Refresh database"
+            aria-label="Refresh database"
           >
             <RefreshCw size={13} className={loading ? "animate-spin" : ""} />
-            <span>Sync</span>
           </button>
 
           <button
@@ -948,21 +949,25 @@ export function ClientHubManager() {
                         <div className="flex items-center justify-end gap-2">
                           <button
                             onClick={() => handleOpenOutreach(client)}
-                            className="text-[11px] font-mono font-bold bg-[#1a2517] hover:bg-[#c8ff3d] text-[#c8ff3d] hover:text-black border border-[#c8ff3d] px-2.5 py-1 rounded transition flex items-center gap-1"
+                            className="size-8 p-0 rounded border border-[#c8ff3d] bg-[#1a2517] hover:bg-[#c8ff3d] text-[#c8ff3d] hover:text-black transition flex items-center justify-center"
+                            title="Send cold email"
+                            aria-label="Send cold email"
                           >
                             <Send size={11} />
-                            <span>Cold Email</span>
                           </button>
                           <button
                             onClick={() => setEditingClient(client)}
-                            className="admin-button admin-button-quiet text-[11px] py-1 px-2"
+                            className="admin-button admin-button-quiet size-8 p-0 flex items-center justify-center"
+                            title="Edit client"
+                            aria-label="Edit client"
                           >
-                            Edit
+                            <Pencil size={12} />
                           </button>
                           <button
                             onClick={() => handleDeleteClient(client._id, client.name)}
-                            className="admin-icon-button is-danger p-1"
+                            className="admin-icon-button is-danger size-8 p-0 flex items-center justify-center"
                             title="Delete client"
+                            aria-label="Delete client"
                           >
                             <Trash2 size={12} />
                           </button>
@@ -1119,23 +1124,27 @@ export function ClientHubManager() {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => handleOpenOutreach(client)}
-                      className="text-xs font-mono font-bold bg-[#1a2517] hover:bg-[#c8ff3d] text-[#c8ff3d] hover:text-black border border-[#c8ff3d] px-3 py-1.5 rounded transition flex items-center gap-1.5 shadow-[0_0_15px_rgba(200,255,61,0.15)] cursor-pointer"
+                      className="size-8 p-0 rounded border border-[#c8ff3d] bg-[#1a2517] hover:bg-[#c8ff3d] text-[#c8ff3d] hover:text-black transition flex items-center justify-center shadow-[0_0_15px_rgba(200,255,61,0.15)] cursor-pointer"
+                      title="Send cold email"
+                      aria-label="Send cold email"
                     >
                       <Send size={12} />
-                      <span>Cold Email</span>
                     </button>
 
                     <button
                       onClick={() => setEditingClient(client)}
-                      className="admin-button admin-button-quiet text-xs py-1.5 px-2.5"
+                      className="admin-button admin-button-quiet size-8 p-0 flex items-center justify-center"
+                      title="Edit client"
+                      aria-label="Edit client"
                     >
-                      Edit
+                      <Pencil size={12} />
                     </button>
 
                     <button
                       onClick={() => handleDeleteClient(client._id, client.name)}
-                      className="admin-icon-button is-danger p-1.5"
+                      className="admin-icon-button is-danger size-8 p-0 flex items-center justify-center"
                       title="Delete client"
+                      aria-label="Delete client"
                     >
                       <Trash2 size={13} />
                     </button>
